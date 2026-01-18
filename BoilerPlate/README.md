@@ -2,6 +2,21 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+Quick additions in this workspace:
+
+- Added React Router and two pages: `Home` and `About`.
+- Added components: `NavBar`, `FeatureCard`, `ToggleButton`.
+- Added `dev:open` npm script to open the dev server in the browser.
+
+Run the project locally:
+
+```bash
+npm install
+npm run dev:open
+```
+
+The `ToggleButton` demonstrates `useState`; `FeatureCard` accepts `title` and `description` props.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
