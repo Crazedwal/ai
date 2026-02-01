@@ -1,27 +1,47 @@
 // src/hooks/useChat.js
 import { useState, useCallback } from "react"
-import { mockConversations, generateMockResponse } from "../lib/mockData"
+import { sendMessage as sendToAPI } from "@/lib/api"
 
 export function useChat() {
-  const [conversations, setConversations] = useState(mockConversations)
-  const [activeConversationId, setActiveConversationId] = useState(
-    mockConversations[0]?.id || null
-  )
+  // ═══════════════════════════════════════════════════════════════
+  // STATE: All the data our chat needs to track
+  // ═══════════════════════════════════════════════════════════════
+  const [conversations, setConversations] = useState([
+    {
+      id: "1",
+      title: "New Chat",
+      messages: [],
+      createdAt: new Date().toISOString()
+    }
+  ])
+  const [activeId, setActiveId] = useState("1")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  // Get current conversation
-  const activeConversation = conversations.find(
-    c => c.id === activeConversationId
-  )
+  // ═══════════════════════════════════════════════════════════════
+  // SYSTEM MESSAGE: Defines AI personality (sent with every request)
+  // ═══════════════════════════════════════════════════════════════
+  const systemMessage = {
+    role: "system",
+    content: "You are a helpful AI assistant. Be friendly, concise, and informative."
+  }
 
-  // Get messages for current conversation
+  // ═══════════════════════════════════════════════════════════════
+  // DERIVED STATE: Computed from our main state
+  // ═══════════════════════════════════════════════════════════════
+  const activeConversation = conversations.find(c => c.id === activeId)
   const messages = activeConversation?.messages || []
 
-  // Send a new message
+  // ═══════════════════════════════════════════════════════════════
+  // SEND MESSAGE: The main function that handles user input
+  // ═══════════════════════════════════════════════════════════════
   const sendMessage = useCallback(async (content) => {
-    if (!activeConversationId) return
+    // Guard: Don't send empty messages
+    if (!content.trim()) return
 
-    // Create user message
+    setError(null)  // Clear any previous error
+
+    // Step 1: Create the user's message object
     const userMessage = {
       id: Date.now().toString(),
       role: "user",
@@ -29,70 +49,91 @@ export function useChat() {
       timestamp: new Date().toISOString()
     }
 
-    // Add user message to conversation
+    // Step 2: Immediately add user message to UI (optimistic update)
     setConversations(prev => prev.map(conv => {
-      if (conv.id === activeConversationId) {
+      if (conv.id === activeId) {
         return {
           ...conv,
           messages: [...conv.messages, userMessage],
-          lastMessage: content
+          // Set title from first message
+          title: conv.messages.length === 0
+            ? content.slice(0, 30) + "..."
+            : conv.title
         }
       }
       return conv
     }))
 
-    // Simulate AI response
+    // Step 3: Build the message array for the API
+    // (includes system message + full conversation history)
+    const currentConvo = conversations.find(c => c.id === activeId)
+    const apiMessages = [
+      systemMessage,
+      ...currentConvo.messages.map(m => ({
+        role: m.role,
+        content: m.content
+      })),
+      { role: "user", content }
+    ]
+
+    // Step 4: Call the API
     setIsLoading(true)
 
-    // Simulate API delay (1-3 seconds)
-    await new Promise(resolve =>
-      setTimeout(resolve, 1000 + Math.random() * 2000)
-    )
+    try {
+      const aiResponse = await sendToAPI(apiMessages)
 
-    // Create AI response
-    const aiMessage = {
-      id: (Date.now() + 1).toString(),
-      role: "assistant",
-      content: generateMockResponse(content),
-      timestamp: new Date().toISOString()
-    }
-
-    // Add AI message to conversation
-    setConversations(prev => prev.map(conv => {
-      if (conv.id === activeConversationId) {
-        return {
-          ...conv,
-          messages: [...conv.messages, aiMessage],
-          lastMessage: aiMessage.content.slice(0, 50) + "..."
-        }
+      // Step 5: Add AI response to conversation
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: aiResponse,
+        timestamp: new Date().toISOString()
       }
-      return conv
-    }))
 
-    setIsLoading(false)
-  }, [activeConversationId])
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === activeId) {
+          return {
+            ...conv,
+            messages: [...conv.messages, aiMessage]
+          }
+        }
+        return conv
+      }))
 
-  // Create new conversation
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [activeId, conversations])
+
+  // ═══════════════════════════════════════════════════════════════
+  // CREATE NEW CHAT: Start a fresh conversation
+  // ═══════════════════════════════════════════════════════════════
   const createNewChat = useCallback(() => {
     const newConvo = {
       id: Date.now().toString(),
-      title: "New Conversation",
+      title: "New Chat",
       messages: [],
-      lastMessage: "",
       createdAt: new Date().toISOString()
     }
-
     setConversations(prev => [newConvo, ...prev])
-    setActiveConversationId(newConvo.id)
+    setActiveId(newConvo.id)
+    setError(null)
   }, [])
 
+  // ═══════════════════════════════════════════════════════════════
+  // RETURN: Everything components need to build the UI
+  // ═══════════════════════════════════════════════════════════════
   return {
     conversations,
     activeConversation,
     messages,
     isLoading,
+    error,
     sendMessage,
-    setActiveConversationId,
-    createNewChat
+    setActiveId,
+    createNewChat,
+    clearError: () => setError(null)
   }
 }

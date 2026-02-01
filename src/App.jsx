@@ -12,7 +12,7 @@ function AppContent() {
     messages,
     isLoading,
     sendMessage,
-    setActiveConversationId,
+    setActiveId,
     createNewChat
   } = useChat()
 
@@ -23,7 +23,7 @@ function AppContent() {
       <Sidebar
         conversations={conversations}
         activeId={activeConversation?.id}
-        onSelectConversation={setActiveConversationId}
+        onSelectConversation={setActiveId}
         onNewChat={createNewChat}
       />
       <ChatArea
@@ -47,3 +47,4 @@ function App() {
 }
 
 export default App
+

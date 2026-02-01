@@ -1,42 +1,57 @@
-// src/lib/api.js
+// src/lib/api.js - Add streaming function
 
-// The OpenRouter API endpoint
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-
-/**
- * Send a message to the AI and get a response
- * @param {Array} messages - The conversation history
- * @returns {Promise<string>} - The AI's response
- */
-export async function sendMessage(messages) {
-  // Step 1: Get the API key from environment
+export async function sendMessageStreaming(messages, onChunk) {
   const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY
 
-  if (!apiKey) {
-    throw new Error("API key not found. Check your .env file!")
-  }
-
-  // Step 2: Make the API request
+  // Step 1: Make the request with stream: true
   const response = await fetch(OPENROUTER_URL, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": window.location.origin,  // Required by OpenRouter
-      "X-Title": "My ChatGPT Clone"            // Optional: identifies your app
+      "HTTP-Referer": window.location.origin,
+      "X-Title": "My ChatGPT Clone"
     },
     body: JSON.stringify({
-      model: "meta-llama/llama-3.3-70b-instruct:free",  // Free model!
-      messages: messages
+      model: "meta-llama/llama-3.3-70b-instruct:free",
+      messages: messages,
+      stream: true  // This enables streaming!
     })
   })
 
-  // Step 3: Check if the request succeeded
   if (!response.ok) {
     throw new Error(`API error: ${response.status}`)
   }
 
-  // Step 4: Parse and return the response
-  const data = await response.json()
-  return data.choices[0].message.content
+  // Step 2: Set up the stream reader
+  const reader = response.body.getReader()   // Gets a reader for the stream
+  const decoder = new TextDecoder()          // Converts bytes to text
+  let fullResponse = ""                       // Accumulates the complete response
+
+  // Step 3: Read chunks in a loop
+  while (true) {
+    const { done, value } = await reader.read()  // Get next chunk
+    if (done) break  // No more data
+
+    // Step 4: Decode and parse the chunk
+    const chunk = decoder.decode(value)
+    const lines = chunk.split("\n").filter(line => line.startsWith("data: "))
+
+    // Step 5: Extract content from each line
+    for (const line of lines) {
+      const data = line.slice(6)  // Remove "data: " prefix
+      if (data === "[DONE]") continue  // Stream complete signal
+
+      try {
+        const parsed = JSON.parse(data)
+        const content = parsed.choices?.[0]?.delta?.content || ""
+        fullResponse += content
+        onChunk(fullResponse)  // Update UI with accumulated text!
+      } catch {
+        // Skip invalid JSON (sometimes happens between chunks)
+      }
+    }
+  }
+
+  return fullResponse
 }
