@@ -1,15 +1,49 @@
-import { Button } from "@/components/ui/button";
+// src/App.jsx
+import { useChat } from "./hooks/useChat"
+import { ThemeProvider } from "./hooks/useTheme.jsx"
+import { LanguageProvider } from "./hooks/useLanguage.jsx"
+import Sidebar from "./components/ui/sidebar/Sidebar"
+import ChatArea from "./components/ui/chat/ChatArea"
+
+function AppContent() {
+  const {
+    conversations,
+    activeConversation,
+    messages,
+    isLoading,
+    sendMessage,
+    setActiveConversationId,
+    createNewChat
+  } = useChat()
+
+  return (
+    <div
+      className="flex h-screen bg-white dark:bg-gray-900 transition-colors duration-300"
+    >
+      <Sidebar
+        conversations={conversations}
+        activeId={activeConversation?.id}
+        onSelectConversation={setActiveConversationId}
+        onNewChat={createNewChat}
+      />
+      <ChatArea
+        conversation={activeConversation}
+        messages={messages}
+        onSendMessage={sendMessage}
+        isLoading={isLoading}
+      />
+    </div>
+  )
+}
 
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold">My Application</h1>
-        <p className="text-muted-foreground">Start building something amazing</p>
-        <Button>Get Started</Button>
-      </div>
-    </div>
-  );
+    <ThemeProvider>
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
+    </ThemeProvider>
+  )
 }
 
-export default App;
+export default App
