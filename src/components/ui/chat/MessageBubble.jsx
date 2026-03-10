@@ -1,7 +1,13 @@
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import rehypeHighlight from "rehype-highlight"
+import "highlight.js/styles/github-dark.css"
 import { cn } from "@/lib/utils"
+import { useAssistantName } from "@/hooks/useAssistantName.jsx"
 
 function MessageBubble({ message }) {
   const isUser = message.role === "user"
+  const { assistantName } = useAssistantName()
 
   return (
     <div className={cn(
@@ -16,21 +22,58 @@ function MessageBubble({ message }) {
       )}>
         {/* Avatar and Label */}
         <div className="flex items-center gap-2 mb-1">
-          <div className={cn(
-            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-            isUser ? "bg-blue-700" : "bg-green-600"
-          )}>
-            {isUser ? "U" : "AI"}
-          </div>
+          {isUser ? (
+            <div className="w-6 h-6 rounded-full bg-blue-700 flex items-center justify-center text-xs font-bold">
+              U
+            </div>
+          ) : (
+            <img
+              src="/ai-avatar.png"
+              alt={assistantName}
+              className="w-6 h-6 rounded-full object-cover"
+            />
+          )}
           <span className="text-sm font-medium">
-            {isUser ? "You" : "Assistant"}
+            {isUser ? "You" : assistantName}
           </span>
         </div>
 
         {/* Message Content */}
-        <p className="text-sm leading-relaxed whitespace-pre-wrap">
-          {message.content}
-        </p>
+        <div className={cn(
+          "text-sm leading-relaxed prose prose-sm max-w-none",
+          isUser
+            ? "prose-invert"
+            : "dark:prose-invert"
+        )}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeHighlight]}
+            components={{
+              code({ className, children, ...props }) {
+                const isBlock = className?.startsWith("language-")
+                return isBlock ? (
+                  <code className={cn("rounded text-xs", className)} {...props}>
+                    {children}
+                  </code>
+                ) : (
+                  <code
+                    className={cn(
+                      "rounded px-1 py-0.5 text-xs font-mono",
+                      isUser
+                        ? "bg-blue-700/50"
+                        : "bg-gray-200 dark:bg-gray-700"
+                    )}
+                    {...props}
+                  >
+                    {children}
+                  </code>
+                )
+              }
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+        </div>
 
         {/* Timestamp */}
         <p className={cn(

@@ -13,7 +13,8 @@
       "Bash(npm run format:*)",
       "Bash(npm run build:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nSet up React + Vite + Tailwind v4 + shadcn/ui project\n\n- Updated Tailwind CSS to v4.1.14 and @tailwindcss/vite plugin\n- Created tailwind.config.ts for CSS-first configuration\n- Set up Prettier for code formatting with ESLint integration\n- Added TypeScript type checking script\n- Installed shadcn/ui components (Button, Card, Badge)\n- Created demo page showcasing all component variants\n- Configured path aliases (@/*) for clean imports\n- Added format:check, format, and type-check npm scripts\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []

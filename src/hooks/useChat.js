@@ -1,8 +1,12 @@
 // src/hooks/useChat.js
 import { useState, useCallback } from "react"
 import { sendMessage as sendToAPI } from "@/lib/api"
+import { useModel } from "@/hooks/useModel"
+import { useTokens } from "@/hooks/useTokens"
 
 export function useChat() {
+  const { selectedModel } = useModel()
+  const { canAfford, spendTokens } = useTokens()
   // ═══════════════════════════════════════════════════════════════
   // STATE: All the data our chat needs to track
   // ═══════════════════════════════════════════════════════════════
@@ -76,13 +80,24 @@ export function useChat() {
       { role: "user", content }
     ]
 
-    // Step 4: Call the API
+    // Step 4: Check token balance for paid models
+    if (selectedModel.tier === "paid" && !canAfford(selectedModel.tokensPerMessage)) {
+      setError(`Not enough tokens. This model costs ${selectedModel.tokensPerMessage} tokens per message. Buy more tokens to continue.`)
+      return
+    }
+
+    // Step 5: Call the API
     setIsLoading(true)
 
     try {
-      const aiResponse = await sendToAPI(apiMessages)
+      const aiResponse = await sendToAPI(apiMessages, selectedModel.id)
 
-      // Step 5: Add AI response to conversation
+      // Deduct tokens for paid models
+      if (selectedModel.tier === "paid") {
+        spendTokens(selectedModel.tokensPerMessage)
+      }
+
+      // Step 6: Add AI response to conversation
       const aiMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -105,7 +120,7 @@ export function useChat() {
     } finally {
       setIsLoading(false)
     }
-  }, [activeId, conversations])
+  }, [activeId, conversations, selectedModel, canAfford, spendTokens])
 
   // ═══════════════════════════════════════════════════════════════
   // CREATE NEW CHAT: Start a fresh conversation
