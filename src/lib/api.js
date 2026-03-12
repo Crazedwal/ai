@@ -31,7 +31,7 @@ export async function sendMessage(messages, modelId = "nvidia/nemotron-3-nano-30
   return data.choices?.[0]?.message?.content || "No response from AI."
 }
 
-export async function sendMessageStreaming(messages, onChunk) {
+export async function sendMessageStreaming(messages, onChunk, modelId = "nvidia/nemotron-3-nano-30b-a3b:free") {
   const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY
 
   const response = await fetch(OPENROUTER_URL, {
@@ -43,7 +43,7 @@ export async function sendMessageStreaming(messages, onChunk) {
       "X-Title": "My ChatGPT Clone"
     },
     body: JSON.stringify({
-      model: "nvidia/nemotron-3-nano-30b-a3b:free",
+      model: modelId,
       messages: messages,
       stream: true
     })

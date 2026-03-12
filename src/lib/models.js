@@ -26,6 +26,30 @@ export const MODELS = [
     tokensPerMessage: 0,
     description: "Google's open model"
   },
+  {
+    id: "deepseek/deepseek-chat-v3-0324:free",
+    name: "DeepSeek V3",
+    provider: "DeepSeek",
+    tier: "free",
+    tokensPerMessage: 0,
+    description: "Strong coding & reasoning"
+  },
+  {
+    id: "deepseek/deepseek-r1:free",
+    name: "DeepSeek R1",
+    provider: "DeepSeek",
+    tier: "free",
+    tokensPerMessage: 0,
+    description: "Advanced reasoning"
+  },
+  {
+    id: "mistralai/mistral-7b-instruct:free",
+    name: "Mistral 7B",
+    provider: "Mistral",
+    tier: "free",
+    tokensPerMessage: 0,
+    description: "Fast European model"
+  },
 
   // ── Paid tier (still free on OpenRouter, but cost in-app tokens) ─
   {
