@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import ConversationList from "./ConversationList"
 import ModelSelector from "./ModelSelector"
 import PaymentPage from "@/components/ui/PaymentPage"
+import DevLog from "@/components/ui/DevLog"
 import { useLanguage } from "../../../hooks/useLanguage.jsx"
 import { useAssistantName } from "../../../hooks/useAssistantName.jsx"
 import { useTokens } from "../../../hooks/useTokens.jsx"
@@ -20,6 +21,7 @@ function Sidebar({
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState("")
   const [showPurchase, setShowPurchase] = useState(false)
+  const [showDevLog, setShowDevLog] = useState(false)
 
   const startEdit = () => { setNameDraft(assistantName); setEditingName(true) }
   const commitEdit = () => { changeName(nameDraft); setEditingName(false) }
@@ -118,9 +120,20 @@ function Sidebar({
           </select>
         </div>
 
+        {/* DevLog Button */}
+        <div className="p-3 border-t border-gray-700">
+          <button
+            onClick={() => setShowDevLog(true)}
+            className="w-full text-left text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            Changelog / Devlog / Reflection
+          </button>
+        </div>
+
       </aside>
 
       {showPurchase && <PaymentPage onClose={() => setShowPurchase(false)} />}
+      {showDevLog && <DevLog onClose={() => setShowDevLog(false)} />}
     </>
   )
 }
