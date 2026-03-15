@@ -2,17 +2,18 @@
 
 const CHANGELOG = [
   {
-    version: "0.4.0",
+    version: "1.2.0",
     date: "2026-03-15",
     changes: [
       "Removed login requirement — app is now open to anyone",
       "Added DeepSeek V3, DeepSeek R1, and Mistral 7B as free models",
       "Fixed streaming to respect selected model instead of always using Nemotron",
       "Removed Stripe/token payment system",
+      "Added Changelog / Devlog / Reflection page",
     ]
   },
   {
-    version: "0.3.0",
+    version: "1.1.0",
     date: "2026-03-15",
     changes: [
       "Added Google sign-in via Firebase Authentication",
@@ -23,22 +24,16 @@ const CHANGELOG = [
     ]
   },
   {
-    version: "0.2.0",
+    version: "1.0.0",
     date: "2026-03-15",
+    label: "Initial Release",
     changes: [
-      "Added model selector with free and paid tiers",
-      "Added token balance system",
-      "Added language selector",
-      "Added customizable assistant name",
-      "Added dark mode support",
-    ]
-  },
-  {
-    version: "0.1.0",
-    date: "2026-03-15",
-    changes: [
-      "Initial build — basic chat UI",
-      "OpenRouter API integration",
+      "Public release — app is live",
+      "Model selector with Nemotron, Llama 3.3 70B, and Gemma 3",
+      "Token balance system",
+      "Language selector",
+      "Customizable assistant name",
+      "Dark mode support",
       "Streaming responses",
       "Conversation history sidebar",
     ]
@@ -103,6 +98,7 @@ export default function DevLog({ onClose }) {
                 <div key={entry.version}>
                   <div className="flex items-baseline gap-2 mb-1">
                     <span className="font-mono text-white font-semibold">v{entry.version}</span>
+                    {entry.label && <span className="text-xs px-1.5 py-0.5 bg-blue-600 rounded text-white font-medium">{entry.label}</span>}
                     <span className="text-xs text-gray-500">{entry.date}</span>
                   </div>
                   <ul className="space-y-0.5 pl-3">
