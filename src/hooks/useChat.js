@@ -27,7 +27,7 @@ export function useChat() {
   // ═══════════════════════════════════════════════════════════════
   const systemMessage = {
     role: "system",
-    content: "You are a knowledgeable and confident AI. Give clear, concise answers — no fluff, no over-explaining. Be direct and smart. Keep responses short unless more detail is needed."
+    content: "You are a helpful AI assistant. Answer questions clearly and accurately. Keep responses reasonably brief — enough to fully answer the question without unnecessary filler."
   }
 
   // ═══════════════════════════════════════════════════════════════
