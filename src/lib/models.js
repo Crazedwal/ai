@@ -1,7 +1,6 @@
 // src/lib/models.js
 
 export const MODELS = [
-  // ── Free tier ──────────────────────────────────────────────────
   {
     id: "nvidia/nemotron-3-nano-30b-a3b:free",
     name: "Nemotron Nano 30B",
@@ -9,80 +8,6 @@ export const MODELS = [
     tier: "free",
     tokensPerMessage: 0,
     description: "Fast & lightweight"
-  },
-  {
-    id: "meta-llama/llama-3.3-70b-instruct:free",
-    name: "Llama 3.3 70B",
-    provider: "Meta",
-    tier: "free",
-    tokensPerMessage: 0,
-    description: "Great for general tasks"
-  },
-  {
-    id: "google/gemma-3-4b-it:free",
-    name: "Gemma 3 4B",
-    provider: "Google",
-    tier: "free",
-    tokensPerMessage: 0,
-    description: "Google's open model"
-  },
-  {
-    id: "deepseek/deepseek-chat-v3-0324:free",
-    name: "DeepSeek V3",
-    provider: "DeepSeek",
-    tier: "free",
-    tokensPerMessage: 0,
-    description: "Strong coding & reasoning"
-  },
-  {
-    id: "deepseek/deepseek-r1:free",
-    name: "DeepSeek R1",
-    provider: "DeepSeek",
-    tier: "free",
-    tokensPerMessage: 0,
-    description: "Advanced reasoning"
-  },
-  {
-    id: "mistralai/mistral-7b-instruct:free",
-    name: "Mistral 7B",
-    provider: "Mistral",
-    tier: "free",
-    tokensPerMessage: 0,
-    description: "Fast European model"
-  },
-
-  // ── Paid tier (still free on OpenRouter, but cost in-app tokens) ─
-  {
-    id: "mistralai/mistral-7b-instruct:free",
-    name: "Mistral 7B",
-    provider: "Mistral",
-    tier: "paid",
-    tokensPerMessage: 3,
-    description: "Fast European model"
-  },
-  {
-    id: "meta-llama/llama-3.3-70b-instruct:free",
-    name: "Llama 3.3 70B",
-    provider: "Meta",
-    tier: "paid",
-    tokensPerMessage: 5,
-    description: "Great for general tasks"
-  },
-  {
-    id: "deepseek/deepseek-chat-v3-0324:free",
-    name: "DeepSeek V3",
-    provider: "DeepSeek",
-    tier: "paid",
-    tokensPerMessage: 8,
-    description: "Strong coding & reasoning"
-  },
-  {
-    id: "deepseek/deepseek-r1:free",
-    name: "DeepSeek R1",
-    provider: "DeepSeek",
-    tier: "paid",
-    tokensPerMessage: 12,
-    description: "Advanced chain-of-thought reasoning"
   }
 ]
 
