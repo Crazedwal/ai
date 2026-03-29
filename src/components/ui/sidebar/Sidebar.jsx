@@ -9,6 +9,7 @@ import GambleModal from "@/components/ui/GambleModal"
 import { useLanguage } from "../../../hooks/useLanguage.jsx"
 import { useAssistantName } from "../../../hooks/useAssistantName.jsx"
 import { useTokens } from "../../../hooks/useTokens.jsx"
+import { useAuth } from "../../../hooks/useAuth.jsx"
 
 function Sidebar({
   conversations,
@@ -19,6 +20,7 @@ function Sidebar({
   const { t, language, changeLanguage, availableLanguages, languageNames } = useLanguage()
   const { assistantName, changeName } = useAssistantName()
   const { balance } = useTokens()
+  const { user, logOut } = useAuth()
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState("")
   const [showPurchase, setShowPurchase] = useState(false)
@@ -166,6 +168,19 @@ function Sidebar({
             <span>{playing ? "Playing..." : "Radio"}</span>
           </button>
         </div>
+
+        {/* Sign Out */}
+        {user && (
+          <div className="p-3 border-t border-gray-700">
+            <button
+              onClick={logOut}
+              className="w-full flex items-center gap-2 text-xs text-red-400 hover:text-red-300 transition-colors"
+            >
+              <span>→</span>
+              <span>Sign out</span>
+            </button>
+          </div>
+        )}
 
       </aside>
 
