@@ -87,6 +87,16 @@ export function QuestProvider({ children }) {
     })
   }
 
+  const setStat = (stat, value) => {
+    setStats(prev => {
+      if ((prev[stat] || 0) >= value) return prev
+      const next = { ...prev, [stat]: value }
+      const session = loadSession()
+      saveSession({ ...session, stats: next })
+      return next
+    })
+  }
+
   // Check completions
   useEffect(() => {
     const justDone = []
@@ -119,7 +129,7 @@ export function QuestProvider({ children }) {
   const resetLabel = `${minutes}:${String(seconds).padStart(2, "0")}`
 
   return (
-    <QuestContext.Provider value={{ quests, increment, newlyCompleted, clearNewlyCompleted, resetLabel }}>
+    <QuestContext.Provider value={{ quests, increment, setStat, newlyCompleted, clearNewlyCompleted, resetLabel }}>
       {children}
     </QuestContext.Provider>
   )

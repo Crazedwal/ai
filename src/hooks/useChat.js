@@ -8,7 +8,7 @@ import { useQuests } from "@/hooks/useQuests"
 export function useChat() {
   const { selectedModel } = useModel()
   const { canAfford, spendTokens } = useTokens()
-  const { increment } = useQuests()
+  const { increment, setStat } = useQuests()
   // ═══════════════════════════════════════════════════════════════
   // STATE: All the data our chat needs to track
   // ═══════════════════════════════════════════════════════════════
@@ -93,6 +93,8 @@ export function useChat() {
 
     try {
       increment("messagesSent")
+      const currentConvoMessages = (conversations.find(c => c.id === activeId)?.messages.filter(m => m.role === "user").length || 0) + 1
+      setStat("messagesInChat", currentConvoMessages)
       const aiResponse = await sendToAPI(apiMessages, selectedModel.id)
 
       // Deduct tokens for paid models
@@ -138,7 +140,8 @@ export function useChat() {
     setConversations(prev => [newConvo, ...prev])
     setActiveId(newConvo.id)
     setError(null)
-  }, [])
+    increment("chatsCreated")
+  }, [increment])
 
   // ═══════════════════════════════════════════════════════════════
   // RETURN: Everything components need to build the UI
