@@ -22,6 +22,22 @@ function Sidebar({
   const [nameDraft, setNameDraft] = useState("")
   const [showPurchase, setShowPurchase] = useState(false)
   const [showDevLog, setShowDevLog] = useState(false)
+  const [playing, setPlaying] = useState(false)
+  const audioRef = useState(() => {
+    const a = new Audio("https://www.myinstants.com/media/sounds/never-gonna-give-you-up.mp3")
+    a.loop = true
+    return a
+  })[0]
+
+  const toggleRadio = () => {
+    if (playing) {
+      audioRef.pause()
+      setPlaying(false)
+    } else {
+      audioRef.play()
+      setPlaying(true)
+    }
+  }
 
   const startEdit = () => { setNameDraft(assistantName); setEditingName(true) }
   const commitEdit = () => { changeName(nameDraft); setEditingName(false) }
@@ -127,6 +143,17 @@ function Sidebar({
             className="w-full text-left text-xs text-gray-500 hover:text-gray-300 transition-colors"
           >
             Changelog / Devlog / Reflection
+          </button>
+        </div>
+
+        {/* Radio */}
+        <div className="p-3 border-t border-gray-700">
+          <button
+            onClick={toggleRadio}
+            className="w-full flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            <span className={playing ? "animate-pulse text-green-400" : ""}>📻</span>
+            <span>{playing ? "Playing..." : "Radio"}</span>
           </button>
         </div>
 
