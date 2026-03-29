@@ -3,10 +3,12 @@ import { useState, useCallback } from "react"
 import { sendMessage as sendToAPI } from "@/lib/api"
 import { useModel } from "@/hooks/useModel"
 import { useTokens } from "@/hooks/useTokens"
+import { useQuests } from "@/hooks/useQuests"
 
 export function useChat() {
   const { selectedModel } = useModel()
   const { canAfford, spendTokens } = useTokens()
+  const { increment } = useQuests()
   // ═══════════════════════════════════════════════════════════════
   // STATE: All the data our chat needs to track
   // ═══════════════════════════════════════════════════════════════
@@ -90,6 +92,7 @@ export function useChat() {
     setIsLoading(true)
 
     try {
+      increment("messagesSent")
       const aiResponse = await sendToAPI(apiMessages, selectedModel.id)
 
       // Deduct tokens for paid models

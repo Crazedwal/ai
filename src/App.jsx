@@ -6,9 +6,11 @@ import { AssistantNameProvider } from "./hooks/useAssistantName.jsx"
 import { TokenProvider } from "./hooks/useTokens.jsx"
 import { ModelProvider } from "./hooks/useModel.jsx"
 import { AuthProvider, useAuth } from "./hooks/useAuth.jsx"
+import { QuestProvider } from "./hooks/useQuests.jsx"
 import Sidebar from "./components/ui/sidebar/Sidebar"
 import ChatArea from "./components/ui/chat/ChatArea"
 import LoginPage from "./components/ui/auth/LoginPage"
+import AfkCheck, { useAfkCheck } from "./components/ui/AfkCheck.jsx"
 
 function AppContent() {
   const {
@@ -21,6 +23,13 @@ function AppContent() {
     createNewChat
   } = useChat()
 
+  const { showAfk, blocked, handleConfirm, handleFail } = useAfkCheck()
+
+  const handleSend = (msg) => {
+    if (blocked) return
+    sendMessage(msg)
+  }
+
   return (
     <div className="flex h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
       <Sidebar
@@ -32,9 +41,11 @@ function AppContent() {
       <ChatArea
         conversation={activeConversation}
         messages={messages}
-        onSendMessage={sendMessage}
+        onSendMessage={handleSend}
         isLoading={isLoading}
+        blocked={blocked}
       />
+      {showAfk && <AfkCheck onConfirm={handleConfirm} onFail={handleFail} />}
     </div>
   )
 }
@@ -55,11 +66,13 @@ function AuthGate() {
   return (
     <LanguageProvider>
       <TokenProvider>
-        <ModelProvider>
-          <AssistantNameProvider>
-            <AppContent />
-          </AssistantNameProvider>
-        </ModelProvider>
+        <QuestProvider>
+          <ModelProvider>
+            <AssistantNameProvider>
+              <AppContent />
+            </AssistantNameProvider>
+          </ModelProvider>
+        </QuestProvider>
       </TokenProvider>
     </LanguageProvider>
   )

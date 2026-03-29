@@ -1,11 +1,13 @@
 // src/components/ui/GambleModal.jsx
 import { useState } from "react"
 import { useTokens } from "../../hooks/useTokens.jsx"
+import { useQuests } from "../../hooks/useQuests.jsx"
 
 const BETS = [5, 10, 25, 50]
 
 export default function GambleModal({ onClose }) {
   const { balance, spendTokens, addTokens } = useTokens()
+  const { increment } = useQuests()
   const [bet, setBet] = useState(10)
   const [result, setResult] = useState(null)
   const [spinning, setSpinning] = useState(false)
@@ -17,8 +19,10 @@ export default function GambleModal({ onClose }) {
 
     setTimeout(() => {
       const win = Math.random() < 0.45
+      increment("gamblesPlayed")
       if (win) {
         addTokens(bet)
+        increment("gamblesWon")
         setResult({ win: true, amount: bet })
       } else {
         spendTokens(bet)
