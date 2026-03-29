@@ -26,6 +26,7 @@ export default function GambleModal({ onClose }) {
         setResult({ win: true, amount: bet })
       } else {
         spendTokens(bet)
+        increment("gamblesLost")
         setResult({ win: false, amount: bet })
       }
       setSpinning(false)

@@ -2,7 +2,7 @@
 import { useQuests } from "../../hooks/useQuests.jsx"
 
 export default function QuestsModal({ onClose }) {
-  const { quests } = useQuests()
+  const { quests, resetLabel } = useQuests()
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
@@ -11,6 +11,11 @@ export default function QuestsModal({ onClose }) {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">📋 Quests</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white text-xl">×</button>
+        </div>
+
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <span>Resets in</span>
+          <span className="font-mono text-yellow-400 font-semibold">{resetLabel}</span>
         </div>
 
         <div className="space-y-3">
