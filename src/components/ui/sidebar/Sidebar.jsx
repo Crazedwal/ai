@@ -5,6 +5,7 @@ import ConversationList from "./ConversationList"
 import ModelSelector from "./ModelSelector"
 import PaymentPage from "@/components/ui/PaymentPage"
 import DevLog from "@/components/ui/DevLog"
+import GambleModal from "@/components/ui/GambleModal"
 import { useLanguage } from "../../../hooks/useLanguage.jsx"
 import { useAssistantName } from "../../../hooks/useAssistantName.jsx"
 import { useTokens } from "../../../hooks/useTokens.jsx"
@@ -22,6 +23,7 @@ function Sidebar({
   const [nameDraft, setNameDraft] = useState("")
   const [showPurchase, setShowPurchase] = useState(false)
   const [showDevLog, setShowDevLog] = useState(false)
+  const [showGamble, setShowGamble] = useState(false)
   const [playing, setPlaying] = useState(false)
   const audioRef = useState(() => {
     const a = new Audio("https://www.myinstants.com/media/sounds/never-gonna-give-you-up.mp3")
@@ -56,12 +58,20 @@ function Sidebar({
           <span className="text-sm text-gray-400">
             🪙 <span className="text-white font-semibold">{balance}</span> tokens
           </span>
-          <button
-            onClick={() => setShowPurchase(true)}
-            className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded font-medium transition-colors"
-          >
-            Buy
-          </button>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setShowGamble(true)}
+              className="text-xs px-2 py-1 bg-yellow-500 hover:bg-yellow-400 text-black rounded font-medium transition-colors"
+            >
+              🎰
+            </button>
+            <button
+              onClick={() => setShowPurchase(true)}
+              className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded font-medium transition-colors"
+            >
+              Buy
+            </button>
+          </div>
         </div>
 
         {/* New Chat Button */}
@@ -161,6 +171,7 @@ function Sidebar({
 
       {showPurchase && <PaymentPage onClose={() => setShowPurchase(false)} />}
       {showDevLog && <DevLog onClose={() => setShowDevLog(false)} />}
+      {showGamble && <GambleModal onClose={() => setShowGamble(false)} />}
     </>
   )
 }

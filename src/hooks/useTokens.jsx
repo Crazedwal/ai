@@ -5,7 +5,12 @@ const TokenContext = createContext()
 
 export function TokenProvider({ children }) {
   const [balance, setBalance] = useState(() => {
-    return parseInt(localStorage.getItem("tokenBalance") || "0", 10)
+    const stored = localStorage.getItem("tokenBalance")
+    if (stored === null) {
+      localStorage.setItem("tokenBalance", "50")
+      return 50
+    }
+    return parseInt(stored, 10)
   })
 
   const spendTokens = (amount) => {
