@@ -68,9 +68,9 @@ function Sidebar({
           <div className="flex gap-1">
             <button
               onClick={() => setShowGamble(true)}
-              className="text-xs px-2 py-1 bg-yellow-500 hover:bg-yellow-400 text-black rounded font-medium transition-colors"
+              className="text-xs px-2 py-1 bg-blue-500 hover:bg-blue-400 text-white rounded font-medium transition-colors"
             >
-              🎰
+              🔵
             </button>
             <button
               onClick={() => setShowPurchase(true)}
