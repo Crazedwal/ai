@@ -18,7 +18,6 @@ const MAX_VISUAL = 10
 
 const MULTIPLIERS = [500, 20, 5, 3, 2, 0, 1, 1, 1, 1, 0, 2, 3, 5, 20, 500]
 
-// Slot colors matching florr
 const SLOT_COLORS = {
   500: "#e03030",
   20:  "#e07020",
@@ -29,7 +28,6 @@ const SLOT_COLORS = {
   0:   "#444444",
 }
 
-// Ball colors matching florr chip style
 const BALL_COLORS = [
   "#44cc44", "#ddaa00", "#3399ee", "#9944ee",
   "#dd3333", "#ee6600", "#22bbaa", "#cc44aa",
@@ -73,7 +71,7 @@ function drawBall(ctx, x, y, color) {
   ctx.fillStyle = color
   ctx.fill()
 
-  // Inner ring (florr chip style)
+  // Inner ring
   ctx.beginPath()
   ctx.arc(x, y, BALL_R * 0.72, 0, Math.PI * 2)
   ctx.strokeStyle = "rgba(255,255,255,0.25)"
@@ -88,17 +86,19 @@ function drawBall(ctx, x, y, color) {
   ctx.stroke()
 
   // Shine highlight
-  const shine = ctx.createRadialGradient(
-    x - BALL_R * 0.32, y - BALL_R * 0.38, BALL_R * 0.05,
-    x - BALL_R * 0.1,  y - BALL_R * 0.1,  BALL_R
-  )
-  shine.addColorStop(0,   "rgba(255,255,255,0.75)")
-  shine.addColorStop(0.4, "rgba(255,255,255,0.15)")
-  shine.addColorStop(1,   "rgba(255,255,255,0)")
-  ctx.beginPath()
-  ctx.arc(x, y, BALL_R, 0, Math.PI * 2)
-  ctx.fillStyle = shine
-  ctx.fill()
+  try {
+    const shine = ctx.createRadialGradient(
+      x - BALL_R * 0.32, y - BALL_R * 0.38, BALL_R * 0.05,
+      x - BALL_R * 0.1,  y - BALL_R * 0.1,  BALL_R
+    )
+    shine.addColorStop(0,   "rgba(255,255,255,0.75)")
+    shine.addColorStop(0.4, "rgba(255,255,255,0.15)")
+    shine.addColorStop(1,   "rgba(255,255,255,0)")
+    ctx.beginPath()
+    ctx.arc(x, y, BALL_R, 0, Math.PI * 2)
+    ctx.fillStyle = shine
+    ctx.fill()
+  } catch (_) {}
 }
 
 function drawSlots(ctx, landedSlots) {
@@ -108,7 +108,7 @@ function drawSlots(ctx, landedSlots) {
     const y = BOARD_H
     const isLit = landedSlots.includes(i)
     const color = SLOT_COLORS[m] || "#444"
-    ctx.fillStyle = isLit ? lighten(color) : color
+    ctx.fillStyle = isLit ? "#ff6666" : color
     ctx.fillRect(x + 0.5, y + 1, slotW - 1, SLOT_H - 2)
 
     if (isLit) {
@@ -125,27 +125,26 @@ function drawSlots(ctx, landedSlots) {
   })
 }
 
-function lighten(hex) {
-  // Simple lighten — add white overlay
-  return hex  // handled via stroke highlight instead
-}
-
 export default function GambleModal({ onClose }) {
   const { balance, spendTokens, addTokens } = useTokens()
   const { increment } = useQuests()
-  const canvasRef    = useRef(null)
-  const animRef      = useRef(null)
-  const stateRef     = useRef({ dropping: false, allPaths: [], landedSlots: [] })
+  const canvasRef  = useRef(null)
+  const animRef    = useRef(null)
+  const addTokRef  = useRef(addTokens)
+  const incRef     = useRef(increment)
 
-  const [bet, setBet]         = useState(5)
+  useEffect(() => { addTokRef.current = addTokens }, [addTokens])
+  useEffect(() => { incRef.current = increment }, [increment])
+
+  const [bet, setBet]           = useState(5)
   const [dropping, setDropping] = useState(false)
-  const [result, setResult]   = useState(null)
+  const [result, setResult]     = useState(null)
 
-  // Draw static board (pegs + empty slots)
   const drawStatic = useCallback((landedSlots = []) => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext("2d")
+    if (!ctx) return
     ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
     ctx.fillStyle = "#5c1212"
     ctx.fillRect(0, 0, CANVAS_W, BOARD_H)
@@ -155,81 +154,6 @@ export default function GambleModal({ onClose }) {
     drawSlots(ctx, landedSlots)
   }, [])
 
-  // Animation loop
-  const startAnimation = useCallback((paths) => {
-    cancelAnimationFrame(animRef.current)
-    const startTime = performance.now()
-
-    const frame = (now) => {
-      const elapsed  = now - startTime
-      const rawStep  = elapsed / STEP_MS
-      const stepIdx  = Math.min(Math.floor(rawStep), ROWS - 1)
-      const t        = rawStep - stepIdx
-
-      const canvas = canvasRef.current
-      if (!canvas) return
-      const ctx = canvas.getContext("2d")
-
-      // Board
-      ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
-      ctx.fillStyle = "#5c1212"
-      ctx.fillRect(0, 0, CANVAS_W, BOARD_H)
-
-      // Pegs
-      for (let r = 0; r < ROWS; r++)
-        for (let j = 0; j <= r; j++)
-          drawPeg(ctx, getPegX(r, j), getPegY(r))
-
-      // Balls
-      const visualPaths = paths.slice(0, MAX_VISUAL)
-      visualPaths.forEach((path, bi) => {
-        const s1 = stepIdx
-        const s2 = Math.min(stepIdx + 1, ROWS)
-        const x1 = getBallX(path[s1]), x2 = getBallX(path[s2])
-        const y1 = getBallY(s1),       y2 = getBallY(s2)
-        const et = easeInOut(Math.min(t, 1))
-        drawBall(ctx, x1 + (x2 - x1) * et, y1 + (y2 - y1) * et, BALL_COLORS[bi % BALL_COLORS.length])
-      })
-
-      drawSlots(ctx, [])
-
-      if (rawStep < ROWS) {
-        animRef.current = requestAnimationFrame(frame)
-      } else {
-        // Done — compute results
-        let totalWon = 0
-        const slots = []
-        paths.forEach(p => {
-          const slot = Math.round(p[p.length - 1])
-          slots.push(slot)
-          totalWon += MULTIPLIERS[slot] || 0
-        })
-        if (totalWon > 0) addTokens(totalWon)
-        const net = totalWon - paths.length  // paths.length = bet
-        if (net > 0) increment("gamblesWon"); else increment("gamblesLost")
-
-        // Draw final state with lit slots
-        const canvas2 = canvasRef.current
-        if (canvas2) {
-          const ctx2 = canvas2.getContext("2d")
-          ctx2.clearRect(0, 0, CANVAS_W, CANVAS_H)
-          ctx2.fillStyle = "#5c1212"
-          ctx2.fillRect(0, 0, CANVAS_W, BOARD_H)
-          for (let r = 0; r < ROWS; r++)
-            for (let j = 0; j <= r; j++)
-              drawPeg(ctx2, getPegX(r, j), getPegY(r))
-          drawSlots(ctx2, slots)
-        }
-
-        setResult({ totalWon, net, numBalls: paths.length, slots })
-        setDropping(false)
-      }
-    }
-
-    animRef.current = requestAnimationFrame(frame)
-  }, [addTokens, increment])
-
-  // Init canvas on mount
   useEffect(() => { drawStatic() }, [drawStatic])
   useEffect(() => () => cancelAnimationFrame(animRef.current), [])
 
@@ -238,10 +162,98 @@ export default function GambleModal({ onClose }) {
     spendTokens(bet)
     setResult(null)
     setDropping(true)
-    increment("gamblesPlayed")
-    increment("ballsDropped", bet)
+    incRef.current("gamblesPlayed")
+    incRef.current("ballsDropped", bet)
+
     const paths = Array.from({ length: bet }, buildPath)
-    startAnimation(paths)
+
+    cancelAnimationFrame(animRef.current)
+    const startTime = performance.now()
+
+    // Failsafe: always clear dropping state after max expected duration
+    const failsafe = setTimeout(() => {
+      setDropping(false)
+    }, STEP_MS * (ROWS + 3))
+
+    const frame = (now) => {
+      try {
+        const elapsed  = now - startTime
+        const rawStep  = elapsed / STEP_MS
+        const stepIdx  = Math.min(Math.floor(rawStep), ROWS - 1)
+        const t        = rawStep - stepIdx
+
+        const canvas = canvasRef.current
+        if (!canvas) {
+          // Canvas temporarily unavailable — keep looping
+          if (rawStep < ROWS) animRef.current = requestAnimationFrame(frame)
+          return
+        }
+        const ctx = canvas.getContext("2d")
+        if (!ctx) {
+          if (rawStep < ROWS) animRef.current = requestAnimationFrame(frame)
+          return
+        }
+
+        // Board
+        ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
+        ctx.fillStyle = "#5c1212"
+        ctx.fillRect(0, 0, CANVAS_W, BOARD_H)
+
+        // Pegs
+        for (let r = 0; r < ROWS; r++)
+          for (let j = 0; j <= r; j++)
+            drawPeg(ctx, getPegX(r, j), getPegY(r))
+
+        // Balls
+        const visualPaths = paths.slice(0, MAX_VISUAL)
+        visualPaths.forEach((path, bi) => {
+          const s1 = stepIdx
+          const s2 = Math.min(stepIdx + 1, ROWS)
+          const x1 = getBallX(path[s1]), x2 = getBallX(path[s2])
+          const y1 = getBallY(s1),       y2 = getBallY(s2)
+          const et = easeInOut(Math.min(t, 1))
+          drawBall(ctx, x1 + (x2 - x1) * et, y1 + (y2 - y1) * et, BALL_COLORS[bi % BALL_COLORS.length])
+        })
+
+        drawSlots(ctx, [])
+
+        if (rawStep < ROWS) {
+          animRef.current = requestAnimationFrame(frame)
+        } else {
+          clearTimeout(failsafe)
+
+          // Compute results
+          let totalWon = 0
+          const slots = []
+          paths.forEach(p => {
+            const slot = Math.round(p[p.length - 1])
+            slots.push(slot)
+            totalWon += MULTIPLIERS[slot] || 0
+          })
+          if (totalWon > 0) addTokRef.current(totalWon)
+          const net = totalWon - paths.length
+          if (net > 0) incRef.current("gamblesWon"); else incRef.current("gamblesLost")
+
+          // Draw final state with lit slots
+          ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
+          ctx.fillStyle = "#5c1212"
+          ctx.fillRect(0, 0, CANVAS_W, BOARD_H)
+          for (let r = 0; r < ROWS; r++)
+            for (let j = 0; j <= r; j++)
+              drawPeg(ctx, getPegX(r, j), getPegY(r))
+          drawSlots(ctx, slots)
+
+          setResult({ totalWon, net, numBalls: paths.length, slots })
+          setDropping(false)
+        }
+      } catch (err) {
+        console.error("Plinko frame error:", err)
+        clearTimeout(failsafe)
+        setDropping(false)
+      }
+    }
+
+    animRef.current = requestAnimationFrame(frame)
   }
 
   return (
