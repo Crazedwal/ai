@@ -1,57 +1,56 @@
 // src/components/ui/GambleModal.jsx
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { useTokens } from "../../hooks/useTokens.jsx"
 import { useQuests } from "../../hooks/useQuests.jsx"
 
 const BETS = [5, 10, 25, 50]
-const ROWS = 15
-const MULTIPLIERS = [500, 20, 5, 3, 2, 0, 1, 1, 1, 1, 0, 2, 3, 5, 20, 500]
-const SLOTS = MULTIPLIERS.length // 16
+const ROWS = 14        // peg rows — row r has r+2 pegs
+const SLOTS = 16       // slots at bottom
+const START_COL = 8    // center-right start (between the 2 top pegs)
+const STEP_MS = 220    // ms per row — slow and satisfying
+
+// Swap 0s and 1s vs before
+const MULTIPLIERS = [500, 20, 5, 3, 2, 1, 0, 0, 0, 0, 1, 2, 3, 5, 20, 500]
 
 function buildPath() {
-  let col = Math.floor(SLOTS / 2) // start center (8)
+  let col = START_COL
   const path = [col]
   for (let i = 0; i < ROWS; i++) {
-    col = col + (Math.random() < 0.5 ? -1 : 1)
+    col += Math.random() < 0.5 ? -1 : 1
+    // Pyramid constraint: ball can't go further than i+1 from start
+    col = Math.max(START_COL - (i + 1), Math.min(START_COL + (i + 1), col))
+    // Board bounds
     col = Math.max(0, Math.min(SLOTS - 1, col))
     path.push(col)
   }
   return path
 }
 
-function getMultiplierStyle(m, active) {
-  const base = active ? "ring-2 ring-white scale-y-110 " : ""
-  if (m >= 100) return base + "bg-red-500 text-white"
-  if (m >= 20)  return base + "bg-orange-400 text-white"
-  if (m >= 5)   return base + "bg-yellow-400 text-black"
-  if (m >= 2)   return base + "bg-green-500 text-white"
-  if (m >= 1)   return base + "bg-blue-500 text-white"
-  if (m > 0)    return base + "bg-purple-500 text-white"
-  return base + "bg-gray-700 text-gray-400"
+function calcWin(path, bet) {
+  const slot = path[path.length - 1]
+  const mult = MULTIPLIERS[slot]
+  return { slot, mult, won: mult } // each ball is worth 1 token
 }
 
-// Calculate peg x positions for a given row (0-indexed)
-// Row r has r+1 pegs, centered in the board
-function getPegPositions(row) {
-  const count = row + 1
-  const positions = []
-  // Center the pegs: left offset = (SLOTS - count) / 2 slots from left
-  const startSlot = (SLOTS - count) / 2
-  for (let i = 0; i < count; i++) {
-    positions.push(startSlot + i)
-  }
-  return positions
+function slotColor(m, active) {
+  const ring = active ? " ring-2 ring-white z-10 scale-y-110" : ""
+  if (m >= 100) return "bg-red-500 text-white" + ring
+  if (m >= 20)  return "bg-orange-400 text-white" + ring
+  if (m >= 5)   return "bg-yellow-400 text-black" + ring
+  if (m >= 2)   return "bg-green-500 text-white" + ring
+  if (m === 1)  return "bg-blue-500 text-white" + ring
+  return "bg-gray-700 text-gray-400" + ring
 }
 
 export default function GambleModal({ onClose }) {
   const { balance, spendTokens, addTokens } = useTokens()
   const { increment } = useQuests()
-  const [bet, setBet] = useState(10)
+  const [bet, setBet] = useState(5)
   const [dropping, setDropping] = useState(false)
-  const [path, setPath] = useState(null)
   const [step, setStep] = useState(-1)
+  const [displayPath, setDisplayPath] = useState(null)  // animated ball path
+  const [allPaths, setAllPaths] = useState(null)        // all balls' paths
   const [result, setResult] = useState(null)
-  const stepRef = useRef(-1)
 
   const drop = () => {
     if (balance < bet || dropping) return
@@ -59,118 +58,124 @@ export default function GambleModal({ onClose }) {
     setResult(null)
     setDropping(true)
     increment("gamblesPlayed")
-    const newPath = buildPath()
-    setPath(newPath)
-    stepRef.current = 0
+
+    // Build all ball paths (bet = number of balls)
+    const paths = Array.from({ length: bet }, () => buildPath())
+    setAllPaths(paths)
+    setDisplayPath(paths[0]) // animate the first ball
     setStep(0)
   }
 
   useEffect(() => {
-    if (!dropping || step < 0 || !path) return
-    if (step >= path.length - 1) {
-      const slot = path[path.length - 1]
-      const mult = MULTIPLIERS[slot]
-      const won = Math.floor(bet * mult)
-      if (won > 0) addTokens(won)
-      const net = won - bet
+    if (!dropping || step < 0 || !displayPath) return
+    if (step >= ROWS) {
+      // Animation done — calculate all results
+      let totalWon = 0
+      let wins = 0
+      allPaths.forEach(p => {
+        const { won } = calcWin(p)
+        totalWon += won
+      })
+      const lastSlot = displayPath[displayPath.length - 1]
+      wins = allPaths.filter(p => {
+        const m = MULTIPLIERS[p[p.length - 1]]
+        return m > 1
+      }).length
+
+      if (totalWon > 0) addTokens(totalWon)
+      const net = totalWon - bet
       if (net > 0) increment("gamblesWon")
       else increment("gamblesLost")
-      setResult({ slot, mult, won, net })
+
+      setResult({ slot: lastSlot, totalWon, net, numBalls: bet })
       setDropping(false)
       return
     }
-    const t = setTimeout(() => {
-      stepRef.current = step + 1
-      setStep(step + 1)
-    }, 120)
+    const t = setTimeout(() => setStep(s => s + 1), STEP_MS)
     return () => clearTimeout(t)
   }, [dropping, step])
 
-  const ballCol = path ? path[Math.min(step, path.length - 1)] : Math.floor(SLOTS / 2)
+  const ballCol = displayPath ? displayPath[Math.min(step, ROWS)] : START_COL
   const ballPct = (ballCol / (SLOTS - 1)) * 100
+  const ballRowPct = step >= 0 ? (Math.min(step, ROWS) / ROWS) * 86 : 0
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div
-        className="rounded-2xl w-full max-w-md flex flex-col gap-3 p-5"
-        style={{ background: "#7a1c1c" }}
-      >
+      <div className="rounded-2xl w-full max-w-md flex flex-col gap-3 p-5" style={{ background: "#7a1c1c" }}>
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-white text-xl font-bold tracking-wide">Plinko</h2>
           <button onClick={onClose} className="text-red-300 hover:text-white text-2xl leading-none">×</button>
         </div>
 
-        <p className="text-red-200 text-sm">Balance: <span className="text-white font-bold">{balance}</span> tokens</p>
+        <p className="text-red-200 text-sm">
+          Balance: <span className="text-white font-bold">{balance}</span> tokens
+          {dropping && <span className="ml-2 text-red-300">({bet} balls dropping...)</span>}
+        </p>
 
         {/* Board */}
-        <div
-          className="relative rounded-lg overflow-hidden"
-          style={{ background: "#6b1818", paddingBottom: "8px" }}
-        >
-          {/* Peg rows */}
-          <div className="flex flex-col gap-1 pt-3 px-2">
-            {Array.from({ length: ROWS }).map((_, row) => {
-              const pegs = getPegPositions(row)
-              return (
-                <div key={row} className="flex justify-around items-center" style={{ height: "18px" }}>
-                  {Array.from({ length: SLOTS }).map((_, col) => {
-                    const isPeg = pegs.some(p => Math.abs(p - col) < 0.6)
-                    return (
-                      <div key={col} className="flex items-center justify-center" style={{ width: `${100 / SLOTS}%` }}>
-                        {isPeg && (
-                          <div
-                            className="rounded-full"
-                            style={{ width: 7, height: 7, background: "rgba(255,180,180,0.35)" }}
-                          />
-                        )}
-                      </div>
-                    )
-                  })}
+        <div className="relative rounded-lg overflow-hidden" style={{ background: "#5c1212" }}>
+          <div className="relative" style={{ height: "260px" }}>
+
+            {/* Pegs — row r has r+2 pegs, centered via flex justify-around */}
+            <div className="absolute inset-0 flex flex-col justify-around px-4 pt-2 pb-8">
+              {Array.from({ length: ROWS }).map((_, row) => (
+                <div key={row} className="flex justify-around items-center">
+                  {Array.from({ length: row + 2 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="rounded-full flex-shrink-0"
+                      style={{ width: 8, height: 8, background: "rgba(255,160,160,0.38)" }}
+                    />
+                  ))}
                 </div>
-              )
-            })}
-          </div>
+              ))}
+            </div>
 
-          {/* Ball */}
-          <div
-            className="absolute transition-all"
-            style={{
-              left: `calc(${ballPct}% - 9px)`,
-              top: dropping || result
-                ? `calc(${(Math.min(step, ROWS) / ROWS) * 82}% + 4px)`
-                : "4px",
-              transitionDuration: dropping ? "110ms" : "0ms",
-              zIndex: 10
-            }}
-          >
-            <div
-              className="rounded-full shadow-lg"
-              style={{
-                width: 18, height: 18,
-                background: "radial-gradient(circle at 35% 35%, #ffffff, #3b82f6)",
-                boxShadow: "0 0 8px rgba(96,165,250,0.8)"
-              }}
-            />
-          </div>
-
-          {/* Multiplier slots */}
-          <div className="flex mt-2 px-1 gap-0.5">
-            {MULTIPLIERS.map((m, i) => (
+            {/* Animated ball */}
+            {(dropping || result) && (
               <div
-                key={i}
-                className={`flex-1 text-center text-xs py-1 rounded font-bold transition-all ${getMultiplierStyle(m, result?.slot === i)}`}
-                style={{ fontSize: "9px", minWidth: 0 }}
+                className="absolute transition-all pointer-events-none"
+                style={{
+                  left: `calc(${ballPct}% - 9px)`,
+                  top: `calc(${ballRowPct}% + 4px)`,
+                  transitionDuration: `${STEP_MS - 20}ms`,
+                  transitionTimingFunction: "ease-in-out",
+                  zIndex: 20
+                }}
               >
-                {m}x
+                <div
+                  className="rounded-full"
+                  style={{
+                    width: 18, height: 18,
+                    background: "radial-gradient(circle at 35% 35%, #ffffff, #60a5fa)",
+                    boxShadow: "0 0 10px rgba(147,197,253,0.9)"
+                  }}
+                />
               </div>
-            ))}
+            )}
+
+            {/* Multiplier slots */}
+            <div className="absolute bottom-0 left-0 right-0 flex gap-0.5 px-1 pb-1">
+              {MULTIPLIERS.map((m, i) => (
+                <div
+                  key={i}
+                  className={`flex-1 text-center rounded font-bold transition-all relative ${slotColor(m, result?.slot === i)}`}
+                  style={{ fontSize: "8px", padding: "3px 0" }}
+                >
+                  {m}x
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Bet */}
+        {/* Bet selector — each unit = 1 ball */}
         <div>
-          <label className="text-xs text-red-300 block mb-1.5">Bet amount</label>
+          <label className="text-xs text-red-300 block mb-1.5">
+            Balls to drop <span className="text-red-400">(1 token each)</span>
+          </label>
           <div className="flex gap-2">
             {BETS.map(b => (
               <button
@@ -193,7 +198,7 @@ export default function GambleModal({ onClose }) {
           className="w-full py-2.5 rounded-lg font-bold text-white text-base transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           style={{ background: dropping ? "#555" : "#c0392b" }}
         >
-          {dropping ? "Dropping..." : "Drop Ball"}
+          {dropping ? `Dropping ${bet} balls...` : `Drop ${bet} Ball${bet > 1 ? "s" : ""}`}
         </button>
 
         {result && (
@@ -202,7 +207,7 @@ export default function GambleModal({ onClose }) {
             result.net === 0 ? "bg-gray-700 text-gray-300" :
             "bg-red-950 text-red-300"
           }`}>
-            {result.mult}x → {result.won} tokens
+            {result.numBalls} balls → {result.totalWon} tokens back
             <div className="text-sm font-normal mt-0.5">
               {result.net > 0 ? `+${result.net} profit` : result.net === 0 ? "Break even" : `${result.net} loss`}
             </div>
