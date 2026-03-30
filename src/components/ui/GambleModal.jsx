@@ -24,7 +24,7 @@ function getPegY(r)    { return ((r + 1) / (ROWS + 1)) * (BOARD_H - 28) }  // le
 function getBallX(col) { return col * SPACING }
 function getBallY(s)   { return (s / ROWS) * (BOARD_H - 36) }
 
-const MULTIPLIERS = [500, 20, 5, 3, 2, 1, 0, 0, 0, 0, 1, 2, 3, 5, 20, 500]
+const MULTIPLIERS = [500, 20, 5, 3, 2, 0, 1, 1, 1, 1, 0, 2, 3, 5, 20, 500]
 
 function buildPath() {
   let col = 7.5   // true center — between the 2 natural top gaps
