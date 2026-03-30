@@ -2,14 +2,70 @@
 
 const CHANGELOG = [
   {
+    version: "1.7.0",
+    date: "2026-03-30",
+    changes: [
+      "Plinko overhaul: bet amount now = number of balls (each worth 1 token)",
+      "Ball moves slower (220ms per step)",
+      "Pyramid fixed — starts with 2 pegs at top, ball constrained within pyramid",
+      "Swapped 0x and 1x multiplier slots",
+      "All balls calculated simultaneously, first ball animated, total shown at end",
+    ]
+  },
+  {
+    version: "1.6.0",
+    date: "2026-03-30",
+    changes: [
+      "Replaced gambling modal with Plinko styled after florr.io Hel biome",
+      "Dark red/maroon board theme",
+      "Multipliers: 500x 20x 5x 3x 2x 0x 1x 1x 1x 1x 0x 2x 3x 5x 20x 500x",
+      "Ball animation drops through pegs row by row with glow effect",
+      "Winning slot highlights on landing",
+    ]
+  },
+  {
+    version: "1.5.0",
+    date: "2026-03-30",
+    changes: [
+      "Quests now rotate every 30 minutes with a randomized pool of 4 quests",
+      "Quest pool expanded to 12 different quests",
+      "Countdown timer shown in quests modal",
+      "Fixed messagesInChat quest — now tracks per conversation, not globally",
+      "Fixed chatsCreated quest — now increments on New Chat",
+      "Fixed gamblesLost stat tracking",
+    ]
+  },
+  {
+    version: "1.4.0",
+    date: "2026-03-30",
+    changes: [
+      "Added quests system — complete tasks to earn tokens",
+      "Added AFK check — popup after 5 min inactivity, blocks chat if missed",
+      "Added sign out button to sidebar",
+      "Added 📻 Radio button to sidebar — plays rickroll on click",
+      "Gambling feature added — 50 starting tokens, 🎰 button in sidebar",
+      "Re-enabled login/auth gate",
+    ]
+  },
+  {
+    version: "1.3.0",
+    date: "2026-03-30",
+    changes: [
+      "Added more free models: DeepSeek V3, DeepSeek R1, Mistral 7B, Gemma 3, Llama 3.3 70B",
+      "Fixed streaming function to use selected model instead of hardcoded Nemotron",
+      "Removed login requirement — app open to anyone with the link",
+      "Added Changelog / Devlog / Reflection page",
+    ]
+  },
+  {
     version: "1.2.0",
     date: "2026-03-15",
     changes: [
-      "Removed login requirement — app is now open to anyone",
-      "Added DeepSeek V3, DeepSeek R1, and Mistral 7B as free models",
-      "Fixed streaming to respect selected model instead of always using Nemotron",
-      "Removed Stripe/token payment system",
-      "Added Changelog / Devlog / Reflection page",
+      "Removed Microsoft sign-in button",
+      "Added email/password sign-in alongside Google",
+      "Deployed to Vercel",
+      "Fixed Vercel build — overrode build command to vite build to skip TypeScript check",
+      "Added Firebase environment variables to Vercel",
     ]
   },
   {
@@ -17,10 +73,8 @@ const CHANGELOG = [
     date: "2026-03-15",
     changes: [
       "Added Google sign-in via Firebase Authentication",
-      "Added email/password sign-in",
-      "Auth gate — only signed-in users could access the app",
+      "Auth gate — only signed-in users can access the app",
       "User avatar and logout button in sidebar",
-      "Deployed to Vercel",
     ]
   },
   {
