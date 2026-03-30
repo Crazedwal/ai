@@ -25,6 +25,8 @@ export function TokenProvider({ children }) {
     setBalance(prev => {
       const next = prev + amount
       localStorage.setItem("tokenBalance", next)
+      const peak = parseInt(localStorage.getItem("peakBalance") || "0", 10)
+      if (next > peak) localStorage.setItem("peakBalance", next)
       return next
     })
   }

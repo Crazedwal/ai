@@ -67,6 +67,7 @@ export default function GambleModal({ onClose }) {
     setResult(null)
     setDropping(true)
     increment("gamblesPlayed")
+    increment("ballsDropped", bet)
     setAllPaths(Array.from({ length: bet }, buildPath))
     setStep(0)
   }
