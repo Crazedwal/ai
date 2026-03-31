@@ -11,7 +11,7 @@ const SLOT_H     = 26
 const BOARD_H    = CANVAS_H - SLOT_H
 const SPACING    = CANVAS_W / SLOTS   // 25px
 const PEG_R      = 4
-const BALL_R     = 9
+const BALL_R     = 6
 // Physics constants
 const GRAVITY    = 2500   // px/s² downward acceleration
 const VY_BOUNCE  = -100   // px/s upward kick when hitting a peg
@@ -164,8 +164,8 @@ export default function GambleModal({ onClose }) {
 
           // Peg collision — loop handles skipping rows on large dt
           while (ball.row < ROWS) {
-            if (ball.y >= getPegY(ball.row)) {
-              ball.y  = getPegY(ball.row)
+            if (ball.y >= getPegY(ball.row) - PEG_R - BALL_R) {
+              ball.y  = getPegY(ball.row) - PEG_R - BALL_R
               ball.vy = VY_BOUNCE  // bounce upward off peg
               const dir = Math.sign(ball.path[ball.row + 1] - ball.path[ball.row])
               ball.vx   = dir * VX_IMPULSE
