@@ -13,12 +13,12 @@ const SPACING    = CANVAS_W / SLOTS   // 25px
 const PEG_R      = 4
 const BALL_R     = 6
 // Physics constants
-const GRAVITY    = 2500   // px/s² downward acceleration
-const VY_BOUNCE  = -100   // px/s upward kick when hitting a peg
-const VX_IMPULSE = 110    // px/s horizontal kick on peg hit
+const GRAVITY    = 625    // px/s² downward acceleration (halved speed)
+const VY_BOUNCE  = -50    // px/s upward kick when hitting a peg
+const VX_IMPULSE = 55     // px/s horizontal kick on peg hit
 const H_DECAY    = 5      // horizontal velocity decay rate (1/s)
 
-const MULTIPLIERS = [500, 20, 5, 3, 2, 0, 1, 1, 1, 1, 0, 2, 3, 5, 20, 500]
+const MULTIPLIERS = [500, 20, 5, 3, 0, 0, 1, 1, 1, 1, 0, 0, 3, 5, 20, 500]
 
 const SLOT_COLORS = {
   500: "#e03030",
@@ -205,7 +205,13 @@ export default function GambleModal({ onClose }) {
           if (elapsed >= ball.delay) drawBall(ctx, ball.x, ball.y)
         })
 
-        drawSlots(ctx, [])
+        // Highlight each ball's target slot when it's in the last 4 rows
+        const targetSlots = []
+        balls.forEach(ball => {
+          if (!ball.done && elapsed >= ball.delay && ball.row >= ROWS - 4)
+            targetSlots.push(Math.round(ball.path[ROWS]))
+        })
+        drawSlots(ctx, targetSlots)
 
         if (!balls.every(b => b.done)) {
           animRef.current = requestAnimationFrame(frame)
