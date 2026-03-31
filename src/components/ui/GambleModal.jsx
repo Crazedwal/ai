@@ -12,8 +12,14 @@ const BOARD_H    = CANVAS_H - SLOT_H
 const SPACING    = CANVAS_W / SLOTS   // 25px
 const PEG_R      = 4
 const BALL_R     = 9
-const STEP_MS    = 280
 const MAX_VISUAL = 10
+
+// Physics constants
+const GRAVITY    = 2500   // px/s² downward acceleration
+const VY_BOUNCE  = -100   // px/s upward kick when hitting a peg
+const VX_IMPULSE = 110    // px/s horizontal kick on peg hit
+const H_DECAY    = 5      // horizontal velocity decay rate (1/s)
+const STAGGER_MS = 150    // ms delay between each ball spawn
 
 const MULTIPLIERS = [500, 20, 5, 3, 2, 0, 1, 1, 1, 1, 0, 2, 3, 5, 20, 500]
 
@@ -27,18 +33,11 @@ const SLOT_COLORS = {
   0:   "#444444",
 }
 
-const BALL_COLORS = [
-  "#44cc44", "#ddaa00", "#3399ee", "#9944ee",
-  "#dd3333", "#ee6600", "#22bbaa", "#cc44aa",
-  "#66cc22", "#ee4488"
-]
+const BALL_COLOR = "#cc2222"
 
 function getPegX(r, j) { return (7.5 - r * 0.5 + j) * SPACING }
 function getPegY(r)    { return ((r + 1) / (ROWS + 1)) * BOARD_H }
 function getBallX(col) { return col * SPACING }
-function getBallY(s)   { return (s / ROWS) * (BOARD_H - BALL_R * 2) + BALL_R }
-
-function easeInOut(t) { return t < 0.5 ? 2*t*t : -1 + (4 - 2*t)*t }
 
 function buildPath() {
   let col = 7.5
@@ -58,33 +57,28 @@ function drawPeg(ctx, x, y) {
 }
 
 function drawBall(ctx, x, y, color) {
-  // Shadow
   ctx.beginPath()
   ctx.arc(x + 1, y + 2, BALL_R, 0, Math.PI * 2)
   ctx.fillStyle = "rgba(0,0,0,0.35)"
   ctx.fill()
 
-  // Main body
   ctx.beginPath()
   ctx.arc(x, y, BALL_R, 0, Math.PI * 2)
   ctx.fillStyle = color
   ctx.fill()
 
-  // Inner ring
   ctx.beginPath()
   ctx.arc(x, y, BALL_R * 0.72, 0, Math.PI * 2)
   ctx.strokeStyle = "rgba(255,255,255,0.25)"
   ctx.lineWidth = 1.5
   ctx.stroke()
 
-  // Outer ring
   ctx.beginPath()
   ctx.arc(x, y, BALL_R, 0, Math.PI * 2)
   ctx.strokeStyle = "rgba(0,0,0,0.3)"
   ctx.lineWidth = 1
   ctx.stroke()
 
-  // Shine highlight
   try {
     const shine = ctx.createRadialGradient(
       x - BALL_R * 0.32, y - BALL_R * 0.38, BALL_R * 0.05,
@@ -103,32 +97,29 @@ function drawBall(ctx, x, y, color) {
 function drawSlots(ctx, landedSlots) {
   const slotW = CANVAS_W / SLOTS
   MULTIPLIERS.forEach((m, i) => {
-    const x = i * slotW
-    const y = BOARD_H
+    const x     = i * slotW
+    const y     = BOARD_H
     const isLit = landedSlots.includes(i)
-    const color = SLOT_COLORS[m] || "#444"
-    ctx.fillStyle = isLit ? "#ff6666" : color
+    ctx.fillStyle = isLit ? "#ff6666" : (SLOT_COLORS[m] || "#444")
     ctx.fillRect(x + 0.5, y + 1, slotW - 1, SLOT_H - 2)
-
     if (isLit) {
       ctx.strokeStyle = "#ffffff"
-      ctx.lineWidth = 1.5
+      ctx.lineWidth   = 1.5
       ctx.strokeRect(x + 0.5, y + 1, slotW - 1, SLOT_H - 2)
     }
-
-    ctx.fillStyle = m === 5 ? "#000" : "#fff"
-    ctx.font = `bold 7.5px sans-serif`
-    ctx.textAlign = "center"
-    ctx.textBaseline = "middle"
+    ctx.fillStyle     = m === 5 ? "#000" : "#fff"
+    ctx.font          = "bold 7.5px sans-serif"
+    ctx.textAlign     = "center"
+    ctx.textBaseline  = "middle"
     ctx.fillText(`${m}x`, x + slotW / 2, y + SLOT_H / 2)
   })
 }
 
 export default function GambleModal({ onClose }) {
   const { balance, spendTokens, addTokens } = useTokens()
-  const canvasRef  = useRef(null)
-  const animRef    = useRef(null)
-  const addTokRef  = useRef(addTokens)
+  const canvasRef = useRef(null)
+  const animRef   = useRef(null)
+  const addTokRef = useRef(addTokens)
 
   useEffect(() => { addTokRef.current = addTokens }, [addTokens])
 
@@ -161,92 +152,118 @@ export default function GambleModal({ onClose }) {
 
     const paths = Array.from({ length: bet }, buildPath)
 
+    // Physics state for each visible ball
+    const balls = paths.slice(0, MAX_VISUAL).map((path, bi) => ({
+      x:     getBallX(path[0]),
+      y:     -BALL_R,
+      vx:    0,
+      vy:    0,
+      row:   0,       // next peg row to check collision against
+      done:  false,
+      path,
+      delay: bi * STAGGER_MS,
+      color: BALL_COLOR,
+    }))
+
     cancelAnimationFrame(animRef.current)
     const startTime = performance.now()
+    let lastTime    = null
 
-    // Failsafe: always clear dropping state after max expected duration
-    const failsafe = setTimeout(() => {
-      setDropping(false)
-    }, STEP_MS * (ROWS + 3))
+    const failsafe = setTimeout(
+      () => setDropping(false),
+      STAGGER_MS * balls.length + 6000
+    )
 
     const frame = (now) => {
       try {
-        const elapsed  = now - startTime
-        const rawStep  = elapsed / STEP_MS
-        const stepIdx  = Math.min(Math.floor(rawStep), ROWS - 1)
-        const t        = rawStep - stepIdx
+        if (lastTime === null) lastTime = now
+        const dt      = Math.min((now - lastTime) / 1000, 0.033) // cap at ~30fps min
+        lastTime      = now
+        const elapsed = now - startTime
+
+        // Update each ball's physics
+        balls.forEach(ball => {
+          if (ball.done || elapsed < ball.delay) return
+
+          ball.vy += GRAVITY * dt
+          ball.y  += ball.vy * dt
+          ball.x  += ball.vx * dt
+          ball.vx *= Math.exp(-H_DECAY * dt)  // exponential horizontal drag
+
+          // Peg collision — loop handles skipping rows on large dt
+          while (ball.row < ROWS) {
+            if (ball.y >= getPegY(ball.row)) {
+              ball.y  = getPegY(ball.row)
+              ball.vy = VY_BOUNCE  // bounce upward off peg
+              const dir = Math.sign(ball.path[ball.row + 1] - ball.path[ball.row])
+              ball.vx   = dir * VX_IMPULSE
+              ball.row++
+            } else {
+              break
+            }
+          }
+
+          // Ball enters slot area
+          if (ball.row >= ROWS && ball.y >= BOARD_H - SLOT_H) {
+            ball.done = true
+            ball.y    = BOARD_H - SLOT_H + 2
+          }
+        })
 
         const canvas = canvasRef.current
         if (!canvas) {
-          // Canvas temporarily unavailable — keep looping
-          if (rawStep < ROWS) animRef.current = requestAnimationFrame(frame)
+          if (!balls.every(b => b.done)) animRef.current = requestAnimationFrame(frame)
           return
         }
         const ctx = canvas.getContext("2d")
         if (!ctx) {
-          if (rawStep < ROWS) animRef.current = requestAnimationFrame(frame)
+          if (!balls.every(b => b.done)) animRef.current = requestAnimationFrame(frame)
           return
         }
 
-        // Board
+        // Draw board + pegs
         ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
         ctx.fillStyle = "#5c1212"
         ctx.fillRect(0, 0, CANVAS_W, BOARD_H)
-
-        // Pegs
         for (let r = 0; r < ROWS; r++)
           for (let j = 0; j <= r; j++)
             drawPeg(ctx, getPegX(r, j), getPegY(r))
 
-        // Balls — each staggered by 100ms
-        const STAGGER_MS = 100
-        const visualPaths = paths.slice(0, MAX_VISUAL)
-        visualPaths.forEach((path, bi) => {
-          const ballElapsed = elapsed - bi * STAGGER_MS
-          if (ballElapsed <= 0) return  // not started yet
-          const ballRaw  = ballElapsed / STEP_MS
-          const ballStep = Math.min(Math.floor(ballRaw), ROWS - 1)
-          const ballT    = ballRaw - ballStep
-          const s1 = ballStep
-          const s2 = Math.min(ballStep + 1, ROWS)
-          const x1 = getBallX(path[s1]), x2 = getBallX(path[s2])
-          const y1 = getBallY(s1),       y2 = getBallY(s2)
-          const et = easeInOut(Math.min(ballT, 1))
-          drawBall(ctx, x1 + (x2 - x1) * et, y1 + (y2 - y1) * et, BALL_COLORS[bi % BALL_COLORS.length])
+        // Draw balls that have started
+        balls.forEach(ball => {
+          if (elapsed >= ball.delay) drawBall(ctx, ball.x, ball.y, ball.color)
         })
 
         drawSlots(ctx, [])
 
-        const lastBallOffset = (Math.min(paths.length, MAX_VISUAL) - 1) * STAGGER_MS
-        const totalDone = elapsed >= STEP_MS * ROWS + lastBallOffset
-
-        if (!totalDone) {
+        if (!balls.every(b => b.done)) {
           animRef.current = requestAnimationFrame(frame)
-        } else {
-          clearTimeout(failsafe)
-
-          // Compute results
-          let totalWon = 0
-          const slots = []
-          paths.forEach(p => {
-            const slot = Math.round(p[p.length - 1])
-            slots.push(slot)
-            totalWon += MULTIPLIERS[slot] || 0
-          })
-          if (totalWon > 0) addTokRef.current(totalWon)
-          const net = totalWon - paths.length
-          // Draw final state with lit slots
-          ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
-          ctx.fillStyle = "#5c1212"
-          ctx.fillRect(0, 0, CANVAS_W, BOARD_H)
-          for (let r = 0; r < ROWS; r++)
-            for (let j = 0; j <= r; j++)
-              drawPeg(ctx, getPegX(r, j), getPegY(r))
-          drawSlots(ctx, slots)
-
-          setResult({ totalWon, net, numBalls: paths.length, slots })
-          setDropping(false)
+          return
         }
+
+        // All visual balls done — compute and show results
+        clearTimeout(failsafe)
+        let totalWon = 0
+        const slots  = []
+        paths.forEach(p => {
+          const slot = Math.round(p[p.length - 1])
+          slots.push(slot)
+          totalWon += MULTIPLIERS[slot] || 0
+        })
+        if (totalWon > 0) addTokRef.current(totalWon)
+        const net = totalWon - paths.length
+
+        ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
+        ctx.fillStyle = "#5c1212"
+        ctx.fillRect(0, 0, CANVAS_W, BOARD_H)
+        for (let r = 0; r < ROWS; r++)
+          for (let j = 0; j <= r; j++)
+            drawPeg(ctx, getPegX(r, j), getPegY(r))
+        drawSlots(ctx, slots)
+
+        setResult({ totalWon, net, numBalls: paths.length, slots })
+        setDropping(false)
+
       } catch (err) {
         console.error("Plinko frame error:", err)
         clearTimeout(failsafe)
@@ -266,7 +283,9 @@ export default function GambleModal({ onClose }) {
           <button onClick={onClose} className="text-red-300 hover:text-white text-2xl leading-none">×</button>
         </div>
 
-        <p className="text-red-200 text-sm">Balance: <span className="text-white font-bold">{balance}</span> tokens</p>
+        <p className="text-red-200 text-sm">
+          Balance: <span className="text-white font-bold">{balance}</span> tokens
+        </p>
 
         <canvas
           ref={canvasRef}
@@ -294,7 +313,9 @@ export default function GambleModal({ onClose }) {
         <button onClick={drop} disabled={dropping || balance < bet}
           className="w-full py-2.5 rounded-lg font-bold text-white text-base transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           style={{ background: dropping ? "#555" : "#c0392b" }}>
-          {dropping ? `Dropping ${bet} ball${bet > 1 ? "s" : ""}...` : `Drop ${bet} Ball${bet > 1 ? "s" : ""}`}
+          {dropping
+            ? `Dropping ${bet} ball${bet > 1 ? "s" : ""}...`
+            : `Drop ${bet} Ball${bet > 1 ? "s" : ""}`}
         </button>
 
         {result && (
