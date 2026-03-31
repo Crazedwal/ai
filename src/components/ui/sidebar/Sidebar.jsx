@@ -6,8 +6,6 @@ import ModelSelector from "./ModelSelector"
 import PaymentPage from "@/components/ui/PaymentPage"
 import DevLog from "@/components/ui/DevLog"
 import GambleModal from "@/components/ui/GambleModal"
-import QuestsModal from "@/components/ui/QuestsModal"
-import { useQuests } from "../../../hooks/useQuests.jsx"
 import { useLanguage } from "../../../hooks/useLanguage.jsx"
 import { useAssistantName } from "../../../hooks/useAssistantName.jsx"
 import { useTokens } from "../../../hooks/useTokens.jsx"
@@ -28,9 +26,6 @@ function Sidebar({
   const [showPurchase, setShowPurchase] = useState(false)
   const [showDevLog, setShowDevLog] = useState(false)
   const [showGamble, setShowGamble] = useState(false)
-  const [showQuests, setShowQuests] = useState(false)
-  const { quests, newlyCompleted, clearNewlyCompleted } = useQuests()
-  const incomplete = quests.filter(q => !q.done).length
   const [playing, setPlaying] = useState(false)
   const audioRef = useState(() => {
     const a = new Audio("https://www.myinstants.com/media/sounds/never-gonna-give-you-up.mp3")
@@ -153,17 +148,6 @@ function Sidebar({
           </select>
         </div>
 
-        {/* Quests Button */}
-        <div className="p-3 border-t border-gray-700">
-          <button
-            onClick={() => { setShowQuests(true); clearNewlyCompleted() }}
-            className="w-full flex items-center justify-between text-xs text-gray-500 hover:text-gray-300 transition-colors"
-          >
-            <span>📋 Quests</span>
-            {incomplete > 0 && <span className="bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full">{incomplete}</span>}
-          </button>
-        </div>
-
         {/* DevLog Button */}
         <div className="p-3 border-t border-gray-700">
           <button
@@ -203,7 +187,6 @@ function Sidebar({
       {showPurchase && <PaymentPage onClose={() => setShowPurchase(false)} />}
       {showDevLog && <DevLog onClose={() => setShowDevLog(false)} />}
       {showGamble && <GambleModal onClose={() => setShowGamble(false)} />}
-      {showQuests && <QuestsModal onClose={() => setShowQuests(false)} />}
     </>
   )
 }

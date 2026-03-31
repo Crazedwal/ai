@@ -1,7 +1,6 @@
 // src/components/ui/GambleModal.jsx
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useTokens } from "../../hooks/useTokens.jsx"
-import { useQuests } from "../../hooks/useQuests.jsx"
 
 const BETS       = [5, 10, 25, 50]
 const ROWS       = 15
@@ -127,14 +126,11 @@ function drawSlots(ctx, landedSlots) {
 
 export default function GambleModal({ onClose }) {
   const { balance, spendTokens, addTokens } = useTokens()
-  const { increment } = useQuests()
   const canvasRef  = useRef(null)
   const animRef    = useRef(null)
   const addTokRef  = useRef(addTokens)
-  const incRef     = useRef(increment)
 
   useEffect(() => { addTokRef.current = addTokens }, [addTokens])
-  useEffect(() => { incRef.current = increment }, [increment])
 
   const [bet, setBet]           = useState(5)
   const [dropping, setDropping] = useState(false)
@@ -162,8 +158,6 @@ export default function GambleModal({ onClose }) {
     spendTokens(bet)
     setResult(null)
     setDropping(true)
-    incRef.current("gamblesPlayed")
-    incRef.current("ballsDropped", bet)
 
     const paths = Array.from({ length: bet }, buildPath)
 
@@ -204,20 +198,29 @@ export default function GambleModal({ onClose }) {
           for (let j = 0; j <= r; j++)
             drawPeg(ctx, getPegX(r, j), getPegY(r))
 
-        // Balls
+        // Balls — each staggered by 100ms
+        const STAGGER_MS = 100
         const visualPaths = paths.slice(0, MAX_VISUAL)
         visualPaths.forEach((path, bi) => {
-          const s1 = stepIdx
-          const s2 = Math.min(stepIdx + 1, ROWS)
+          const ballElapsed = elapsed - bi * STAGGER_MS
+          if (ballElapsed <= 0) return  // not started yet
+          const ballRaw  = ballElapsed / STEP_MS
+          const ballStep = Math.min(Math.floor(ballRaw), ROWS - 1)
+          const ballT    = ballRaw - ballStep
+          const s1 = ballStep
+          const s2 = Math.min(ballStep + 1, ROWS)
           const x1 = getBallX(path[s1]), x2 = getBallX(path[s2])
           const y1 = getBallY(s1),       y2 = getBallY(s2)
-          const et = easeInOut(Math.min(t, 1))
+          const et = easeInOut(Math.min(ballT, 1))
           drawBall(ctx, x1 + (x2 - x1) * et, y1 + (y2 - y1) * et, BALL_COLORS[bi % BALL_COLORS.length])
         })
 
         drawSlots(ctx, [])
 
-        if (rawStep < ROWS) {
+        const lastBallOffset = (Math.min(paths.length, MAX_VISUAL) - 1) * STAGGER_MS
+        const totalDone = elapsed >= STEP_MS * ROWS + lastBallOffset
+
+        if (!totalDone) {
           animRef.current = requestAnimationFrame(frame)
         } else {
           clearTimeout(failsafe)
@@ -232,8 +235,6 @@ export default function GambleModal({ onClose }) {
           })
           if (totalWon > 0) addTokRef.current(totalWon)
           const net = totalWon - paths.length
-          if (net > 0) incRef.current("gamblesWon"); else incRef.current("gamblesLost")
-
           // Draw final state with lit slots
           ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
           ctx.fillStyle = "#5c1212"
