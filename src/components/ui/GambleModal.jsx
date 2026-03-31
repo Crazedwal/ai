@@ -177,7 +177,8 @@ export default function GambleModal({ onClose }) {
 
           // Ball disappears once fully below the canvas
           if (ball.row >= ROWS && ball.y > CANVAS_H + BALL_R) {
-            ball.done = true
+            ball.done      = true
+            ball.finalSlot = Math.max(0, Math.min(SLOTS - 1, Math.round(ball.x / SPACING)))
           }
         })
 
@@ -222,8 +223,8 @@ export default function GambleModal({ onClose }) {
         clearTimeout(failsafe)
         let totalWon = 0
         const slots  = []
-        paths.forEach(p => {
-          const slot = Math.round(p[p.length - 1])
+        balls.forEach(ball => {
+          const slot = ball.finalSlot ?? Math.max(0, Math.min(SLOTS - 1, Math.round(ball.path[ROWS])))
           slots.push(slot)
           totalWon += MULTIPLIERS[slot] || 0
         })
