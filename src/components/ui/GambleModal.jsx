@@ -175,10 +175,9 @@ export default function GambleModal({ onClose }) {
             }
           }
 
-          // Ball enters slot area
-          if (ball.row >= ROWS && ball.y >= BOARD_H - SLOT_H) {
+          // Ball disappears once fully below the canvas
+          if (ball.row >= ROWS && ball.y > CANVAS_H + BALL_R) {
             ball.done = true
-            ball.y    = BOARD_H - SLOT_H + 2
           }
         })
 
