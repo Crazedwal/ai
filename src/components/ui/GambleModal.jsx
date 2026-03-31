@@ -109,6 +109,15 @@ export default function GambleModal({ onClose }) {
       for (let j = 0; j <= r; j++)
         drawPeg(ctx, getPegX(r, j), getPegY(r))
     drawSlots(ctx, landedSlots)
+    ctx.strokeStyle = "rgba(255,160,160,0.7)"
+    ctx.lineWidth   = 2
+    for (let d = 1; d < SLOTS; d++) {
+      const x = d * SPACING
+      ctx.beginPath()
+      ctx.moveTo(x, BOARD_H - 8)
+      ctx.lineTo(x, CANVAS_H)
+      ctx.stroke()
+    }
   }, [])
 
   useEffect(() => { drawStatic() }, [drawStatic])
@@ -175,6 +184,17 @@ export default function GambleModal({ onClose }) {
             }
           }
 
+          // Divider wall collisions in slot area
+          if (ball.y + BALL_R >= BOARD_H - 6) {
+            for (let d = 1; d < SLOTS; d++) {
+              const divX = d * SPACING
+              if (Math.abs(ball.x - divX) < BALL_R) {
+                ball.x  = divX + (ball.x >= divX ? BALL_R : -BALL_R)
+                ball.vx = -ball.vx * 0.5
+              }
+            }
+          }
+
           // Ball disappears once fully below the canvas
           if (ball.row >= ROWS && ball.y > CANVAS_H + BALL_R) {
             ball.done      = true
@@ -206,13 +226,18 @@ export default function GambleModal({ onClose }) {
           if (elapsed >= ball.delay) drawBall(ctx, ball.x, ball.y)
         })
 
-        // Highlight each ball's target slot when it's in the last 4 rows
-        const targetSlots = []
-        balls.forEach(ball => {
-          if (!ball.done && elapsed >= ball.delay && ball.row >= ROWS - 4)
-            targetSlots.push(Math.round(ball.path[ROWS]))
-        })
-        drawSlots(ctx, targetSlots)
+        drawSlots(ctx, [])
+
+        // Draw divider lines between slots
+        ctx.strokeStyle = "rgba(255,160,160,0.7)"
+        ctx.lineWidth   = 2
+        for (let d = 1; d < SLOTS; d++) {
+          const x = d * SPACING
+          ctx.beginPath()
+          ctx.moveTo(x, BOARD_H - 8)
+          ctx.lineTo(x, CANVAS_H)
+          ctx.stroke()
+        }
 
         if (!balls.every(b => b.done)) {
           animRef.current = requestAnimationFrame(frame)
@@ -238,6 +263,15 @@ export default function GambleModal({ onClose }) {
           for (let j = 0; j <= r; j++)
             drawPeg(ctx, getPegX(r, j), getPegY(r))
         drawSlots(ctx, slots)
+        ctx.strokeStyle = "rgba(255,160,160,0.7)"
+        ctx.lineWidth   = 2
+        for (let d = 1; d < SLOTS; d++) {
+          const x = d * SPACING
+          ctx.beginPath()
+          ctx.moveTo(x, BOARD_H - 8)
+          ctx.lineTo(x, CANVAS_H)
+          ctx.stroke()
+        }
 
         setResult({ totalWon, net, numBalls: paths.length, slots })
         setDropping(false)
