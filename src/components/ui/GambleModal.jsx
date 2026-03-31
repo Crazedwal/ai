@@ -12,14 +12,11 @@ const BOARD_H    = CANVAS_H - SLOT_H
 const SPACING    = CANVAS_W / SLOTS   // 25px
 const PEG_R      = 4
 const BALL_R     = 9
-const MAX_VISUAL = 10
-
 // Physics constants
 const GRAVITY    = 2500   // px/s² downward acceleration
 const VY_BOUNCE  = -100   // px/s upward kick when hitting a peg
 const VX_IMPULSE = 110    // px/s horizontal kick on peg hit
 const H_DECAY    = 5      // horizontal velocity decay rate (1/s)
-const STAGGER_MS = 150    // ms delay between each ball spawn
 
 const MULTIPLIERS = [500, 20, 5, 3, 2, 0, 1, 1, 1, 1, 0, 2, 3, 5, 20, 500]
 
@@ -33,7 +30,8 @@ const SLOT_COLORS = {
   0:   "#444444",
 }
 
-const BALL_COLOR = "#cc2222"
+const BALL_FILL    = "#7a0000"   // dark red body
+const BALL_STROKE  = "#cc2222"   // medium red outline
 
 function getPegX(r, j) { return (7.5 - r * 0.5 + j) * SPACING }
 function getPegY(r)    { return ((r + 1) / (ROWS + 1)) * BOARD_H }
@@ -56,42 +54,14 @@ function drawPeg(ctx, x, y) {
   ctx.fill()
 }
 
-function drawBall(ctx, x, y, color) {
-  ctx.beginPath()
-  ctx.arc(x + 1, y + 2, BALL_R, 0, Math.PI * 2)
-  ctx.fillStyle = "rgba(0,0,0,0.35)"
-  ctx.fill()
-
+function drawBall(ctx, x, y) {
   ctx.beginPath()
   ctx.arc(x, y, BALL_R, 0, Math.PI * 2)
-  ctx.fillStyle = color
+  ctx.fillStyle   = BALL_FILL
+  ctx.strokeStyle = BALL_STROKE
+  ctx.lineWidth   = 2.5
   ctx.fill()
-
-  ctx.beginPath()
-  ctx.arc(x, y, BALL_R * 0.72, 0, Math.PI * 2)
-  ctx.strokeStyle = "rgba(255,255,255,0.25)"
-  ctx.lineWidth = 1.5
   ctx.stroke()
-
-  ctx.beginPath()
-  ctx.arc(x, y, BALL_R, 0, Math.PI * 2)
-  ctx.strokeStyle = "rgba(0,0,0,0.3)"
-  ctx.lineWidth = 1
-  ctx.stroke()
-
-  try {
-    const shine = ctx.createRadialGradient(
-      x - BALL_R * 0.32, y - BALL_R * 0.38, BALL_R * 0.05,
-      x - BALL_R * 0.1,  y - BALL_R * 0.1,  BALL_R
-    )
-    shine.addColorStop(0,   "rgba(255,255,255,0.75)")
-    shine.addColorStop(0.4, "rgba(255,255,255,0.15)")
-    shine.addColorStop(1,   "rgba(255,255,255,0)")
-    ctx.beginPath()
-    ctx.arc(x, y, BALL_R, 0, Math.PI * 2)
-    ctx.fillStyle = shine
-    ctx.fill()
-  } catch (_) {}
 }
 
 function drawSlots(ctx, landedSlots) {
@@ -152,17 +122,19 @@ export default function GambleModal({ onClose }) {
 
     const paths = Array.from({ length: bet }, buildPath)
 
-    // Physics state for each visible ball
-    const balls = paths.slice(0, MAX_VISUAL).map((path, bi) => ({
+    // Dynamic stagger: faster for larger bets so total time stays ~3-4s
+    const stagger = Math.max(30, Math.round(500 / paths.length))
+
+    // Physics state for every ball
+    const balls = paths.map((path, bi) => ({
       x:     getBallX(path[0]),
       y:     -BALL_R,
       vx:    0,
       vy:    0,
-      row:   0,       // next peg row to check collision against
+      row:   0,
       done:  false,
       path,
-      delay: bi * STAGGER_MS,
-      color: BALL_COLOR,
+      delay: bi * stagger,
     }))
 
     cancelAnimationFrame(animRef.current)
@@ -171,7 +143,7 @@ export default function GambleModal({ onClose }) {
 
     const failsafe = setTimeout(
       () => setDropping(false),
-      STAGGER_MS * balls.length + 6000
+      stagger * balls.length + 6000
     )
 
     const frame = (now) => {
@@ -231,7 +203,7 @@ export default function GambleModal({ onClose }) {
 
         // Draw balls that have started
         balls.forEach(ball => {
-          if (elapsed >= ball.delay) drawBall(ctx, ball.x, ball.y, ball.color)
+          if (elapsed >= ball.delay) drawBall(ctx, ball.x, ball.y)
         })
 
         drawSlots(ctx, [])
