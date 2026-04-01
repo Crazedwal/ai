@@ -168,42 +168,38 @@ export default function GambleModal({ onClose }) {
 
           ball.vy += GRAVITY * dt
           ball.y  += ball.vy * dt
-          const prevX = ball.x
           ball.x  += ball.vx * dt
           ball.vx *= Math.exp(-H_DECAY * dt)
 
-          // Peg collision — loop handles skipping rows on large dt
+          // Peg collision — snap to peg surface (both x and y) so ball never clips inside
           while (ball.row < ROWS) {
-            if (ball.y >= getPegY(ball.row) - PEG_R - BALL_R) {
-              ball.y  = getPegY(ball.row) - PEG_R - BALL_R
+            const r    = ball.row
+            const pegY = getPegY(r)
+            const pegX = ball.path[r] * SPACING  // exact peg this ball targets
+            if (ball.y >= pegY - PEG_R - BALL_R) {
+              const dir = Math.sign(ball.path[r + 1] - ball.path[r])
+              ball.y  = pegY - PEG_R - BALL_R          // sit on top of peg
+              ball.x  = pegX + dir * (PEG_R + BALL_R)  // offset to bounce side
               ball.vy = VY_BOUNCE
-              const dir = Math.sign(ball.path[ball.row + 1] - ball.path[ball.row])
-              ball.vx   = dir * VX_IMPULSE
+              ball.vx = dir * VX_IMPULSE
               ball.row++
             } else {
               break
             }
           }
 
-          // Swept divider wall collisions — check if ball crossed a divider this frame
-          if (ball.y + BALL_R >= BOARD_H - 8) {
+          // Divider collision — overlap check, runs every frame ball is in slot area
+          if (ball.y + BALL_R > BOARD_H - BALL_R * 2) {
             for (let d = 1; d < SLOTS; d++) {
               const divX = d * SPACING
-              const leftEdge  = ball.x  - BALL_R
-              const rightEdge = ball.x  + BALL_R
-              const prevLeft  = prevX   - BALL_R
-              const prevRight = prevX   + BALL_R
-              const crossedRight = prevRight <= divX && rightEdge > divX
-              const crossedLeft  = prevLeft  >= divX && leftEdge  < divX
-              if (crossedRight) {
-                ball.x  = divX - BALL_R
-                ball.vx = -Math.abs(ball.vx) * 0.5
-                break
-              }
-              if (crossedLeft) {
-                ball.x  = divX + BALL_R
-                ball.vx =  Math.abs(ball.vx) * 0.5
-                break
+              if (ball.x > divX - BALL_R && ball.x < divX + BALL_R) {
+                if (ball.x >= divX) {
+                  ball.x  = divX + BALL_R
+                  ball.vx =  Math.abs(ball.vx) * 0.5 + 8
+                } else {
+                  ball.x  = divX - BALL_R
+                  ball.vx = -(Math.abs(ball.vx) * 0.5 + 8)
+                }
               }
             }
           }
