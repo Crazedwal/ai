@@ -171,18 +171,13 @@ export default function GambleModal({ onClose }) {
           ball.x  += ball.vx * dt
           ball.vx *= Math.exp(-H_DECAY * dt)
 
-          // Peg collision — snap y to peg surface, snap x to nearest visible peg
+          // Peg collision — snap y only, apply velocity impulse, let x flow naturally
           while (ball.row < ROWS) {
             const r    = ball.row
             const pegY = getPegY(r)
             if (ball.y >= pegY - PEG_R - BALL_R) {
               const dir = Math.sign(ball.path[r + 1] - ball.path[r])
-              // Find the nearest actual peg in this row to snap x against
-              const firstPegX = (7.5 - r * 0.5) * SPACING
-              const j    = Math.max(0, Math.min(r, Math.round((ball.x - firstPegX) / SPACING)))
-              const pegX = getPegX(r, j)
               ball.y  = pegY - PEG_R - BALL_R
-              ball.x  = pegX + dir * (PEG_R + BALL_R + 1)
               ball.vy = VY_BOUNCE
               ball.vx = dir * VX_IMPULSE
               ball.row++
