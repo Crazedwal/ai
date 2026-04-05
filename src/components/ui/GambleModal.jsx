@@ -171,15 +171,18 @@ export default function GambleModal({ onClose }) {
           ball.x  += ball.vx * dt
           ball.vx *= Math.exp(-H_DECAY * dt)
 
-          // Peg collision — snap to peg surface (both x and y) so ball never clips inside
+          // Peg collision — snap y to peg surface, snap x to nearest visible peg
           while (ball.row < ROWS) {
             const r    = ball.row
             const pegY = getPegY(r)
-            const pegX = ball.path[r] * SPACING  // exact peg this ball targets
             if (ball.y >= pegY - PEG_R - BALL_R) {
               const dir = Math.sign(ball.path[r + 1] - ball.path[r])
-              ball.y  = pegY - PEG_R - BALL_R          // sit on top of peg
-              ball.x  = pegX + dir * (PEG_R + BALL_R)  // offset to bounce side
+              // Find the nearest actual peg in this row to snap x against
+              const firstPegX = (7.5 - r * 0.5) * SPACING
+              const j    = Math.max(0, Math.min(r, Math.round((ball.x - firstPegX) / SPACING)))
+              const pegX = getPegX(r, j)
+              ball.y  = pegY - PEG_R - BALL_R
+              ball.x  = pegX + dir * (PEG_R + BALL_R + 1)
               ball.vy = VY_BOUNCE
               ball.vx = dir * VX_IMPULSE
               ball.row++
@@ -188,14 +191,14 @@ export default function GambleModal({ onClose }) {
             }
           }
 
-          // Divider collision — overlap check, runs every frame ball is in slot area
-          if (ball.y + BALL_R > BOARD_H - BALL_R * 2) {
+          // Divider collision — active as soon as ball exits last peg, no gap
+          if (ball.row >= ROWS) {
             for (let d = 1; d < SLOTS; d++) {
               const divX = d * SPACING
               if (ball.x > divX - BALL_R && ball.x < divX + BALL_R) {
                 if (ball.x >= divX) {
                   ball.x  = divX + BALL_R
-                  ball.vx =  Math.abs(ball.vx) * 0.5 + 8
+                  ball.vx = Math.abs(ball.vx) * 0.5 + 8
                 } else {
                   ball.x  = divX - BALL_R
                   ball.vx = -(Math.abs(ball.vx) * 0.5 + 8)
