@@ -158,6 +158,19 @@ function Sidebar({
           </button>
         </div>
 
+        {/* Personality Matchmaker */}
+        <div className="p-3 border-t border-gray-700">
+          <a
+            href="/personality-matchmaker.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center gap-2 text-xs text-gray-500 hover:text-purple-400 transition-colors"
+          >
+            <span>🔮</span>
+            <span>Personality Matchmaker</span>
+          </a>
+        </div>
+
         {/* Radio */}
         <div className="p-3 border-t border-gray-700">
           <button
