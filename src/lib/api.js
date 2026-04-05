@@ -2,6 +2,11 @@
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
+// Share key with standalone HTML pages (e.g. personality-matchmaker.html)
+if (import.meta.env.VITE_OPENROUTER_API_KEY) {
+  localStorage.setItem('openrouter_api_key', import.meta.env.VITE_OPENROUTER_API_KEY)
+}
+
 export async function sendMessage(messages, modelId = "nvidia/nemotron-3-nano-30b-a3b:free") {
   const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY
 

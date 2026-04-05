@@ -198,8 +198,8 @@
 </div>
 
 <script>
-  // ─── PASTE YOUR OPENROUTER API KEY HERE ───────────────────────────────────
-  const API_KEY = ""
+  // ─── API KEY: reads from localStorage so you don't have to hardcode it ───
+  const API_KEY = localStorage.getItem('openrouter_api_key') || ""
   // ─────────────────────────────────────────────────────────────────────────
 
   const MODEL = "nvidia/nemotron-3-nano-30b-a3b:free"
