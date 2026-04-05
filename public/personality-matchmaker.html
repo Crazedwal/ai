@@ -13,365 +13,186 @@
       background-image:
         radial-gradient(ellipse 80% 60% at 20% 10%, rgba(80,20,180,0.35) 0%, transparent 70%),
         radial-gradient(ellipse 60% 50% at 80% 80%, rgba(120,20,200,0.2) 0%, transparent 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      color: #fff;
-      padding: 20px;
+      color: #fff; padding: 20px;
     }
 
     .phone {
-      width: 360px;
-      min-height: 640px;
-      background: rgba(16, 12, 40, 0.92);
+      width: 380px; height: 680px;
+      background: rgba(16, 12, 40, 0.95);
       backdrop-filter: blur(24px);
       border: 1px solid rgba(140, 80, 255, 0.25);
       border-radius: 36px;
-      padding: 28px 22px 32px;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.04) inset,
-        0 0 80px rgba(100,40,220,0.18),
-        0 32px 80px rgba(0,0,0,0.6);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 80px rgba(100,40,220,0.18), 0 32px 80px rgba(0,0,0,0.6);
+      display: flex; flex-direction: column; overflow: hidden;
     }
 
-    /* status bar */
-    .status-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 20px;
-      padding: 0 4px;
+    .header {
+      padding: 20px 22px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
     }
-    .status-bar .battery { font-size: 10px; letter-spacing: 1px; }
+    .header-icon {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0; box-shadow: 0 0 16px rgba(168,85,247,0.4);
+    }
+    .header-text h2 { font-size: 15px; font-weight: 700; }
+    .header-text p  { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+    .header-badge {
+      margin-left: auto; font-size: 10px; padding: 3px 8px;
+      background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 20px; color: #c084fc; letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0;
+    }
 
-    /* ── SCREEN MANAGEMENT ── */
-    .screen { display: none; flex-direction: column; flex: 1; }
+    .screen { display: none; flex-direction: column; flex: 1; min-height: 0; }
     .screen.active { display: flex; }
 
-    /* ── START SCREEN ── */
-    .start-screen {
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      text-align: center;
-    }
+    /* START */
+    .start-screen { align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 30px 28px; }
     .start-icon {
-      width: 88px; height: 88px;
-      background: linear-gradient(135deg, #7c3aed, #a855f7);
-      border-radius: 50%;
+      width: 90px; height: 90px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(168,85,237,0.15));
+      border: 2px solid rgba(168,85,247,0.4); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 38px;
-      box-shadow: 0 0 40px rgba(168,85,247,0.5);
-      margin-bottom: 8px;
+      font-size: 40px; box-shadow: 0 0 40px rgba(168,85,247,0.3); margin-bottom: 4px;
     }
     .start-screen h1 {
-      font-size: 22px; font-weight: 800; letter-spacing: 1.5px;
+      font-size: 20px; font-weight: 800; letter-spacing: 1px;
       background: linear-gradient(90deg, #c084fc, #818cf8);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      text-transform: uppercase;
     }
-    .start-screen .subtitle {
-      font-size: 11px; letter-spacing: 3px; color: rgba(255,255,255,0.45);
-      text-transform: uppercase; margin-bottom: 8px;
-    }
-    .start-screen p {
-      font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.6;
-      max-width: 260px; margin-bottom: 16px;
-    }
+    .start-screen .tagline { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; max-width: 260px; }
+    .start-screen .note { font-size: 11px; color: rgba(255,255,255,0.25); }
 
-    /* ── QUIZ SCREEN ── */
-    .quiz-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 10px;
+    /* CHAT */
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 16px 16px 8px;
+      display: flex; flex-direction: column; gap: 10px; min-height: 0;
     }
-    .quiz-title {
-      font-size: 10px; letter-spacing: 3px; color: rgba(255,255,255,0.4);
-      text-transform: uppercase;
-    }
-    .quiz-counter {
-      font-size: 13px; font-weight: 700;
-      color: rgba(255,255,255,0.5);
-    }
-    .progress-bar-track {
-      height: 4px; background: rgba(255,255,255,0.08);
-      border-radius: 4px; overflow: hidden; margin-bottom: 24px;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc);
-      border-radius: 4px;
-      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 10px rgba(168,85,247,0.6);
-    }
-    .question-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(140,80,255,0.2);
-      border-radius: 20px;
-      padding: 20px 18px;
-      margin-bottom: 18px;
-      position: relative;
-    }
-    .question-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 2px;
-      color: #a855f7; text-transform: uppercase; margin-bottom: 12px;
-    }
-    .question-text {
-      font-size: 17px; font-weight: 600; line-height: 1.5;
-      color: rgba(255,255,255,0.95);
-    }
-    .sparkle { position: absolute; top: 16px; right: 16px; font-size: 18px; opacity: 0.6; }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 4px; }
 
-    .options { display: flex; flex-direction: column; gap: 10px; flex: 1; }
-    .option {
-      display: flex; align-items: center; gap: 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      padding: 14px 16px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      user-select: none;
-    }
-    .option:hover { background: rgba(140,80,255,0.12); border-color: rgba(140,80,255,0.35); }
-    .option.selected {
-      background: linear-gradient(120deg, rgba(124,58,237,0.35), rgba(168,85,247,0.2));
-      border-color: #a855f7;
-      box-shadow: 0 0 20px rgba(168,85,247,0.15);
-    }
-    .option-letter {
-      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.6);
-      transition: all 0.2s;
-    }
-    .option.selected .option-letter {
+    .msg { display: flex; gap: 8px; max-width: 88%; animation: fadeUp 0.25s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .msg.ai   { align-self: flex-start; }
+    .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .msg-avatar {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
       background: linear-gradient(135deg, #7c3aed, #a855f7);
-      border-color: transparent; color: #fff;
-      box-shadow: 0 0 12px rgba(168,85,247,0.5);
+      display: flex; align-items: center; justify-content: center; font-size: 14px; margin-top: 2px;
     }
-    .option-text { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.4; }
-    .option.selected .option-text { color: #fff; }
+    .msg-bubble { padding: 10px 14px; border-radius: 18px; font-size: 13px; line-height: 1.55; }
+    .msg.ai   .msg-bubble { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.08); border-bottom-left-radius: 4px; }
+    .msg.user .msg-bubble { background: linear-gradient(135deg, #7c3aed, #a855f7); border-bottom-right-radius: 4px; }
 
-    /* ── LOADING SCREEN ── */
-    .loading-screen {
-      align-items: center; justify-content: center; gap: 20px;
-      text-align: center;
-    }
-    .loading-icon {
-      width: 100px; height: 100px;
-      background: rgba(124,58,237,0.15);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      position: relative;
-    }
-    .loading-ring {
-      position: absolute; inset: -8px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      border-top-color: #a855f7;
-      border-right-color: rgba(168,85,247,0.3);
-      animation: spin 1.2s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-dots {
-      display: flex; gap: 6px; justify-content: center;
-    }
-    .loading-dots span {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #a855f7; opacity: 0.3;
-      animation: pulse-dot 1.2s ease-in-out infinite;
-    }
-    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes pulse-dot { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:1;transform:scale(1.3)} }
-    .loading-title { font-size: 18px; font-weight: 700; color: #c084fc; }
-    .loading-sub { font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
+    .typing-indicator { display: flex; align-items: center; gap: 4px; padding: 10px 14px; }
+    .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(168,85,247,0.7); animation: bounce 1.2s ease-in-out infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
 
-    /* ── RESULTS SCREEN ── */
-    .results-header {
-      font-size: 10px; letter-spacing: 4px; color: rgba(255,255,255,0.35);
-      text-transform: uppercase; text-align: center; margin-bottom: 16px;
+    .chat-input-area {
+      padding: 12px 14px 18px; border-top: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0; display: flex; gap: 8px; align-items: flex-end;
     }
+    .chat-input-area textarea {
+      flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px; padding: 10px 14px; color: #fff; font-size: 13px;
+      font-family: inherit; resize: none; outline: none; max-height: 100px; line-height: 1.4;
+      transition: border-color 0.2s;
+    }
+    .chat-input-area textarea:focus { border-color: rgba(168,85,247,0.5); }
+    .chat-input-area textarea::placeholder { color: rgba(255,255,255,0.25); }
+    .send-btn {
+      width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+      background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; font-size: 15px;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+    }
+    .send-btn:hover { transform: scale(1.08); }
+    .send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+    /* RESULT CARD */
     .result-card {
-      background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(168,85,247,0.12));
-      border: 1px solid rgba(168,85,247,0.3);
-      border-radius: 22px;
-      padding: 22px 18px;
-      text-align: center;
-      margin-bottom: 14px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(168,85,247,0.1));
+      border: 1px solid rgba(168,85,247,0.35); border-radius: 18px;
+      padding: 18px 16px; width: 100%;
     }
-    .result-emoji {
-      width: 72px; height: 72px;
-      background: linear-gradient(135deg, rgba(124,58,237,0.4), rgba(168,85,247,0.2));
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 36px;
-      margin: 0 auto 14px;
-      border: 2px solid rgba(168,85,247,0.4);
-      box-shadow: 0 0 30px rgba(168,85,247,0.25);
+    .rc-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .rc-emoji {
+      width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(168,85,247,0.2); border: 2px solid rgba(168,85,247,0.4);
+      display: flex; align-items: center; justify-content: center; font-size: 26px;
     }
-    .result-title {
-      font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 4px;
-    }
-    .result-subtitle {
-      font-size: 10px; letter-spacing: 3px; color: #a855f7;
-      text-transform: uppercase; margin-bottom: 12px;
-    }
-    .result-desc {
-      font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.6;
-    }
-
-    .traits-section { margin-bottom: 14px; }
-    .traits-title {
-      font-size: 10px; letter-spacing: 3px; color: rgba(255,255,255,0.35);
-      text-transform: uppercase; margin-bottom: 12px;
-    }
-    .trait-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
-    .trait-label { font-size: 12px; color: rgba(255,255,255,0.6); width: 82px; flex-shrink: 0; }
-    .trait-bar-track {
-      flex: 1; height: 6px;
-      background: rgba(255,255,255,0.08); border-radius: 6px; overflow: hidden;
-    }
-    .trait-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #7c3aed, #c084fc);
-      border-radius: 6px;
-      width: 0%;
-      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 8px rgba(168,85,247,0.4);
-    }
-    .trait-pct { font-size: 11px; font-weight: 700; color: #c084fc; width: 30px; text-align: right; flex-shrink: 0; }
-
-    .best-match-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      padding: 14px 16px;
+    .rc-title { font-size: 17px; font-weight: 800; }
+    .rc-subtitle { font-size: 10px; letter-spacing: 2px; color: #a855f7; text-transform: uppercase; margin-top: 2px; }
+    .rc-desc { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 14px; }
+    .rc-traits { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
+    .rc-trait { display: flex; align-items: center; gap: 8px; }
+    .rc-trait-label { font-size: 11px; color: rgba(255,255,255,0.5); width: 74px; flex-shrink: 0; }
+    .rc-track { flex: 1; height: 5px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; }
+    .rc-fill { height: 100%; background: linear-gradient(90deg, #7c3aed, #c084fc); border-radius: 5px; width: 0; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .rc-pct { font-size: 10px; font-weight: 700; color: #c084fc; width: 28px; text-align: right; flex-shrink: 0; }
+    .rc-match {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 18px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 10px 12px; margin-bottom: 14px;
     }
-    .best-match-label {
-      font-size: 10px; letter-spacing: 2px; color: #a855f7;
-      text-transform: uppercase; margin-bottom: 4px;
+    .rc-match-label { font-size: 9px; letter-spacing: 2px; color: #a855f7; text-transform: uppercase; margin-bottom: 3px; }
+    .rc-match-name { font-size: 13px; font-weight: 600; }
+    .rc-match-compat { font-size: 11px; color: rgba(255,255,255,0.35); }
+    .use-btn {
+      width: 100%; padding: 12px; border: none; border-radius: 50px; cursor: pointer;
+      background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff;
+      font-size: 14px; font-weight: 700; box-shadow: 0 6px 20px rgba(124,58,237,0.4);
+      transition: all 0.2s; margin-bottom: 8px; display: block;
     }
-    .best-match-name { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); }
-    .best-match-compat { font-size: 12px; color: rgba(255,255,255,0.4); }
-    .best-match-emoji { font-size: 28px; }
+    .use-btn:hover { transform: translateY(-2px); }
+    .use-btn.saved { background: linear-gradient(135deg, #16a34a, #22c55e); box-shadow: 0 6px 20px rgba(34,197,94,0.3); }
+    .restart-btn {
+      width: 100%; padding: 10px; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50px; background: transparent; color: rgba(255,255,255,0.5);
+      font-size: 13px; cursor: pointer; transition: all 0.2s;
+    }
+    .restart-btn:hover { border-color: rgba(168,85,247,0.4); color: #fff; }
 
-    /* ── SHARED BUTTONS ── */
     .btn {
-      width: 100%; padding: 15px;
-      border: none; border-radius: 50px; cursor: pointer;
-      font-size: 15px; font-weight: 700; letter-spacing: 0.5px;
-      transition: all 0.2s ease;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #7c3aed, #a855f7);
-      color: #fff;
+      width: 100%; padding: 14px; border: none; border-radius: 50px; cursor: pointer;
+      font-size: 15px; font-weight: 700; transition: all 0.2s;
+      background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff;
       box-shadow: 0 8px 30px rgba(124,58,237,0.4);
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,0.55); }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-    .btn-outline {
-      background: transparent;
-      color: rgba(255,255,255,0.7);
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-    .btn-outline:hover { border-color: rgba(168,85,247,0.5); color: #fff; }
-
-    .btn-row { display: flex; gap: 10px; }
-    .btn-row .btn { flex: 1; font-size: 13px; }
-
-    .mt-auto { margin-top: auto; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,0.55); }
   </style>
 </head>
 <body>
-
 <div class="phone">
-  <div class="status-bar">
-    <span>9:41</span>
-    <span class="battery">○ □</span>
+  <div class="header">
+    <div class="header-icon">🔮</div>
+    <div class="header-text">
+      <h2>Personality Matchmaker</h2>
+      <p>Discover your archetype</p>
+    </div>
+    <div class="header-badge" id="exchange-badge">AI</div>
   </div>
 
-  <!-- ── START SCREEN ── -->
   <div class="screen start-screen active" id="screen-start">
     <div class="start-icon">🔮</div>
-    <h1>AI Personality<br>Matchmaker</h1>
-    <p class="subtitle">Powered by AI</p>
-    <p>Answer 6 quick questions and let AI reveal your unique personality archetype.</p>
-    <button class="btn btn-primary" onclick="startQuiz()">Begin Discovery</button>
+    <h1>What's Your Archetype?</h1>
+    <p class="tagline">Have a real conversation with AI. It asks questions and reveals your unique personality type.</p>
+    <p class="note">No multiple choice — just talk naturally.</p>
+    <button class="btn" onclick="startChat()" style="margin-top:8px">Start Conversation</button>
   </div>
 
-  <!-- ── QUIZ SCREEN ── -->
-  <div class="screen" id="screen-quiz">
-    <div class="quiz-header">
-      <span class="quiz-title">Question</span>
-      <span class="quiz-counter" id="quiz-counter">1/6</span>
-    </div>
-    <div class="progress-bar-track">
-      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
-    </div>
-    <div class="question-card">
-      <div class="question-label" id="q-label">Question 1</div>
-      <div class="question-text" id="q-text"></div>
-      <span class="sparkle">✦</span>
-    </div>
-    <div class="options" id="options-list"></div>
-    <div class="mt-auto" style="padding-top:18px">
-      <button class="btn btn-primary" id="next-btn" disabled onclick="nextQuestion()">Next Question</button>
-    </div>
-  </div>
-
-  <!-- ── LOADING SCREEN ── -->
-  <div class="screen loading-screen" id="screen-loading">
-    <div class="loading-icon">
-      <div class="loading-ring"></div>
-      <span style="font-size:36px">🔮</span>
-    </div>
-    <div class="loading-title">AI Analyzes</div>
-    <div class="loading-sub">Your Responses</div>
-    <div class="loading-dots">
-      <span></span><span></span><span></span>
-    </div>
-  </div>
-
-  <!-- ── RESULTS SCREEN ── -->
-  <div class="screen" id="screen-results">
-    <div class="results-header">Your Result</div>
-    <div class="result-card">
-      <div class="result-emoji" id="res-emoji">🏛️</div>
-      <div class="result-title" id="res-title">The Architect</div>
-      <div class="result-subtitle" id="res-subtitle">Strategic Visionary</div>
-      <div class="result-desc" id="res-desc">You see patterns others miss.</div>
-    </div>
-    <div class="traits-section">
-      <div class="traits-title">Match Strength</div>
-      <div class="trait-row"><span class="trait-label">Strategic</span><div class="trait-bar-track"><div class="trait-bar-fill" id="bar-Strategic"></div></div><span class="trait-pct" id="pct-Strategic">0%</span></div>
-      <div class="trait-row"><span class="trait-label">Creative</span><div class="trait-bar-track"><div class="trait-bar-fill" id="bar-Creative"></div></div><span class="trait-pct" id="pct-Creative">0%</span></div>
-      <div class="trait-row"><span class="trait-label">Analytical</span><div class="trait-bar-track"><div class="trait-bar-fill" id="bar-Analytical"></div></div><span class="trait-pct" id="pct-Analytical">0%</span></div>
-      <div class="trait-row"><span class="trait-label">Empathetic</span><div class="trait-bar-track"><div class="trait-bar-fill" id="bar-Empathetic"></div></div><span class="trait-pct" id="pct-Empathetic">0%</span></div>
-    </div>
-    <div class="best-match-card">
-      <div>
-        <div class="best-match-label">Best Match</div>
-        <div class="best-match-name" id="res-match-name">The Explorer</div>
-        <div class="best-match-compat" id="res-match-compat">89% compatibility</div>
-      </div>
-      <div class="best-match-emoji" id="res-match-emoji">💛</div>
-    </div>
-    <div class="btn-row mt-auto">
-      <button class="btn btn-outline" onclick="retakeQuiz()">Retake Quiz</button>
-      <button class="btn btn-primary" onclick="shareResult()">Share Result</button>
+  <div class="screen" id="screen-chat">
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-area" id="input-area">
+      <textarea id="chat-input" placeholder="Type your answer..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>➤</button>
     </div>
   </div>
 </div>
@@ -383,232 +204,235 @@
 
   const MODEL = "nvidia/nemotron-3-nano-30b-a3b:free"
 
-  const questions = [
-    {
-      text: "You discover a hidden room. What do you do first?",
-      options: ["Explore every corner carefully", "Look for something valuable", "Find someone to share it with", "Figure out how to use it"]
-    },
-    {
-      text: "Your friend group needs a leader for a big project. You...",
-      options: ["Step up and take charge immediately", "Pitch a bold, creative direction", "Support whoever the group chooses", "Quietly analyze what needs to be done first"]
-    },
-    {
-      text: "It's Saturday morning with no plans. You instinctively...",
-      options: ["Plan a detailed schedule for the day", "Start a creative project you've been putting off", "Call up friends to hang out", "Fall into a research rabbit hole on something interesting"]
-    },
-    {
-      text: "You receive unexpected criticism on your work. You...",
-      options: ["Use it to refine your strategy", "Channel it into creative reinvention", "Talk it through with someone you trust", "Systematically examine if they have a point"]
-    },
-    {
-      text: "When solving a tough problem, your go-to approach is...",
-      options: ["Proven strategies and frameworks", "Intuition and outside-the-box thinking", "Getting input and perspectives from others", "Data, logic, and careful analysis"]
-    },
-    {
-      text: "Your ideal superpower would be...",
-      options: ["Perfect foresight — always know the best move", "Infinite creativity — manifest anything you imagine", "Pure empathy — understand anyone instantly", "Instant mastery — learn any skill immediately"]
-    }
+  const SYSTEM_PROMPT = `You are a warm, insightful personality analyst. Discover the user's personality type through natural conversation.
+
+Rules:
+- Ask ONE short, interesting question at a time — never multiple at once
+- Questions should feel like genuine curiosity, not a formal quiz
+- After 5-6 meaningful exchanges you have enough data to determine their type
+- When you have enough, respond with ONLY this JSON object and nothing else (no markdown, no explanation):
+{
+  "done": true,
+  "title": "The [Archetype]",
+  "subtitle": "[2-4 word descriptor]",
+  "emoji": "[single emoji]",
+  "description": "[2-3 sentences about this personality]",
+  "traits": { "Strategic": 0-100, "Creative": 0-100, "Analytical": 0-100, "Empathetic": 0-100 },
+  "bestMatch": "[compatible archetype name]",
+  "compatibility": 50-99,
+  "bestMatchEmoji": "[emoji]"
+}
+
+Begin with a very brief warm greeting and your first question. Keep all non-JSON messages to 1-2 sentences maximum.`
+
+  const MOCK_QUESTIONS = [
+    "Hey! I'm going to figure out your personality type through conversation. Let's start — what's something you've been genuinely excited about lately?",
+    "Interesting! When you face a tough decision, do you usually go with your gut feeling or think it through step by step?",
+    "Got it. If a close friend came to you with a big problem, what's your first instinct — try to fix it, or just be there and listen?",
+    "One more — if you had a completely free weekend, what would your ideal way to spend it look like?",
+    "Last question — would you say you're someone who plans things out carefully or prefers to just see where things go?",
   ]
 
-  // Option index → trait weight  [Strategic, Creative, Empathetic, Analytical]
-  const traitWeights = [
-    [1, 0, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1],
-  ]
-
-  const mockPersonalities = {
-    Strategic: { title: "The Architect", subtitle: "Strategic Visionary", emoji: "🏛️",
-      desc: "You see patterns others miss. You plan three steps ahead and your friends come to you when they need a strategy. Creative, analytical, and quietly confident.",
-      bestMatch: "The Explorer", bestEmoji: "🧭" },
-    Creative:  { title: "The Creator",   subtitle: "Visionary Artist",    emoji: "🎨",
-      desc: "Your mind is a kaleidoscope of ideas. You live at the intersection of imagination and action — turning blank canvases into worlds others couldn't have dreamed up.",
-      bestMatch: "The Architect", bestEmoji: "🏛️" },
-    Empathetic:{ title: "The Connector", subtitle: "Social Harmonizer",   emoji: "🌟",
-      desc: "You have an extraordinary gift for reading people. Rooms feel warmer when you enter. You build bridges where others see walls, making everyone around you feel seen.",
-      bestMatch: "The Creator", bestEmoji: "🎨" },
-    Analytical:{ title: "The Scholar",   subtitle: "Analytical Thinker",  emoji: "🔬",
-      desc: "You're driven by truth and understanding. Where others see chaos, you see a puzzle waiting to be solved. Your precision and depth of thought are your superpowers.",
-      bestMatch: "The Connector", bestEmoji: "🌟" },
-  }
-
-  let currentQ   = 0
-  let answers    = []
-  let selectedOpt = null
+  let history      = []
+  let exchangeCount = 0
+  let waiting      = false
 
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'))
     document.getElementById(id).classList.add('active')
   }
 
-  function startQuiz() {
-    currentQ    = 0
-    answers     = []
-    selectedOpt = null
-    renderQuestion()
-    showScreen('screen-quiz')
+  function startChat() {
+    history       = []
+    exchangeCount = 0
+    waiting       = false
+    document.getElementById('chat-messages').innerHTML = ''
+    document.getElementById('chat-input').value = ''
+    document.getElementById('chat-input').disabled = false
+    document.getElementById('send-btn').disabled = true
+    document.getElementById('input-area').style.display = 'flex'
+    document.getElementById('exchange-badge').textContent = 'AI'
+    showScreen('screen-chat')
+    setTimeout(aiRespond, 400)
   }
 
-  function retakeQuiz() {
-    showScreen('screen-start')
+  function autoResize(el) {
+    el.style.height = 'auto'
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px'
+    document.getElementById('send-btn').disabled = el.value.trim() === '' || waiting
   }
 
-  function renderQuestion() {
-    const q = questions[currentQ]
-    document.getElementById('q-label').textContent = `Question ${currentQ + 1}`
-    document.getElementById('q-text').textContent  = q.text
-    document.getElementById('quiz-counter').textContent = `${currentQ + 1}/6`
-    document.getElementById('progress-fill').style.width = `${(currentQ / 6) * 100}%`
-    document.getElementById('next-btn').disabled = true
-    selectedOpt = null
-
-    const letters = ['A', 'B', 'C', 'D']
-    const list = document.getElementById('options-list')
-    list.innerHTML = q.options.map((opt, i) => `
-      <div class="option" onclick="selectOption(${i})">
-        <div class="option-letter" id="opt-letter-${i}">${letters[i]}</div>
-        <div class="option-text">${opt}</div>
-      </div>
-    `).join('')
-  }
-
-  function selectOption(i) {
-    document.querySelectorAll('.option').forEach((el, idx) => {
-      el.classList.toggle('selected', idx === i)
-    })
-    selectedOpt = i
-    document.getElementById('next-btn').disabled = false
-  }
-
-  function nextQuestion() {
-    if (selectedOpt === null) return
-    answers.push(selectedOpt)
-
-    if (currentQ < questions.length - 1) {
-      currentQ++
-      renderQuestion()
-    } else {
-      // Final question answered — go to loading
-      document.getElementById('progress-fill').style.width = '100%'
-      setTimeout(() => {
-        showScreen('screen-loading')
-        analyzePersonality()
-      }, 300)
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (!document.getElementById('send-btn').disabled) sendMessage()
     }
   }
 
-  async function analyzePersonality() {
-    if (!API_KEY) {
-      await mockAnalyze()
+  function addMessage(role, html) {
+    const el = document.createElement('div')
+    el.className = `msg ${role}`
+    if (role === 'ai') {
+      el.innerHTML = `<div class="msg-avatar">🔮</div><div class="msg-bubble">${html}</div>`
     } else {
-      try {
-        await realAnalyze()
-      } catch (err) {
-        console.warn("API failed, falling back to mock:", err)
-        await mockAnalyze()
-      }
+      el.innerHTML = `<div class="msg-bubble">${html}</div>`
     }
+    document.getElementById('chat-messages').appendChild(el)
+    scrollBottom()
   }
 
-  async function realAnalyze() {
-    const answerSummary = answers.map((a, i) =>
-      `Q${i+1}: "${questions[i].text}" → "${questions[i].options[a]}"`
-    ).join('\n')
+  function addTyping() {
+    const el = document.createElement('div')
+    el.className = 'msg ai'; el.id = 'typing'
+    el.innerHTML = `<div class="msg-avatar">🔮</div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`
+    document.getElementById('chat-messages').appendChild(el)
+    scrollBottom()
+  }
 
-    const prompt = `You are a personality analyst. The user answered 6 questions:\n\n${answerSummary}\n\nReturn ONLY a valid JSON object (no markdown, no code blocks) with exactly this structure:\n{\n  "title": "The [Archetype name]",\n  "subtitle": "[2-4 word evocative descriptor]",\n  "emoji": "[single relevant emoji]",\n  "description": "[2-3 sentences about this personality type]",\n  "traits": { "Strategic": [0-100], "Creative": [0-100], "Analytical": [0-100], "Empathetic": [0-100] },\n  "bestMatch": "[Personality archetype name]",\n  "compatibility": [50-99],\n  "bestMatchEmoji": "[single emoji]"\n}`
+  function removeTyping() { document.getElementById('typing')?.remove() }
+  function scrollBottom() {
+    const el = document.getElementById('chat-messages')
+    el.scrollTop = el.scrollHeight
+  }
 
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
+  async function sendMessage() {
+    const input = document.getElementById('chat-input')
+    const text  = input.value.trim()
+    if (!text || waiting) return
+    input.value = ''; input.style.height = 'auto'
+    document.getElementById('send-btn').disabled = true
+    addMessage('user', esc(text))
+    history.push({ role: 'user', content: text })
+    exchangeCount++
+    document.getElementById('exchange-badge').textContent = `${Math.min(exchangeCount, 5)}/5`
+    await aiRespond()
+  }
+
+  async function aiRespond() {
+    waiting = true
+    addTyping()
+    try {
+      const reply = API_KEY ? await callAPI() : await mockReply()
+      removeTyping()
+      const result = tryParse(reply)
+      if (result) { showResult(result); return }
+      addMessage('ai', esc(reply))
+      history.push({ role: 'assistant', content: reply })
+    } catch (err) {
+      removeTyping()
+      addMessage('ai', 'Sorry, something went wrong. Try refreshing.')
+      console.error(err)
+    }
+    waiting = false
+    document.getElementById('send-btn').disabled = document.getElementById('chat-input').value.trim() === ''
+    document.getElementById('chat-input').focus()
+  }
+
+  async function callAPI() {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": window.location.origin,
-        "X-Title": "AI Personality Matchmaker"
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': window.location.origin,
+        'X-Title': 'AI Personality Matchmaker'
       },
       body: JSON.stringify({
         model: MODEL,
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.8
+        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...history],
+        temperature: 0.85
       })
     })
-
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const data  = await res.json()
-    const raw   = data.choices?.[0]?.message?.content || ""
-    const json  = JSON.parse(raw.replace(/```json?|```/g, "").trim())
-    showResults(json)
+    const data = await res.json()
+    return (data.choices?.[0]?.message?.content || '').trim()
   }
 
-  async function mockAnalyze() {
-    await new Promise(r => setTimeout(r, 2200))
-
-    // Tally trait scores from answers
-    const scores = { Strategic: 0, Creative: 0, Empathetic: 0, Analytical: 0 }
-    const keys   = Object.keys(scores)
-    answers.forEach(a => { scores[keys[a]] += 1 })
-
-    const top = keys.reduce((a, b) => scores[a] >= scores[b] ? a : b)
-    const p   = mockPersonalities[top]
-
-    // Generate realistic trait percentages
-    const base = { Strategic: 30, Creative: 30, Analytical: 30, Empathetic: 30 }
-    keys.forEach((k, i) => { base[k] += scores[k] * 12 + Math.floor(Math.random() * 10) })
-
-    // Cap at 100 and add some variation
-    const traits = {
-      Strategic:  Math.min(99, base.Strategic  + (top === 'Strategic'  ? 15 : 0)),
-      Creative:   Math.min(99, base.Creative   + (top === 'Creative'   ? 15 : 0)),
-      Analytical: Math.min(99, base.Analytical + (top === 'Analytical' ? 15 : 0)),
-      Empathetic: Math.min(99, base.Empathetic + (top === 'Empathetic' ? 15 : 0)),
-    }
-
-    showResults({
-      title:          p.title,
-      subtitle:       p.subtitle,
-      emoji:          p.emoji,
-      description:    p.desc,
-      traits,
-      bestMatch:      p.bestMatch,
-      compatibility:  Math.floor(Math.random() * 15) + 82,
-      bestMatchEmoji: p.bestEmoji,
+  async function mockReply() {
+    await new Promise(r => setTimeout(r, 1000 + Math.random() * 700))
+    const idx = exchangeCount - 1
+    if (idx < MOCK_QUESTIONS.length) return MOCK_QUESTIONS[idx]
+    return JSON.stringify({
+      done: true, title: "The Architect", subtitle: "Strategic Visionary", emoji: "🏛️",
+      description: "You see patterns others miss. You plan three steps ahead and your friends come to you when they need a strategy. Creative, analytical, and quietly confident.",
+      traits: { Strategic: 88, Creative: 72, Analytical: 81, Empathetic: 65 },
+      bestMatch: "The Explorer", compatibility: 87, bestMatchEmoji: "🧭"
     })
   }
 
-  function showResults(data) {
-    document.getElementById('res-emoji').textContent    = data.emoji      || "🔮"
-    document.getElementById('res-title').textContent    = data.title      || "The Visionary"
-    document.getElementById('res-subtitle').textContent = data.subtitle   || "Unique Mind"
-    document.getElementById('res-desc').textContent     = data.description|| ""
-    document.getElementById('res-match-name').textContent   = data.bestMatch  || "The Explorer"
-    document.getElementById('res-match-compat').textContent = `${data.compatibility || 88}% compatibility`
-    document.getElementById('res-match-emoji').textContent  = data.bestMatchEmoji || "💛"
-
-    showScreen('screen-results')
-
-    // Animate trait bars in after a tick so transition fires
-    const traits = data.traits || {}
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        ['Strategic','Creative','Analytical','Empathetic'].forEach(k => {
-          const v = Math.min(99, Math.max(1, traits[k] || 50))
-          document.getElementById(`bar-${k}`).style.width = `${v}%`
-          document.getElementById(`pct-${k}`).textContent = `${v}%`
-        })
-      }, 120)
-    })
+  function tryParse(text) {
+    try {
+      const obj = JSON.parse(text.replace(/```json?|```/g, '').trim())
+      if (obj.done && obj.title) return obj
+    } catch (_) {}
+    return null
   }
 
-  function shareResult() {
-    const title = document.getElementById('res-title').textContent
-    const sub   = document.getElementById('res-subtitle').textContent
-    if (navigator.share) {
-      navigator.share({ title: "My AI Personality", text: `I'm ${title} — ${sub}! Find out yours.` })
-        .catch(() => {})
-    } else {
-      const text = `I'm ${title} (${sub}) on the AI Personality Matchmaker!`
-      navigator.clipboard?.writeText(text).then(() => alert("Copied to clipboard!")).catch(() => alert(text))
-    }
+  function showResult(data) {
+    document.getElementById('input-area').style.display = 'none'
+    document.getElementById('exchange-badge').textContent = 'Done'
+
+    const wrap = document.createElement('div')
+    wrap.style.cssText = 'width:100%;animation:fadeUp 0.3s ease'
+    wrap.innerHTML = `
+      <div class="result-card">
+        <div class="rc-top">
+          <div class="rc-emoji">${data.emoji || '🔮'}</div>
+          <div>
+            <div class="rc-title">${esc(data.title)}</div>
+            <div class="rc-subtitle">${esc(data.subtitle)}</div>
+          </div>
+        </div>
+        <div class="rc-desc">${esc(data.description)}</div>
+        <div class="rc-traits">
+          ${['Strategic','Creative','Analytical','Empathetic'].map(k => `
+            <div class="rc-trait">
+              <span class="rc-trait-label">${k}</span>
+              <div class="rc-track"><div class="rc-fill" id="rf-${k}"></div></div>
+              <span class="rc-pct" id="rp-${k}">0%</span>
+            </div>`).join('')}
+        </div>
+        <div class="rc-match">
+          <div>
+            <div class="rc-match-label">Best Match</div>
+            <div class="rc-match-name">${esc(data.bestMatch)}</div>
+            <div class="rc-match-compat">${data.compatibility}% compatibility</div>
+          </div>
+          <span style="font-size:26px">${data.bestMatchEmoji || '💛'}</span>
+        </div>
+        <button class="use-btn" id="use-btn" onclick="usePersona()">✦ Use This Persona in Chat</button>
+        <button class="restart-btn" onclick="startChat()">Start Over</button>
+      </div>`
+    document.getElementById('chat-messages').appendChild(wrap)
+    scrollBottom()
+
+    // Store data for usePersona
+    window._personaData = data
+
+    requestAnimationFrame(() => setTimeout(() => {
+      const t = data.traits || {}
+      ;['Strategic','Creative','Analytical','Empathetic'].forEach(k => {
+        const v = Math.min(99, Math.max(1, t[k] || 50))
+        document.getElementById(`rf-${k}`).style.width = v + '%'
+        document.getElementById(`rp-${k}`).textContent = v + '%'
+      })
+    }, 150))
+  }
+
+  function usePersona() {
+    const data = window._personaData
+    if (!data) return
+    localStorage.setItem('userPersona', JSON.stringify(data))
+    const btn = document.getElementById('use-btn')
+    btn.textContent = '✓ Persona Active in Chat!'
+    btn.classList.add('saved')
+    btn.disabled = true
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
   }
 </script>
 </body>

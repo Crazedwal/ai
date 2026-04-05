@@ -25,9 +25,18 @@ export function useChat() {
   // ═══════════════════════════════════════════════════════════════
   // SYSTEM MESSAGE: Defines AI personality (sent with every request)
   // ═══════════════════════════════════════════════════════════════
+  const persona = (() => {
+    try { return JSON.parse(localStorage.getItem('userPersona') || 'null') } catch { return null }
+  })()
+
   const systemMessage = {
     role: "system",
-    content: "You are a helpful AI assistant. Be friendly, concise, and informative."
+    content: [
+      "You are a helpful AI assistant. Be friendly, concise, and informative.",
+      persona
+        ? `The user's personality type is "${persona.title}" (${persona.subtitle}). ${persona.description} Tailor your tone and responses to suit this personality.`
+        : ""
+    ].filter(Boolean).join('\n\n')
   }
 
   // ═══════════════════════════════════════════════════════════════
