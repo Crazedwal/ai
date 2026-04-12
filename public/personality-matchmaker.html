@@ -159,6 +159,39 @@
     }
     .restart-btn:hover { border-color: rgba(168,85,247,0.4); color: #fff; }
 
+    /* KCD CARD */
+    .kcd-card {
+      width: 100%; margin-top: 10px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px; padding: 16px; animation: fadeUp 0.3s ease 0.15s both;
+    }
+    .kcd-card h3 {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(168,85,247,0.9); margin-bottom: 14px;
+    }
+    .kcd-cols { display: flex; flex-direction: column; gap: 10px; }
+    .kcd-col-label {
+      font-size: 11px; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 5px;
+    }
+    .kcd-col-label.keep  { color: #22c55e; }
+    .kcd-col-label.change { color: #f59e0b; }
+    .kcd-col-label.delete { color: #ef4444; }
+    .kcd-cols textarea {
+      width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 9px 12px; color: #fff; font-size: 12px;
+      font-family: inherit; resize: none; outline: none; transition: border-color 0.2s; line-height: 1.5;
+    }
+    .kcd-cols textarea:focus { border-color: rgba(168,85,247,0.45); }
+    .kcd-cols textarea::placeholder { color: rgba(255,255,255,0.2); }
+    .kcd-save-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+    .kcd-saved { font-size: 10px; color: #22c55e; opacity: 0; transition: opacity 0.3s; }
+    .kcd-save-btn {
+      padding: 7px 16px; border: none; border-radius: 50px; cursor: pointer;
+      background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff;
+      font-size: 12px; font-weight: 700; transition: all 0.2s;
+    }
+    .kcd-save-btn:hover { transform: translateY(-1px); }
+
     .btn {
       width: 100%; padding: 14px; border: none; border-radius: 50px; cursor: pointer;
       font-size: 15px; font-weight: 700; transition: all 0.2s;
@@ -487,6 +520,34 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
         <button class="restart-btn" onclick="startChat()">Start Over</button>
       </div>`
     document.getElementById('chat-messages').appendChild(wrap)
+
+    // KCD card
+    const kcdExisting = loadKCD()
+    const kcdWrap = document.createElement('div')
+    kcdWrap.innerHTML = `
+      <div class="kcd-card">
+        <h3>Keep / Change / Delete</h3>
+        <div class="kcd-cols">
+          <div>
+            <div class="kcd-col-label keep">✦ Keep</div>
+            <textarea id="kcd-keep" rows="2" placeholder="What do you want to keep about yourself?">${esc(kcdExisting?.keep || '')}</textarea>
+          </div>
+          <div>
+            <div class="kcd-col-label change">↻ Change</div>
+            <textarea id="kcd-change" rows="2" placeholder="What do you want to work on or shift?">${esc(kcdExisting?.change || '')}</textarea>
+          </div>
+          <div>
+            <div class="kcd-col-label delete">✕ Delete</div>
+            <textarea id="kcd-delete" rows="2" placeholder="What do you want to let go of?">${esc(kcdExisting?.delete || '')}</textarea>
+          </div>
+        </div>
+        <div class="kcd-save-row">
+          <span class="kcd-saved" id="kcd-saved">Saved!</span>
+          <button class="kcd-save-btn" onclick="saveKCD()">Save</button>
+        </div>
+      </div>`
+    document.getElementById('chat-messages').appendChild(kcdWrap)
+
     scrollBottom()
 
     // Store data for usePersona
@@ -500,6 +561,20 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
         document.getElementById(`rp-${k}`).textContent = v + '%'
       })
     }, 150))
+  }
+
+  function loadKCD() {
+    try { return JSON.parse(localStorage.getItem('userKCD') || 'null') } catch { return null }
+  }
+
+  function saveKCD() {
+    const keep   = document.getElementById('kcd-keep')?.value.trim() || ''
+    const change = document.getElementById('kcd-change')?.value.trim() || ''
+    const del    = document.getElementById('kcd-delete')?.value.trim() || ''
+    localStorage.setItem('userKCD', JSON.stringify({ keep, change, delete: del }))
+    const saved = document.getElementById('kcd-saved')
+    saved.style.opacity = '1'
+    setTimeout(() => { saved.style.opacity = '0' }, 1500)
   }
 
   function usePersona() {

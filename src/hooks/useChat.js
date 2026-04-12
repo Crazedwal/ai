@@ -30,6 +30,9 @@ export function useChat() {
   const constraints = (() => {
     try { return JSON.parse(localStorage.getItem('userConstraints') || 'null') } catch { return null }
   })()
+  const kcd = (() => {
+    try { return JSON.parse(localStorage.getItem('userKCD') || 'null') } catch { return null }
+  })()
 
   const systemMessage = {
     role: "system",
@@ -41,6 +44,9 @@ export function useChat() {
       constraints?.who ? `The user is: ${constraints.who}.` : "",
       constraints?.frustrations ? `Avoid the following (user frustrations): ${constraints.frustrations}.` : "",
       constraints?.comforts ? `The user prefers: ${constraints.comforts}.` : "",
+      kcd?.keep   ? `The user wants to keep: ${kcd.keep}.` : "",
+      kcd?.change ? `The user wants to change: ${kcd.change}.` : "",
+      kcd?.delete ? `The user wants to let go of: ${kcd.delete}.` : "",
     ].filter(Boolean).join('\n\n')
   }
 
