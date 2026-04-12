@@ -166,6 +166,32 @@
       box-shadow: 0 8px 30px rgba(124,58,237,0.4);
     }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,0.55); }
+
+    /* CONSTRAINTS CARD */
+    .start-screen { overflow-y: auto; justify-content: flex-start; }
+    .start-screen::-webkit-scrollbar { width: 3px; }
+    .start-screen::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 3px; }
+    .start-hero { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding-top: 20px; width: 100%; }
+    .constraints-card {
+      width: 100%; margin-top: 6px; margin-bottom: 20px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px; padding: 16px;
+    }
+    .constraints-card h3 {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(168,85,247,0.9); margin-bottom: 14px;
+    }
+    .cc-field { margin-bottom: 12px; }
+    .cc-field:last-child { margin-bottom: 0; }
+    .cc-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 5px; display: block; }
+    .cc-field input, .cc-field textarea {
+      width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 9px 12px; color: #fff; font-size: 12px;
+      font-family: inherit; outline: none; resize: none; transition: border-color 0.2s;
+    }
+    .cc-field input:focus, .cc-field textarea:focus { border-color: rgba(168,85,247,0.45); }
+    .cc-field input::placeholder, .cc-field textarea::placeholder { color: rgba(255,255,255,0.2); }
+    .cc-saved { font-size: 10px; color: #22c55e; text-align: right; margin-top: 8px; height: 14px; transition: opacity 0.3s; }
   </style>
 </head>
 <body>
@@ -180,11 +206,30 @@
   </div>
 
   <div class="screen start-screen active" id="screen-start">
-    <div class="start-icon">🔮</div>
-    <h1>What's Your Archetype?</h1>
-    <p class="tagline">Have a real conversation with AI. It asks questions and reveals your unique personality type.</p>
-    <p class="note">No multiple choice — just talk naturally.</p>
-    <button class="btn" onclick="startChat()" style="margin-top:8px">Start Conversation</button>
+    <div class="start-hero">
+      <div class="start-icon">🔮</div>
+      <h1>What's Your Archetype?</h1>
+      <p class="tagline">Have a real conversation with AI. It asks questions and reveals your unique personality type.</p>
+      <p class="note">No multiple choice — just talk naturally.</p>
+      <button class="btn" onclick="startChat()" style="margin-top:8px">Start Conversation</button>
+    </div>
+
+    <div class="constraints-card">
+      <h3>Your Constraints</h3>
+      <div class="cc-field">
+        <label class="cc-label">Who are you?</label>
+        <input id="cc-who" type="text" placeholder="e.g. developer, student, designer..." oninput="saveConstraints()" />
+      </div>
+      <div class="cc-field">
+        <label class="cc-label">Frustrations</label>
+        <textarea id="cc-frustrations" rows="2" placeholder="e.g. overly long answers, unnecessary disclaimers..." oninput="saveConstraints()"></textarea>
+      </div>
+      <div class="cc-field">
+        <label class="cc-label">Comforts</label>
+        <textarea id="cc-comforts" rows="2" placeholder="e.g. code examples, short answers, step-by-step..." oninput="saveConstraints()"></textarea>
+      </div>
+      <div class="cc-saved" id="cc-saved"></div>
+    </div>
   </div>
 
   <div class="screen" id="screen-chat">
@@ -232,6 +277,34 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
     "One more — if you had a completely free weekend, what would your ideal way to spend it look like?",
     "Last question — would you say you're someone who plans things out carefully or prefers to just see where things go?",
   ]
+
+  // ─── CONSTRAINTS ────────────────────────────────────────────────────────────
+  const CONSTRAINTS_KEY = 'userConstraints'
+
+  function loadConstraints() {
+    try { return JSON.parse(localStorage.getItem(CONSTRAINTS_KEY) || 'null') } catch { return null }
+  }
+
+  function saveConstraints() {
+    const who = document.getElementById('cc-who').value.trim()
+    const frustrations = document.getElementById('cc-frustrations').value.trim()
+    const comforts = document.getElementById('cc-comforts').value.trim()
+    localStorage.setItem(CONSTRAINTS_KEY, JSON.stringify({ who, frustrations, comforts }))
+    const saved = document.getElementById('cc-saved')
+    saved.textContent = '✓ Saved'
+    clearTimeout(window._ccTimer)
+    window._ccTimer = setTimeout(() => { saved.textContent = '' }, 1500)
+  }
+
+  function initConstraintsFields() {
+    const c = loadConstraints()
+    if (!c) return
+    document.getElementById('cc-who').value = c.who || ''
+    document.getElementById('cc-frustrations').value = c.frustrations || ''
+    document.getElementById('cc-comforts').value = c.comforts || ''
+  }
+  initConstraintsFields()
+  // ────────────────────────────────────────────────────────────────────────────
 
   let history      = []
   let exchangeCount = 0
@@ -328,6 +401,16 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
     document.getElementById('chat-input').focus()
   }
 
+  function buildSystemPrompt() {
+    const c = loadConstraints()
+    const extra = [
+      c?.who          ? `The user describes themselves as: ${c.who}.` : '',
+      c?.frustrations ? `They find the following frustrating (avoid these): ${c.frustrations}.` : '',
+      c?.comforts     ? `They prefer: ${c.comforts}.` : '',
+    ].filter(Boolean).join(' ')
+    return extra ? `${SYSTEM_PROMPT}\n\nAbout the user: ${extra}` : SYSTEM_PROMPT
+  }
+
   async function callAPI() {
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -339,7 +422,7 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
       },
       body: JSON.stringify({
         model: MODEL,
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...history],
+        messages: [{ role: 'system', content: buildSystemPrompt() }, ...history],
         temperature: 0.85
       })
     })

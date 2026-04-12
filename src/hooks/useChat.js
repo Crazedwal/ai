@@ -3,7 +3,6 @@ import { useState, useCallback } from "react"
 import { sendMessage as sendToAPI } from "@/lib/api"
 import { useModel } from "@/hooks/useModel"
 import { useTokens } from "@/hooks/useTokens"
-
 export function useChat() {
   const { selectedModel } = useModel()
   const { canAfford, spendTokens } = useTokens()
@@ -28,6 +27,9 @@ export function useChat() {
   const persona = (() => {
     try { return JSON.parse(localStorage.getItem('userPersona') || 'null') } catch { return null }
   })()
+  const constraints = (() => {
+    try { return JSON.parse(localStorage.getItem('userConstraints') || 'null') } catch { return null }
+  })()
 
   const systemMessage = {
     role: "system",
@@ -35,7 +37,10 @@ export function useChat() {
       "You are a helpful AI assistant. Be friendly, concise, and informative.",
       persona
         ? `The user's personality type is "${persona.title}" (${persona.subtitle}). ${persona.description} Tailor your tone and responses to suit this personality.`
-        : ""
+        : "",
+      constraints?.who ? `The user is: ${constraints.who}.` : "",
+      constraints?.frustrations ? `Avoid the following (user frustrations): ${constraints.frustrations}.` : "",
+      constraints?.comforts ? `The user prefers: ${constraints.comforts}.` : "",
     ].filter(Boolean).join('\n\n')
   }
 
