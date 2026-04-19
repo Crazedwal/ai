@@ -280,7 +280,7 @@
   const API_KEY = localStorage.getItem('openrouter_api_key') || ""
   // ─────────────────────────────────────────────────────────────────────────
 
-  const MODEL = "meta-llama/llama-3.1-8b-instruct:free"
+  const MODEL = "mistralai/mistral-7b-instruct:free"
 
   const SYSTEM_PROMPT = `You are a warm, insightful personality analyst. Discover the user's personality type through natural conversation.
 
@@ -418,23 +418,15 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
     waiting = true
     addTyping()
     try {
-      let reply
-      if (API_KEY) {
-        try { reply = await callAPI() } catch (err) {
-          console.warn('API failed, using mock:', err)
-          reply = await mockReply()
-        }
-      } else {
-        reply = await mockReply()
-      }
+      const reply = await callAPI()
       removeTyping()
       const result = tryParse(reply)
       if (result) { showResult(result); return }
-      addMessage('ai', esc(reply || '...'))
-      history.push({ role: 'assistant', content: reply || '' })
+      addMessage('ai', esc(reply))
+      history.push({ role: 'assistant', content: reply })
     } catch (err) {
       removeTyping()
-      addMessage('ai', 'Sorry, something went wrong. Try refreshing.')
+      addMessage('ai', `Something went wrong: ${err.message}. Check your API key or try again.`)
       console.error(err)
     }
     waiting = false
@@ -453,10 +445,12 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
   }
 
   async function callAPI() {
+    const key = localStorage.getItem('openrouter_api_key') || ''
+    if (!key) throw new Error('No API key found. Open the main app first to set your key.')
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${API_KEY}`,
+        'Authorization': `Bearer ${key}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': window.location.origin,
         'X-Title': 'AI Personality Matchmaker'
@@ -472,7 +466,9 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
       throw new Error(`HTTP ${res.status}: ${errText.slice(0, 200)}`)
     }
     const data = await res.json()
-    return (data.choices?.[0]?.message?.content || '').trim()
+    const content = data.choices?.[0]?.message?.content
+    if (!content) throw new Error('Empty response from AI')
+    return content.trim()
   }
 
   async function mockReply() {
@@ -489,9 +485,18 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
 
   function tryParse(text) {
     if (!text || typeof text !== 'string') return null
+    // Try whole text first (clean JSON response)
     try {
       const obj = JSON.parse(text.replace(/```json?|```/g, '').trim())
       if (obj.done && obj.title) return obj
+    } catch (_) {}
+    // Try to extract JSON object from anywhere in the text
+    try {
+      const match = text.match(/\{[\s\S]*?"done"\s*:\s*true[\s\S]*?\}(?=\s*$|\s*```)/)
+      if (match) {
+        const obj = JSON.parse(match[0])
+        if (obj.done && obj.title) return obj
+      }
     } catch (_) {}
     return null
   }
