@@ -418,12 +418,20 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
     waiting = true
     addTyping()
     try {
-      const reply = API_KEY ? await callAPI() : await mockReply()
+      let reply
+      if (API_KEY) {
+        try { reply = await callAPI() } catch (err) {
+          console.warn('API failed, using mock:', err)
+          reply = await mockReply()
+        }
+      } else {
+        reply = await mockReply()
+      }
       removeTyping()
       const result = tryParse(reply)
       if (result) { showResult(result); return }
-      addMessage('ai', esc(reply))
-      history.push({ role: 'assistant', content: reply })
+      addMessage('ai', esc(reply || '...'))
+      history.push({ role: 'assistant', content: reply || '' })
     } catch (err) {
       removeTyping()
       addMessage('ai', 'Sorry, something went wrong. Try refreshing.')
@@ -469,7 +477,7 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
 
   async function mockReply() {
     await new Promise(r => setTimeout(r, 1000 + Math.random() * 700))
-    const idx = exchangeCount - 1
+    const idx = exchangeCount  // 0 on initial auto-call, 1+ after user replies
     if (idx < MOCK_QUESTIONS.length) return MOCK_QUESTIONS[idx]
     return JSON.stringify({
       done: true, title: "The Architect", subtitle: "Strategic Visionary", emoji: "🏛️",
@@ -480,6 +488,7 @@ Begin with a very brief warm greeting and your first question. Keep all non-JSON
   }
 
   function tryParse(text) {
+    if (!text || typeof text !== 'string') return null
     try {
       const obj = JSON.parse(text.replace(/```json?|```/g, '').trim())
       if (obj.done && obj.title) return obj
