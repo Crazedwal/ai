@@ -58,14 +58,14 @@ function Sidebar({
         {/* Token balance */}
         <div className="px-4 py-2 flex items-center justify-between">
           <span className="text-sm text-gray-400">
-            🪙 <span className="text-white font-semibold">{balance}</span> tokens
+            <span className="text-white font-semibold">{balance}</span> tokens
           </span>
           <div className="flex gap-1">
             <button
               onClick={() => setShowGamble(true)}
               className="text-xs px-2 py-1 bg-blue-500 hover:bg-blue-400 text-white rounded font-medium transition-colors"
             >
-              🔵
+              Plinko
             </button>
             <button
               onClick={() => setShowPurchase(true)}
@@ -164,10 +164,9 @@ function Sidebar({
             href="/personality-matchmaker.html"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center gap-2 text-xs text-gray-500 hover:text-purple-400 transition-colors"
+            className="w-full text-xs text-gray-500 hover:text-purple-400 transition-colors"
           >
-            <span>🔮</span>
-            <span>Personality Matchmaker</span>
+            Personality Matchmaker
           </a>
         </div>
 
@@ -175,10 +174,9 @@ function Sidebar({
         <div className="p-3 border-t border-gray-700">
           <button
             onClick={toggleRadio}
-            className="w-full flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            className={`w-full text-left text-xs transition-colors ${playing ? "text-green-400 animate-pulse" : "text-gray-500 hover:text-gray-300"}`}
           >
-            <span className={playing ? "animate-pulse text-green-400" : ""}>📻</span>
-            <span>{playing ? "Playing..." : "Radio"}</span>
+            {playing ? "Radio — Playing" : "Radio"}
           </button>
         </div>
 

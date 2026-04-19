@@ -12,14 +12,10 @@ function ChatHeader({ title }) {
       <div className="flex items-center gap-4">
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="px-2 py-1 rounded text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border border-gray-200 dark:border-gray-700"
           aria-label="Toggle theme"
         >
-          {theme === "dark" ? (
-            <span className="text-xl">☀️</span>
-          ) : (
-            <span className="text-xl">🌙</span>
-          )}
+          {theme === "dark" ? "Light" : "Dark"}
         </button>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500 dark:text-gray-400">DeepSeek Model</span>
