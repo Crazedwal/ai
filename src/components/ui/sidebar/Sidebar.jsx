@@ -20,7 +20,7 @@ function Sidebar({
   const { t, language, changeLanguage, availableLanguages, languageNames } = useLanguage()
   const { assistantName, changeName } = useAssistantName()
   const { balance } = useTokens()
-  const { user, logOut } = useAuth()
+  const { user, isGuest, logOut } = useAuth()
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState("")
   const [showPurchase, setShowPurchase] = useState(false)
@@ -180,18 +180,25 @@ function Sidebar({
           </button>
         </div>
 
-        {/* Sign Out */}
-        {user && (
-          <div className="p-3 border-t border-gray-700">
+        {/* Sign Out / Guest prompt */}
+        <div className="p-3 border-t border-gray-700">
+          {isGuest ? (
+            <a
+              href="/"
+              onClick={() => window.location.reload()}
+              className="w-full block text-xs text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Sign in to save chats
+            </a>
+          ) : user ? (
             <button
               onClick={logOut}
-              className="w-full flex items-center gap-2 text-xs text-red-400 hover:text-red-300 transition-colors"
+              className="w-full text-left text-xs text-red-400 hover:text-red-300 transition-colors"
             >
-              <span>→</span>
-              <span>Sign out</span>
+              Sign out
             </button>
-          </div>
-        )}
+          ) : null}
+        </div>
 
       </aside>
 

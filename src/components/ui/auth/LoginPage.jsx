@@ -4,6 +4,7 @@ import {
   signInWithEmail,
   signUpWithEmail,
 } from "../../../lib/firebase"
+import { useAuth } from "../../../hooks/useAuth"
 
 function GoogleIcon() {
   return (
@@ -30,6 +31,7 @@ function GoogleIcon() {
 
 
 export default function LoginPage() {
+  const { continueAsGuest } = useAuth()
   const [mode, setMode] = useState("login") // "login" | "signup"
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -149,6 +151,17 @@ export default function LoginPage() {
             {mode === "login" ? "Sign up" : "Sign in"}
           </button>
         </p>
+
+        {/* Guest */}
+        <div className="mt-6 pt-5 border-t border-gray-800 text-center">
+          <button
+            onClick={continueAsGuest}
+            className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            Continue as guest
+          </button>
+          <p className="text-xs text-gray-600 mt-1">Chats won't be saved</p>
+        </div>
       </div>
     </div>
   )

@@ -40,7 +40,7 @@ function AppContent() {
 }
 
 function AuthGate() {
-  const { user, loading } = useAuth()
+  const { user, loading, isGuest } = useAuth()
 
   if (loading) {
     return (
@@ -50,7 +50,7 @@ function AuthGate() {
     )
   }
 
-  if (!user) return <LoginPage />
+  if (!user && !isGuest) return <LoginPage />
 
   return (
     <LanguageProvider>
