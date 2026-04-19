@@ -2,16 +2,16 @@
 
 export const MODELS = [
   {
-    id: "nvidia/nemotron-3-nano-30b-a3b:free",
-    name: "Nemotron Nano 30B",
-    provider: "NVIDIA",
+    id: "deepseek/deepseek-chat-v3-0324:free",
+    name: "DeepSeek Chat V3",
+    provider: "DeepSeek",
     tier: "free",
     tokensPerMessage: 0,
-    description: "Fast & lightweight"
+    description: "Fast & high quality"
   }
 ]
 
-export const DEFAULT_MODEL_ID = "nvidia/nemotron-3-nano-30b-a3b:free"
+export const DEFAULT_MODEL_ID = "deepseek/deepseek-chat-v3-0324:free"
 
 export const TOKEN_PACKAGES = [
   { id: "starter", tokens: 100, price: 1.99, label: "Starter" },
