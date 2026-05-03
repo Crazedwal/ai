@@ -42,12 +42,26 @@ export function useChat() {
   const persona      = readLS('userPersona')
   const constraints  = readLS('userConstraints')
   const kcd          = readLS('userKCD')
+  const profile      = readLS('userProfile')
 
   const systemMessage = {
     role: "system",
     content: [
       "You are a helpful AI assistant. Be friendly, concise, and informative.",
-      persona ? `User personality: ${persona.title} — ${persona.subtitle}. Keep this in mind subtly; don't overdo it.` : "",
+      // User profile
+      profile?.name        ? `The user's name is ${profile.name}.` : "",
+      profile?.occupation  ? `They work as: ${profile.occupation}.` : "",
+      profile?.industry    ? `Their industry: ${profile.industry}.` : "",
+      profile?.expertise   ? `Their AI expertise level: ${profile.expertise}.` : "",
+      profile?.uses?.length ? `They mainly use AI for: ${profile.uses.join(", ")}.` : "",
+      profile?.responseStyle === "Concise"  ? "Keep responses short and to the point." : "",
+      profile?.responseStyle === "Detailed" ? "Give thorough, detailed responses." : "",
+      profile?.tone === "Technical"    ? "Use technical language and precision." : "",
+      profile?.tone === "Casual"       ? "Keep a casual, conversational tone." : "",
+      profile?.tone === "Professional" ? "Maintain a professional tone." : "",
+      // Persona
+      persona ? `User personality type: ${persona.title} — ${persona.subtitle}. Keep this in mind subtly.` : "",
+      // Constraints
       constraints?.who          ? `The user is: ${constraints.who}.` : "",
       constraints?.frustrations ? `Avoid: ${constraints.frustrations}.` : "",
       constraints?.comforts     ? `They prefer: ${constraints.comforts}.` : "",

@@ -1,4 +1,5 @@
 // src/App.jsx
+import { useState } from "react"
 import { useChat } from "./hooks/useChat"
 import { ThemeProvider } from "./hooks/useTheme.jsx"
 import { LanguageProvider } from "./hooks/useLanguage.jsx"
@@ -9,6 +10,7 @@ import { AuthProvider, useAuth } from "./hooks/useAuth.jsx"
 import Sidebar from "./components/ui/sidebar/Sidebar"
 import ChatArea from "./components/ui/chat/ChatArea"
 import LoginPage from "./components/ui/auth/LoginPage"
+import ProfileSetupModal, { hasSeenSetup } from "./components/ui/ProfileSetupModal"
 
 function AppContent() {
   const {
@@ -21,6 +23,9 @@ function AppContent() {
     createNewChat
   } = useChat()
 
+  const [showProfile, setShowProfile] = useState(!hasSeenSetup())
+  const [showEditProfile, setShowEditProfile] = useState(false)
+
   return (
     <div className="flex h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
       <Sidebar
@@ -28,6 +33,7 @@ function AppContent() {
         activeId={activeConversation?.id}
         onSelectConversation={setActiveId}
         onNewChat={createNewChat}
+        onEditProfile={() => setShowEditProfile(true)}
       />
       <ChatArea
         conversation={activeConversation}
@@ -35,6 +41,8 @@ function AppContent() {
         onSendMessage={sendMessage}
         isLoading={isLoading}
       />
+      {showProfile && <ProfileSetupModal onClose={() => setShowProfile(false)} />}
+      {showEditProfile && <ProfileSetupModal onClose={() => setShowEditProfile(false)} />}
     </div>
   )
 }

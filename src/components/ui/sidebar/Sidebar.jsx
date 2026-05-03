@@ -15,7 +15,8 @@ function Sidebar({
   conversations,
   activeId,
   onSelectConversation,
-  onNewChat
+  onNewChat,
+  onEditProfile
 }) {
   const { t, language, changeLanguage, availableLanguages, languageNames } = useLanguage()
   const { assistantName, changeName } = useAssistantName()
@@ -168,6 +169,16 @@ function Sidebar({
           >
             Stock Market Simulator
           </a>
+        </div>
+
+        {/* Edit Profile */}
+        <div className="p-3 border-t border-gray-700">
+          <button
+            onClick={onEditProfile}
+            className="w-full text-left text-xs text-gray-500 hover:text-blue-400 transition-colors"
+          >
+            Edit Profile
+          </button>
         </div>
 
         {/* Personality Matchmaker */}
