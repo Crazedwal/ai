@@ -158,6 +158,18 @@ function Sidebar({
           </button>
         </div>
 
+        {/* Stock Market */}
+        <div className="p-3 border-t border-gray-700">
+          <a
+            href="/stock-market.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full text-xs text-gray-500 hover:text-green-400 transition-colors"
+          >
+            Stock Market Simulator
+          </a>
+        </div>
+
         {/* Personality Matchmaker */}
         <div className="p-3 border-t border-gray-700">
           <a

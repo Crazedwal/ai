@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockSim</title>
+  <style>
+    :root {
+      --bg: #0b0b0b;
+      --surface: #111;
+      --surface2: #1a1a1a;
+      --border: #222;
+      --text: #e8e8e8;
+      --text2: #888;
+      --text3: #444;
+      --green: #00d26a;
+      --green-dim: rgba(0,210,106,.1);
+      --red: #ff453a;
+      --red-dim: rgba(255,69,58,.1);
+      --blue: #0a84ff;
+      --mono: 'SF Mono','Consolas','Monaco',monospace;
+    }
+    [data-theme="light"] {
+      --bg: #f0f2f5;
+      --surface: #fff;
+      --surface2: #f5f5f7;
+      --border: #e0e0e0;
+      --text: #111;
+      --text2: #666;
+      --text3: #bbb;
+      --green: #006d35;
+      --green-dim: rgba(0,109,53,.08);
+      --red: #c0392b;
+      --red-dim: rgba(192,57,43,.08);
+      --blue: #0071e3;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;font-size:13px;min-height:100vh}
+
+    /* HEADER */
+    .hdr{height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:20px;position:sticky;top:0;z-index:10}
+    .logo{font-size:15px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
+    .logo b{color:var(--blue)}
+    .mkt{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .hdr-r{margin-left:auto;display:flex;align-items:center;gap:16px}
+    .hpf{text-align:right}
+    .hpf .lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+    .hpf .val{font-size:15px;font-weight:700;font-family:var(--mono)}
+    .tbtn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;transition:.15s}
+    .tbtn:hover{color:var(--text);border-color:var(--text3)}
+
+    /* LAYOUT */
+    .layout{display:grid;grid-template-columns:1fr 364px;height:calc(100vh - 50px)}
+
+    /* LEFT */
+    .left{border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+
+    /* PORTFOLIO STRIP */
+    .pf{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface)}
+    .pfi{padding:12px 20px;border-right:1px solid var(--border)}
+    .pfi .lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+    .pfi .val{font-size:14px;font-weight:600;font-family:var(--mono)}
+
+    /* TABLE */
+    table{width:100%;border-collapse:collapse}
+    thead th{padding:8px 10px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;user-select:none;cursor:pointer}
+    thead th:first-child{text-align:left;padding-left:20px}
+    thead th:hover{color:var(--text2)}
+    tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+    tbody tr:hover{background:var(--surface2)}
+    tbody tr.sel{background:var(--surface2)}
+    td{padding:11px 10px;text-align:right;white-space:nowrap;vertical-align:middle}
+    td:first-child{text-align:left;padding-left:20px}
+    .sym{font-weight:700;font-size:13px;font-family:var(--mono)}
+    .co{font-size:11px;color:var(--text2);margin-top:1px}
+    .price{font-family:var(--mono);font-weight:600;font-size:13px}
+    .chg{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:3px;display:inline-block}
+    .up{color:var(--green);background:var(--green-dim)}
+    .dn{color:var(--red);background:var(--red-dim)}
+    .vol{font-family:var(--mono);font-size:11px;color:var(--text2)}
+
+    /* RIGHT PANEL */
+    .right{overflow-y:auto;background:var(--surface);display:flex;flex-direction:column}
+    .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:8px}
+    .empty svg{opacity:.15}
+    .empty p{font-size:12px}
+
+    /* STOCK HEADER */
+    .sk-hdr{padding:18px 18px 14px;border-bottom:1px solid var(--border)}
+    .sk-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+    .sk-sym{font-size:20px;font-weight:800;font-family:var(--mono)}
+    .sk-name{font-size:11px;color:var(--text2);margin-top:2px}
+    .sk-price{font-size:32px;font-weight:700;font-family:var(--mono);letter-spacing:-1.5px;line-height:1}
+    .sk-chg{font-size:13px;font-family:var(--mono);margin-top:4px}
+
+    /* CHART */
+    .chart-wrap{padding:14px 14px 6px;border-bottom:1px solid var(--border)}
+    .chart-tabs{display:flex;gap:2px;margin-bottom:10px}
+    .ct{padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;border:none;transition:.15s}
+    .ct.act{background:var(--surface2);color:var(--text)}
+    .ct:hover{color:var(--text)}
+
+    /* TRADE */
+    .trade{padding:14px 18px;border-bottom:1px solid var(--border)}
+    .tr-tabs{display:flex;background:var(--surface2);border-radius:7px;padding:3px;margin-bottom:14px}
+    .tt{flex:1;padding:7px;border:none;background:transparent;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2);transition:.15s}
+    .tt.b{background:var(--surface);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+    .tt.s{background:var(--surface);color:var(--red);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+    .tr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .tr-lbl{font-size:12px;color:var(--text2)}
+    .tr-val{font-family:var(--mono);font-size:12px}
+    .tr-input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;font-family:var(--mono);width:120px;text-align:right;outline:none;transition:.15s}
+    .tr-input:focus{border-color:var(--blue)}
+    .tr-total{padding:10px 0 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;margin-top:2px}
+    .tr-total .tv{font-family:var(--mono);font-weight:600}
+    .exec{width:100%;padding:11px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:12px;letter-spacing:.3px;transition:opacity .15s}
+    .exec:hover{opacity:.82}
+    .exec.buy{background:var(--green);color:#fff}
+    .exec.sell{background:var(--red);color:#fff}
+
+    /* HOLDINGS */
+    .hold{padding:14px 18px}
+    .h-ttl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px}
+    .h-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+    .h-row:last-child{border-bottom:none}
+    .h-shares{font-size:11px;color:var(--text2);margin-top:2px}
+    .h-pnl{font-family:var(--mono);font-size:12px}
+    .h-empty{font-size:12px;color:var(--text3)}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);padding:11px 16px;border-radius:8px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);transform:translateY(60px);opacity:0;transition:.22s ease;z-index:999;pointer-events:none}
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast.ok{border-left:3px solid var(--green)}
+    .toast.err{border-left:3px solid var(--red)}
+
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo">Stock<b>Sim</b></div>
+  <div class="mkt"><div class="dot"></div><span>Market Open</span></div>
+  <div class="hdr-r">
+    <div class="hpf">
+      <div class="lbl">Total Value</div>
+      <div class="val" id="h-total">$10,000.00</div>
+    </div>
+    <button class="tbtn" id="tbtn" onclick="toggleTheme()">Light</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="left">
+    <div class="pf">
+      <div class="pfi"><div class="lbl">Cash</div><div class="val" id="pf-cash">$10,000.00</div></div>
+      <div class="pfi"><div class="lbl">Invested</div><div class="val" id="pf-inv">$0.00</div></div>
+      <div class="pfi"><div class="lbl">P&amp;L</div><div class="val" id="pf-pnl">$0.00</div></div>
+      <div class="pfi"><div class="lbl">Return</div><div class="val" id="pf-ret">0.00%</div></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align:left;padding-left:20px">Symbol</th>
+          <th>Price</th>
+          <th>Change</th>
+          <th>% Chg</th>
+          <th>Trend</th>
+          <th>Volume</th>
+        </tr>
+      </thead>
+      <tbody id="tbl"></tbody>
+    </table>
+  </div>
+
+  <div class="right" id="right">
+    <div class="empty">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+        <polyline points="16 7 22 7 22 13"/>
+      </svg>
+      <p>Select a stock to trade</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STOCKS ────────────────────────────────────────────────────────────────────
+const STOCKS = [
+  {s:'AAPL', n:'Apple Inc.',             p:189.50, v:0.0028, bv:72_400_000},
+  {s:'MSFT', n:'Microsoft Corp.',        p:415.20, v:0.0022, bv:21_300_000},
+  {s:'NVDA', n:'NVIDIA Corp.',           p:875.40, v:0.0075, bv:44_200_000},
+  {s:'GOOGL',n:'Alphabet Inc.',          p:172.30, v:0.0024, bv:26_800_000},
+  {s:'AMZN', n:'Amazon.com Inc.',        p:182.60, v:0.0032, bv:40_100_000},
+  {s:'TSLA', n:'Tesla Inc.',             p:248.90, v:0.0095, bv:98_600_000},
+  {s:'META', n:'Meta Platforms Inc.',    p:512.30, v:0.0042, bv:16_400_000},
+  {s:'JPM',  n:'JPMorgan Chase & Co.',   p:198.70, v:0.0018, bv:9_200_000},
+  {s:'NFLX', n:'Netflix Inc.',           p:648.20, v:0.0058, bv:5_800_000},
+  {s:'AMD',  n:'Advanced Micro Devices', p:168.40, v:0.0068, bv:52_300_000},
+  {s:'BRK.B',n:'Berkshire Hathaway',    p:395.10, v:0.0014, bv:4_100_000},
+  {s:'V',    n:'Visa Inc.',              p:276.80, v:0.0017, bv:7_200_000},
+]
+
+// State
+const prices = {}, opens = {}, hist = {}, vols = {}
+STOCKS.forEach(st => {
+  prices[st.s] = st.p
+  opens[st.s]  = st.p
+  vols[st.s]   = st.bv
+  // Seed 80 historical points
+  const h = []
+  let p = st.p
+  for (let i = 80; i > 0; i--) { p = p / (1 + st.v * (Math.random() - .5) * 2); h.unshift(p) }
+  h.push(st.p)
+  hist[st.s] = h
+})
+
+let cash     = 10000
+const hold   = {} // { sym: {shares, avgCost} }
+let sel      = null
+let mode     = 'buy'
+let period   = '1D'
+let chartEl  = null
+let toastTmr = null
+
+// ── SIMULATION ────────────────────────────────────────────────────────────────
+function tick() {
+  STOCKS.forEach(st => {
+    const d = prices[st.s] * st.v * (Math.random() - .5) * 2
+    prices[st.s] = Math.max(1, prices[st.s] + d)
+    hist[st.s].push(prices[st.s])
+    if (hist[st.s].length > 250) hist[st.s].shift()
+    vols[st.s] = Math.round(st.bv * (.75 + Math.random() * .5))
+  })
+  renderTable()
+  renderPF()
+  if (sel) { refreshDetailHeader(); drawChart() }
+}
+
+// ── FORMAT ────────────────────────────────────────────────────────────────────
+const f2  = n => n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+const fvol = n => n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':(n/1e3).toFixed(1)+'K'
+const css  = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim()
+
+// ── SPARKLINE ────────────────────────────────────────────────────────────────
+function drawSpark(canvas, data) {
+  const ctx = canvas.getContext('2d')
+  const W = canvas.width, H = canvas.height
+  ctx.clearRect(0, 0, W, H)
+  const d = data.slice(-50)
+  if (d.length < 2) return
+  const mn = Math.min(...d), mx = Math.max(...d), rng = mx - mn || 1
+  const isUp = d[d.length-1] >= d[0]
+  ctx.beginPath()
+  ctx.strokeStyle = css(isUp ? '--green' : '--red')
+  ctx.lineWidth = 1.5
+  ctx.lineJoin = 'round'
+  d.forEach((p, i) => {
+    const x = (i / (d.length-1)) * W
+    const y = H - ((p - mn) / rng) * H * .8 - H * .1
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+  })
+  ctx.stroke()
+}
+
+// ── MAIN CHART ────────────────────────────────────────────────────────────────
+function drawChart() {
+  if (!sel || !chartEl) return
+  const canvas = chartEl
+  const W = canvas.width, H = canvas.height
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, W, H)
+
+  const d = period === '1D' ? hist[sel].slice(-60)
+          : period === '1W' ? hist[sel].slice(-120)
+          : hist[sel]
+  if (d.length < 2) return
+
+  const mn = Math.min(...d), mx = Math.max(...d)
+  const pad = (mx - mn) * .12 || 1
+  const lo = mn - pad, hi = mx + pad, rng = hi - lo
+  const px = i => (i / (d.length-1)) * W
+  const py = v => H - ((v - lo) / rng) * H
+  const isUp = d[d.length-1] >= d[0]
+  const color = css(isUp ? '--green' : '--red')
+  const borderColor = css('--border')
+  const text3 = css('--text3')
+
+  // Grid
+  ctx.lineWidth = .5
+  ctx.strokeStyle = borderColor
+  ctx.fillStyle = text3
+  ctx.font = '9px SF Mono,Consolas,monospace'
+  for (let i = 1; i < 4; i++) {
+    const y = H * i / 4
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke()
+    const lbl = '$' + f2(hi - rng * (y / H))
+    ctx.fillText(lbl, 4, y - 3)
+  }
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, H)
+  grad.addColorStop(0, color + '28')
+  grad.addColorStop(1, color + '00')
+  ctx.beginPath()
+  ctx.moveTo(px(0), py(d[0]))
+  d.forEach((p, i) => ctx.lineTo(px(i), py(p)))
+  ctx.lineTo(px(d.length-1), H)
+  ctx.lineTo(0, H)
+  ctx.closePath()
+  ctx.fillStyle = grad
+  ctx.fill()
+
+  // Line
+  ctx.beginPath()
+  ctx.strokeStyle = color
+  ctx.lineWidth = 1.8
+  ctx.lineJoin = 'round'
+  d.forEach((p, i) => i === 0 ? ctx.moveTo(px(i), py(p)) : ctx.lineTo(px(i), py(p)))
+  ctx.stroke()
+
+  // Dot
+  const lx = px(d.length-1), ly = py(d[d.length-1])
+  ctx.beginPath()
+  ctx.arc(lx, ly, 3, 0, Math.PI*2)
+  ctx.fillStyle = color
+  ctx.fill()
+}
+
+// ── TABLE ────────────────────────────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('tbl')
+  STOCKS.forEach(st => {
+    const s = st.s
+    const p = prices[s], o = opens[s]
+    const chg = p - o, pct = chg / o * 100
+    const up = chg >= 0
+    const cls = up ? 'up' : 'dn'
+    const sign = up ? '+' : ''
+
+    let row = document.getElementById('row-'+s)
+    if (!row) {
+      row = document.createElement('tr')
+      row.id = 'row-'+s
+      row.onclick = () => selectStock(s)
+      row.innerHTML = `
+        <td><div class="sym">${s}</div><div class="co">${st.n}</div></td>
+        <td class="price" id="p-${s}"></td>
+        <td id="c-${s}"></td>
+        <td id="pc-${s}"></td>
+        <td><canvas id="sp-${s}" width="80" height="28"></canvas></td>
+        <td class="vol" id="v-${s}"></td>`
+      tbody.appendChild(row)
+    }
+    row.classList.toggle('sel', sel === s)
+
+    document.getElementById('p-'+s).textContent = '$'+f2(p)
+    const cel = document.getElementById('c-'+s)
+    cel.innerHTML = `<span class="chg ${cls}">${sign}$${f2(Math.abs(chg))}</span>`
+    const pcl = document.getElementById('pc-'+s)
+    pcl.innerHTML = `<span class="chg ${cls}">${sign}${pct.toFixed(2)}%</span>`
+    document.getElementById('v-'+s).textContent = fvol(vols[s])
+    const sp = document.getElementById('sp-'+s)
+    if (sp) drawSpark(sp, hist[s])
+  })
+}
+
+// ── PORTFOLIO ────────────────────────────────────────────────────────────────
+function renderPF() {
+  let cur = 0, cost = 0
+  Object.entries(hold).forEach(([s, h]) => {
+    cur  += prices[s] * h.shares
+    cost += h.avgCost * h.shares
+  })
+  const pnl = cur - cost
+  const ret = cost > 0 ? pnl / cost * 100 : 0
+  const sign = n => n >= 0 ? '+' : ''
+
+  document.getElementById('pf-cash').textContent = '$'+f2(cash)
+  document.getElementById('pf-inv').textContent  = '$'+f2(cur)
+  const pe = document.getElementById('pf-pnl')
+  pe.textContent = sign(pnl)+'$'+f2(Math.abs(pnl))
+  pe.className = 'val '+(pnl >= 0 ? 'up' : 'dn')
+  const re = document.getElementById('pf-ret')
+  re.textContent = sign(ret)+ret.toFixed(2)+'%'
+  re.className = 'val '+(ret >= 0 ? 'up' : 'dn')
+  document.getElementById('h-total').textContent = '$'+f2(cash + cur)
+}
+
+// ── SELECT ────────────────────────────────────────────────────────────────────
+function selectStock(s) {
+  sel = s; mode = 'buy'
+  renderTable()
+  buildDetail()
+}
+
+function refreshDetailHeader() {
+  if (!sel) return
+  const p = prices[sel], o = opens[sel]
+  const chg = p - o, pct = chg / o * 100
+  const up = chg >= 0, sign = up ? '+' : ''
+  const pe = document.getElementById('d-price')
+  const ce = document.getElementById('d-chg')
+  if (pe) pe.textContent = '$'+f2(p)
+  if (ce) {
+    ce.className = 'sk-chg '+(up ? 'up' : 'dn')
+    ce.textContent = sign+'$'+f2(Math.abs(chg))+' ('+sign+pct.toFixed(2)+'%)'
+  }
+  updateTotal()
+  refreshHold()
+}
+
+function buildDetail() {
+  const st = STOCKS.find(x => x.s === sel)
+  const p = prices[sel], o = opens[sel]
+  const chg = p - o, pct = chg / o * 100
+  const up = chg >= 0, sign = up ? '+' : ''
+  const cls = up ? 'up' : 'dn'
+
+  document.getElementById('right').innerHTML = `
+    <div class="sk-hdr">
+      <div class="sk-top">
+        <div><div class="sk-sym">${sel}</div><div class="sk-name">${st.n}</div></div>
+      </div>
+      <div class="sk-price" id="d-price">$${f2(p)}</div>
+      <div class="sk-chg ${cls}" id="d-chg">${sign}$${f2(Math.abs(chg))} (${sign}${pct.toFixed(2)}%)</div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-tabs">
+        ${['1D','1W','All'].map(t=>`<button class="ct${t===period?' act':''}" onclick="setPeriod('${t}')">${t}</button>`).join('')}
+      </div>
+      <canvas id="main-chart" width="328" height="158" style="display:block;width:100%"></canvas>
+    </div>
+
+    <div class="trade">
+      <div class="tr-tabs">
+        <button class="tt${mode==='buy'?' b':''}" onclick="setMode('buy')">Buy</button>
+        <button class="tt${mode==='sell'?' s':''}" onclick="setMode('sell')">Sell</button>
+      </div>
+      <div class="tr-row">
+        <span class="tr-lbl">Shares</span>
+        <input class="tr-input" id="tr-sh" type="number" min="1" step="1" value="1" oninput="updateTotal()">
+      </div>
+      <div class="tr-row">
+        <span class="tr-lbl">Market Price</span>
+        <span class="tr-val">$${f2(p)}</span>
+      </div>
+      <div class="tr-total">
+        <span>Estimated Total</span>
+        <span class="tv" id="tr-tot">$${f2(p)}</span>
+      </div>
+      <button class="exec ${mode}" id="exec-btn" onclick="execute()">
+        ${mode==='buy'?'Buy':'Sell'} ${sel}
+      </button>
+    </div>
+
+    <div class="hold">
+      <div class="h-ttl">Your Position</div>
+      <div id="hold-content"></div>
+    </div>
+  `
+
+  chartEl = document.getElementById('main-chart')
+  drawChart()
+  refreshHold()
+}
+
+function setPeriod(p) { period = p; buildDetail() }
+
+function setMode(m) {
+  mode = m
+  document.querySelectorAll('.tt').forEach((el, i) => {
+    el.className = 'tt' + (i===0 && m==='buy' ? ' b' : i===1 && m==='sell' ? ' s' : '')
+  })
+  const btn = document.getElementById('exec-btn')
+  if (btn) { btn.className = 'exec '+m; btn.textContent = (m==='buy'?'Buy':'Sell')+' '+sel }
+}
+
+function updateTotal() {
+  if (!sel) return
+  const sh = parseFloat(document.getElementById('tr-sh')?.value) || 0
+  const el = document.getElementById('tr-tot')
+  if (el) el.textContent = '$'+f2(sh * prices[sel])
+}
+
+function refreshHold() {
+  const el = document.getElementById('hold-content')
+  if (!el || !sel) return
+  const h = hold[sel]
+  if (!h || h.shares <= 0) { el.innerHTML = `<div class="h-empty">No position in ${sel}</div>`; return }
+  const cur = prices[sel] * h.shares, cost = h.avgCost * h.shares
+  const pnl = cur - cost, pct = pnl / cost * 100
+  const cls = pnl >= 0 ? 'up' : 'dn', sign = pnl >= 0 ? '+' : ''
+  el.innerHTML = `
+    <div class="h-row">
+      <div>
+        <div style="font-weight:600;font-family:var(--mono)">${h.shares} shares</div>
+        <div class="h-shares">Avg cost $${f2(h.avgCost)}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:var(--mono);font-size:13px;font-weight:600">$${f2(cur)}</div>
+        <div class="h-pnl ${cls}">${sign}$${f2(Math.abs(pnl))} (${sign}${pct.toFixed(2)}%)</div>
+      </div>
+    </div>`
+}
+
+// ── TRADE ────────────────────────────────────────────────────────────────────
+function execute() {
+  if (!sel) return
+  const shares = Math.floor(parseFloat(document.getElementById('tr-sh')?.value) || 0)
+  if (shares <= 0) { toast('Enter a valid number of shares', 'err'); return }
+  const price = prices[sel], total = shares * price
+
+  if (mode === 'buy') {
+    if (total > cash) { toast('Insufficient cash', 'err'); return }
+    cash -= total
+    if (!hold[sel]) hold[sel] = {shares: 0, avgCost: 0}
+    const h = hold[sel]
+    const prev = h.shares * h.avgCost
+    h.shares += shares
+    h.avgCost = (prev + total) / h.shares
+    toast(`Bought ${shares} share${shares>1?'s':''} of ${sel} @ $${f2(price)}`, 'ok')
+  } else {
+    const h = hold[sel]
+    if (!h || h.shares < shares) { toast('Not enough shares', 'err'); return }
+    cash += total
+    h.shares -= shares
+    if (h.shares === 0) delete hold[sel]
+    toast(`Sold ${shares} share${shares>1?'s':''} of ${sel} @ $${f2(price)}`, 'ok')
+  }
+  renderPF(); refreshHold()
+  const sh = document.getElementById('tr-sh')
+  if (sh) { sh.value = 1; updateTotal() }
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function toast(msg, type) {
+  const t = document.getElementById('toast')
+  t.textContent = msg; t.className = 'toast '+type+' show'
+  clearTimeout(toastTmr)
+  toastTmr = setTimeout(() => t.classList.remove('show'), 2600)
+}
+
+// ── THEME ────────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement
+  const dark = html.getAttribute('data-theme') === 'dark'
+  html.setAttribute('data-theme', dark ? 'light' : 'dark')
+  document.getElementById('tbtn').textContent = dark ? 'Dark' : 'Light'
+  setTimeout(() => { renderTable(); if (sel) drawChart() }, 30)
+}
+
+// ── INIT ────────────────────────────────────────────────────────────────────
+renderTable()
+renderPF()
+setInterval(tick, 1500)
+</script>
+</body>
+</html>
