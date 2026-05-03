@@ -6,433 +6,593 @@
 <title>StockSim</title>
 <style>
 :root{
-  --bg:#0c0c0f;--s1:#141418;--s2:#1c1c22;--s3:#242430;
-  --border:#2a2a36;--text:#e8e8f0;--t2:#888898;--t3:#44445a;
+  --bg:#0c0c0f;--s1:#111115;--s2:#18181e;--s3:#222228;
+  --border:#26262f;--text:#e2e2ec;--t2:#7a7a90;--t3:#3a3a50;
   --green:#00c87a;--gdim:rgba(0,200,122,.1);
-  --red:#ff4545;--rdim:rgba(255,69,69,.1);
+  --red:#ff4040;--rdim:rgba(255,64,64,.1);
   --blue:#2563eb;--yellow:#f59e0b;
   --mono:'SF Mono','Consolas','Monaco',monospace;
 }
 [data-theme=light]{
-  --bg:#f0f1f3;--s1:#ffffff;--s2:#f7f8fa;--s3:#eef0f3;
-  --border:#e2e4e9;--text:#111218;--t2:#5a5b6a;--t3:#b8bac8;
+  --bg:#eef0f4;--s1:#fff;--s2:#f5f6fa;--s3:#eaecf2;
+  --border:#dde0e8;--text:#12131a;--t2:#5a5c72;--t3:#b0b2c8;
   --green:#006d3a;--gdim:rgba(0,109,58,.08);
-  --red:#c0392b;--rdim:rgba(192,57,43,.08);
-  --blue:#1d4ed8;
+  --red:#bf2600;--rdim:rgba(191,38,0,.08);
+  --blue:#1d4ed8;--yellow:#d97706;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px}
 
-/* HEADER */
-.hdr{height:52px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:0;flex-shrink:0;z-index:20}
-.logo{font-size:16px;font-weight:800;letter-spacing:-.8px;margin-right:20px;white-space:nowrap}
+.hdr{height:50px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:0;flex-shrink:0;z-index:20}
+.logo{font-size:15px;font-weight:800;letter-spacing:-.8px;margin-right:16px;white-space:nowrap}
 .logo b{color:var(--blue)}
-
 .indices{display:flex;gap:0;margin-right:auto}
-.idx{padding:0 14px;border-right:1px solid var(--border);cursor:default}
-.idx .iname{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
-.idx .ival{font-size:13px;font-weight:600;font-family:var(--mono)}
-.idx .ichg{font-size:10px;font-family:var(--mono)}
-
-.search-wrap{position:relative;margin:0 12px}
-.search-wrap input{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:7px 10px 7px 32px;border-radius:7px;font-size:12px;width:220px;outline:none;transition:.15s}
-.search-wrap input:focus{border-color:var(--blue);width:260px}
-.search-wrap input::placeholder{color:var(--t3)}
-.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none}
-
-.hdr-pf{text-align:right;padding:0 14px;border-left:1px solid var(--border)}
-.hdr-pf .lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
-.hdr-pf .val{font-size:15px;font-weight:700;font-family:var(--mono)}
-.tbtn{background:var(--s2);border:1px solid var(--border);color:var(--t2);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;margin-left:12px;transition:.15s;white-space:nowrap}
+.idx{padding:0 12px;border-right:1px solid var(--border);line-height:1}
+.idx .in{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+.idx .iv{font-size:13px;font-weight:700;font-family:var(--mono);margin-top:1px}
+.idx .ic{font-size:10px;font-family:var(--mono)}
+.srch{position:relative;margin:0 10px}
+.srch input{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 10px 6px 30px;border-radius:6px;font-size:12px;width:200px;outline:none;transition:.15s}
+.srch input:focus{border-color:var(--blue);width:240px}
+.srch input::placeholder{color:var(--t3)}
+.srch svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--t3)}
+.hpf{text-align:right;padding:0 12px;border-left:1px solid var(--border)}
+.hpf .lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.hpf .val{font-size:14px;font-weight:700;font-family:var(--mono)}
+.tbtn{background:var(--s2);border:1px solid var(--border);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;margin-left:10px;transition:.15s}
 .tbtn:hover{color:var(--text)}
 
-/* MAIN */
-.main{display:flex;height:calc(100vh - 52px)}
-
-/* LEFT */
+.main{display:flex;height:calc(100vh - 50px)}
 .left{display:flex;flex-direction:column;flex:1;min-width:0;border-right:1px solid var(--border)}
-.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0}
-.tab{padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;color:var(--t2);border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
+.filter-bar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0;padding:0 4px}
+.tab{padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--t2);border-bottom:2px solid transparent;transition:.15s;white-space:nowrap;background:none;border-left:none;border-right:none;border-top:none}
 .tab:hover{color:var(--text)}
 .tab.act{color:var(--blue);border-bottom-color:var(--blue)}
-.sector-select{margin-left:auto;margin-right:8px;align-self:center;background:var(--s2);border:1px solid var(--border);color:var(--t2);padding:4px 8px;border-radius:5px;font-size:11px;outline:none;cursor:pointer}
+.sector-sel{margin-left:auto;margin-right:8px;background:var(--s2);border:1px solid var(--border);color:var(--t2);padding:4px 8px;border-radius:5px;font-size:11px;outline:none;cursor:pointer}
+.count-badge{font-size:10px;color:var(--t3);margin-left:auto;margin-right:12px;white-space:nowrap}
 
 .tbl-wrap{overflow-y:auto;flex:1}
 .tbl-wrap::-webkit-scrollbar{width:4px}
 .tbl-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 table{width:100%;border-collapse:collapse}
 thead{position:sticky;top:0;z-index:5;background:var(--s1)}
-thead th{padding:8px 10px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+thead th{padding:7px 10px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
 thead th:hover{color:var(--t2)}
-thead th:first-child{text-align:left;padding-left:14px}
+thead th:first-child{text-align:left;padding-left:12px;width:30px}
+thead th:nth-child(2){text-align:left}
 tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s}
 tbody tr:hover{background:var(--s2)}
 tbody tr.sel{background:var(--s2)}
-td{padding:9px 10px;text-align:right;white-space:nowrap;vertical-align:middle}
-td:first-child{text-align:left;padding-left:14px}
-td.sym-cell{max-width:200px}
+td{padding:8px 10px;text-align:right;white-space:nowrap;vertical-align:middle}
+td:first-child{padding-left:12px;width:30px}
+td:nth-child(2){text-align:left}
 .sym{font-weight:700;font-size:12px;font-family:var(--mono)}
-.co{font-size:10px;color:var(--t2);margin-top:1px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sector-badge{font-size:9px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.price{font-family:var(--mono);font-weight:600;font-size:12px}
+.co{font-size:10px;color:var(--t2);margin-top:1px;max-width:170px;overflow:hidden;text-overflow:ellipsis}
+.pr{font-family:var(--mono);font-weight:600;font-size:12px}
 .chg{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:3px;display:inline-block}
 .up{color:var(--green);background:var(--gdim)}
 .dn{color:var(--red);background:var(--rdim)}
 .vol{font-family:var(--mono);font-size:11px;color:var(--t2)}
-.star{cursor:pointer;font-size:14px;color:var(--t3);padding:0 2px;transition:.1s;background:none;border:none;line-height:1}
+.star{cursor:pointer;font-size:13px;color:var(--t3);background:none;border:none;line-height:1;transition:.1s;padding:0}
 .star:hover,.star.on{color:var(--yellow)}
-td.star-cell{width:28px;padding-right:8px}
-.mktcap{font-family:var(--mono);font-size:11px;color:var(--t2)}
 
-/* RIGHT */
-.right{width:400px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;background:var(--s1)}
-.right-scroll{flex:1;overflow-y:auto}
-.right-scroll::-webkit-scrollbar{width:4px}
-.right-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.right{width:390px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1)}
+.rscroll{flex:1;overflow-y:auto}
+.rscroll::-webkit-scrollbar{width:4px}
+.rscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
-/* EMPTY STATE */
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--t3);gap:10px;padding:40px}
-.empty svg{opacity:.15}
-.empty h3{font-size:14px;font-weight:600;color:var(--t2)}
-.empty p{font-size:12px;text-align:center;line-height:1.6}
+/* DEFAULT PANEL */
+.mkt-overview{padding:14px}
+.ov-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:10px}
+.idx-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.idx-card{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:10px;text-align:center}
+.idx-card .icn{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.idx-card .icv{font-size:13px;font-weight:700;font-family:var(--mono)}
+.idx-card .icc{font-size:10px;font-family:var(--mono);margin-top:2px}
+.movers-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.mover-col{}
+.mover-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:6px}
+.mover-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.mover-row:last-child{border-bottom:none}
+.mover-row:hover .msym{color:var(--blue)}
+.msym{font-family:var(--mono);font-weight:700;font-size:12px;transition:.1s}
+.mpct{font-family:var(--mono);font-size:11px}
+.act-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.act-row:last-child{border-bottom:none}
+.act-row:hover .msym{color:var(--blue)}
+.avol{font-family:var(--mono);font-size:11px;color:var(--t2)}
 
-/* PORTFOLIO PANEL */
-.pf-panel{padding:16px}
-.panel-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:12px}
-.pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.pf-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px}
-.pf-card .lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.pf-card .val{font-size:16px;font-weight:700;font-family:var(--mono)}
-
-.h-list{display:flex;flex-direction:column;gap:0}
-.h-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
-.h-row:last-child{border-bottom:none}
-.h-sym{font-weight:700;font-family:var(--mono);font-size:12px}
-.h-shares{font-size:10px;color:var(--t2);margin-top:1px}
-.h-right{text-align:right}
-.h-val{font-family:var(--mono);font-size:12px;font-weight:600}
-.h-pnl{font-family:var(--mono);font-size:10px;margin-top:1px}
-.no-hold{font-size:12px;color:var(--t3);padding:8px 0}
-
-.orders-list{display:flex;flex-direction:column;gap:6px}
-.order-item{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
-.order-info .oi-main{font-size:12px;font-weight:600}
-.order-info .oi-sub{font-size:10px;color:var(--t2);margin-top:2px;font-family:var(--mono)}
-.cancel-btn{background:none;border:1px solid var(--border);color:var(--t2);padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer;transition:.15s}
-.cancel-btn:hover{border-color:var(--red);color:var(--red)}
-.hist-item{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px}
-.hist-item:last-child{border-bottom:none}
-.hist-sym{font-family:var(--mono);font-weight:600}
-.hist-detail{color:var(--t2);font-family:var(--mono)}
-.hist-amt{font-family:var(--mono);font-weight:600}
-
-/* STOCK DETAIL */
-.sk-hdr{padding:16px 16px 12px;border-bottom:1px solid var(--border)}
+/* DETAIL */
+.sk-hdr{padding:14px 14px 10px;border-bottom:1px solid var(--border)}
 .sk-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.sk-left .sk-sym{font-size:22px;font-weight:800;font-family:var(--mono)}
-.sk-left .sk-name{font-size:11px;color:var(--t2);margin-top:2px}
-.sk-left .sk-sector{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
-.sk-right{text-align:right}
-.sk-price{font-size:28px;font-weight:700;font-family:var(--mono);letter-spacing:-1px;line-height:1}
+.sk-sym{font-size:20px;font-weight:800;font-family:var(--mono)}
+.sk-name{font-size:11px;color:var(--t2);margin-top:2px}
+.sk-sec{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.sk-r{text-align:right}
+.sk-price{font-size:28px;font-weight:700;font-family:var(--mono);letter-spacing:-1.2px;line-height:1}
 .sk-chg{font-size:12px;font-family:var(--mono);margin-top:3px}
-.sk-extra{display:flex;gap:16px;font-size:11px;color:var(--t2);font-family:var(--mono)}
-.sk-extra span{white-space:nowrap}
+.sk-meta{display:flex;gap:12px;font-size:11px;color:var(--t2);font-family:var(--mono);margin-top:6px;flex-wrap:wrap}
+.watch-btn{display:flex;align-items:center;gap:6px;margin-top:10px;background:none;border:1px solid var(--border);color:var(--t2);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:.15s;font-weight:600}
+.watch-btn:hover{border-color:var(--yellow);color:var(--yellow)}
+.watch-btn.on{border-color:var(--yellow);color:var(--yellow);background:rgba(245,158,11,.08)}
 
-/* CHART */
-.chart-wrap{padding:12px 12px 6px;border-bottom:1px solid var(--border)}
+.chart-sec{padding:10px 12px 6px;border-bottom:1px solid var(--border)}
 .ct-tabs{display:flex;gap:2px;margin-bottom:8px}
 .ct{padding:3px 9px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;color:var(--t2);background:transparent;border:none;transition:.15s}
 .ct:hover{color:var(--text)}
 .ct.act{background:var(--s3);color:var(--text)}
 
-/* KEY STATS */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border)}
-.stat{padding:10px 16px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
+.stat{padding:9px 14px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
 .stat:nth-child(2n){border-right:none}
-.stat .slbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.stat .sval{font-size:12px;font-weight:600;font-family:var(--mono)}
+.slbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.sval{font-size:12px;font-weight:600;font-family:var(--mono)}
 
-/* TRADE */
-.trade{padding:14px 16px;border-bottom:1px solid var(--border)}
-.tr-tabs{display:flex;background:var(--s2);border-radius:7px;padding:3px;margin-bottom:12px}
-.tt{flex:1;padding:7px;border:none;background:transparent;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;color:var(--t2);transition:.15s}
-.tt.b{background:var(--s1);color:var(--green);box-shadow:0 1px 4px rgba(0,0,0,.3)}
-.tt.s{background:var(--s1);color:var(--red);box-shadow:0 1px 4px rgba(0,0,0,.3)}
-.ot-row{display:flex;gap:6px;margin-bottom:12px}
-.ot-btn{flex:1;padding:5px;border:1px solid var(--border);background:transparent;color:var(--t2);border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s}
-.ot-btn.act{border-color:var(--blue);color:var(--blue);background:rgba(37,99,235,.08)}
-.tr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.tr-lbl{font-size:12px;color:var(--t2)}
-.tr-val{font-family:var(--mono);font-size:12px}
-.tr-input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;font-family:var(--mono);width:130px;text-align:right;outline:none;transition:.15s}
-.tr-input:focus{border-color:var(--blue)}
-.tr-total{padding:9px 0 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px}
-.tr-total .tv{font-family:var(--mono);font-weight:600}
-.exec{width:100%;padding:11px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .15s}
-.exec:hover{opacity:.82}
-.exec.buy{background:var(--green);color:#fff}
-.exec.sell{background:var(--red);color:#fff}
-.avail{font-size:11px;color:var(--t2);text-align:center;margin-top:8px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--t3);gap:8px}
+.empty svg{opacity:.12}
+.empty p{font-size:12px}
 
-/* POSITION */
-.pos-wrap{padding:12px 16px;border-bottom:1px solid var(--border)}
-.pos-row{display:flex;justify-content:space-between;align-items:center}
-.pos-left .pos-sym{font-size:13px;font-weight:700;font-family:var(--mono)}
-.pos-left .pos-shares{font-size:10px;color:var(--t2);margin-top:1px}
-.pos-right{text-align:right}
-.pos-val{font-family:var(--mono);font-size:13px;font-weight:600}
-.pos-pnl{font-family:var(--mono);font-size:11px;margin-top:1px}
-
-/* PENDING */
-.pending-wrap{padding:12px 16px;border-bottom:1px solid var(--border)}
-
-/* TOAST */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--s1);border:1px solid var(--border);padding:10px 20px;border-radius:8px;font-size:12px;box-shadow:0 8px 28px rgba(0,0,0,.4);opacity:0;transition:.22s ease;z-index:999;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--s1);border:1px solid var(--border);padding:10px 18px;border-radius:7px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:.2s ease;z-index:999;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .toast.ok{border-left:3px solid var(--green)}
 .toast.err{border-left:3px solid var(--red)}
-.hidden{display:none!important}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 </style>
 </head>
 <body>
-
 <header class="hdr">
   <div class="logo">Stock<b>Sim</b></div>
   <div class="indices">
-    <div class="idx"><div class="iname">S&amp;P 500</div><div class="ival" id="i-spx">5,432.18</div><div class="ichg up" id="ic-spx">+0.00%</div></div>
-    <div class="idx"><div class="iname">NASDAQ</div><div class="ival" id="i-comp">17,254.42</div><div class="ichg up" id="ic-comp">+0.00%</div></div>
-    <div class="idx"><div class="iname">DOW</div><div class="ival" id="i-dji">39,142.23</div><div class="ichg up" id="ic-dji">+0.00%</div></div>
+    <div class="idx"><div class="in">S&amp;P 500</div><div class="iv" id="i-spx">—</div><div class="ic" id="ic-spx">—</div></div>
+    <div class="idx"><div class="in">NASDAQ</div><div class="iv" id="i-comp">—</div><div class="ic" id="ic-comp">—</div></div>
+    <div class="idx"><div class="in">DOW</div><div class="iv" id="i-dji">—</div><div class="ic" id="ic-dji">—</div></div>
+    <div class="idx"><div class="in">Russell 2K</div><div class="iv" id="i-rut">—</div><div class="ic" id="ic-rut">—</div></div>
+    <div class="idx"><div class="in">VIX</div><div class="iv" id="i-vix">—</div><div class="ic" id="ic-vix" style="color:var(--t2)">Volatility</div></div>
   </div>
-  <div class="search-wrap">
-    <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input id="search" type="text" placeholder="Search stocks..." oninput="onSearch()">
-  </div>
-  <div class="hdr-pf">
-    <div class="lbl">Portfolio</div>
-    <div class="val" id="h-total">$10,000.00</div>
+  <div class="srch">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input id="search" type="text" placeholder="Search ticker or company..." oninput="onSearch()">
   </div>
   <button class="tbtn" id="tbtn" onclick="toggleTheme()">Light</button>
 </header>
-
 <div class="main">
   <div class="left">
-    <div class="tabs">
-      <div class="tab act" onclick="setTab('all',this)">All Stocks</div>
-      <div class="tab" onclick="setTab('watchlist',this)">Watchlist</div>
-      <div class="tab" onclick="setTab('gainers',this)">Top Gainers</div>
-      <div class="tab" onclick="setTab('losers',this)">Top Losers</div>
-      <div class="tab" onclick="setTab('portfolio',this)">My Holdings</div>
-      <select class="sector-select" id="sector-sel" onchange="onSectorChange()">
+    <div class="filter-bar">
+      <button class="tab act" onclick="setTab('all',this)">All</button>
+      <button class="tab" onclick="setTab('watchlist',this)">Watchlist</button>
+      <button class="tab" onclick="setTab('gainers',this)">Gainers</button>
+      <button class="tab" onclick="setTab('losers',this)">Losers</button>
+      <span class="count-badge" id="count-badge"></span>
+      <select class="sector-sel" id="sec-sel" onchange="onSector()">
         <option value="">All Sectors</option>
         <option>Technology</option><option>Finance</option><option>Healthcare</option>
-        <option>Consumer</option><option>Energy</option><option>Industrial</option><option>ETF</option>
+        <option>Consumer Disc.</option><option>Consumer Staples</option>
+        <option>Energy</option><option>Industrial</option><option>Materials</option>
+        <option>Real Estate</option><option>Utilities</option><option>Communication</option><option>ETF</option>
       </select>
     </div>
-    <div class="tbl-wrap" id="tbl-wrap">
+    <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr>
-            <th style="text-align:left;padding-left:14px;width:28px"></th>
-            <th style="text-align:left">Symbol</th>
-            <th onclick="sortBy('p')">Price</th>
-            <th onclick="sortBy('chg')">Change</th>
-            <th onclick="sortBy('pct')">% Chg</th>
-            <th>Trend</th>
-            <th onclick="sortBy('cap')">Mkt Cap</th>
-            <th onclick="sortBy('vol')">Volume</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th></th>
+          <th onclick="srt('sym')">Symbol ↕</th>
+          <th onclick="srt('p')">Price</th>
+          <th onclick="srt('chg')">Change</th>
+          <th onclick="srt('pct')">% Chg</th>
+          <th>Trend</th>
+          <th onclick="srt('cap')">Mkt Cap</th>
+          <th onclick="srt('vol')">Volume</th>
+        </tr></thead>
         <tbody id="tbl"></tbody>
       </table>
     </div>
   </div>
-
-  <div class="right">
-    <div class="right-scroll" id="right-panel">
-      <div class="empty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-        <h3>Select a stock to trade</h3>
-        <p>Search or click any stock<br>to view details and place orders.</p>
-      </div>
-    </div>
-  </div>
+  <div class="right"><div class="rscroll" id="rpanel"><div id="default-panel"></div></div></div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-// ─── STOCK DATA ───────────────────────────────────────────────────────────────
-const STOCKS=[
-  // Technology
-  {s:'AAPL', n:'Apple Inc.',              sec:'Technology', p:189.50,v:.0028,bv:72e6,so:15.4e9,pe:31.2,div:.96},
-  {s:'MSFT', n:'Microsoft Corp.',         sec:'Technology', p:415.20,v:.0022,bv:21e6,so:7.43e9,pe:36.1,div:3.00},
-  {s:'NVDA', n:'NVIDIA Corp.',            sec:'Technology', p:875.40,v:.0075,bv:44e6,so:24.6e9,pe:72.4,div:.16},
-  {s:'GOOGL',n:'Alphabet Inc. Cl A',      sec:'Technology', p:172.30,v:.0024,bv:26e6,so:12.3e9,pe:27.8,div:0},
-  {s:'META', n:'Meta Platforms Inc.',     sec:'Technology', p:512.30,v:.0042,bv:16e6,so:2.54e9,pe:29.3,div:2.00},
-  {s:'AMZN', n:'Amazon.com Inc.',         sec:'Technology', p:182.60,v:.0032,bv:40e6,so:10.4e9,pe:54.2,div:0},
-  {s:'TSLA', n:'Tesla Inc.',              sec:'Technology', p:248.90,v:.0095,bv:98e6,so:3.18e9,pe:62.1,div:0},
-  {s:'AMD',  n:'Advanced Micro Devices',  sec:'Technology', p:168.40,v:.0068,bv:52e6,so:1.62e9,pe:45.3,div:0},
-  {s:'INTC', n:'Intel Corp.',             sec:'Technology', p:43.20, v:.0045,bv:38e6,so:4.25e9,pe:18.2,div:1.46},
-  {s:'QCOM', n:'Qualcomm Inc.',           sec:'Technology', p:175.80,v:.0040,bv:9e6, so:1.11e9,pe:19.8,div:3.40},
-  {s:'AVGO', n:'Broadcom Inc.',           sec:'Technology', p:1423.50,v:.0038,bv:4e6,so:470e6, pe:34.6,div:21.0},
-  {s:'TXN',  n:'Texas Instruments Inc.',  sec:'Technology', p:172.40,v:.0030,bv:5e6, so:910e6, pe:28.4,div:5.20},
-  {s:'CRM',  n:'Salesforce Inc.',         sec:'Technology', p:285.60,v:.0045,bv:5e6, so:970e6, pe:48.2,div:0},
-  {s:'ORCL', n:'Oracle Corp.',            sec:'Technology', p:125.40,v:.0032,bv:7e6, so:2.73e9,pe:22.8,div:1.60},
-  {s:'ADBE', n:'Adobe Inc.',              sec:'Technology', p:480.20,v:.0040,bv:3e6, so:450e6, pe:43.1,div:0},
-  {s:'NOW',  n:'ServiceNow Inc.',         sec:'Technology', p:745.80,v:.0050,bv:2e6, so:204e6, pe:72.3,div:0},
-  {s:'IBM',  n:'IBM Corp.',               sec:'Technology', p:192.30,v:.0025,bv:5e6, so:910e6, pe:21.4,div:6.64},
-  {s:'MU',   n:'Micron Technology Inc.',  sec:'Technology', p:89.40, v:.0060,bv:18e6,so:1.11e9,pe:24.6,div:.46},
-  {s:'AMAT', n:'Applied Materials Inc.',  sec:'Technology', p:198.70,v:.0048,bv:5e6, so:856e6, pe:22.1,div:1.28},
-  {s:'ASML', n:'ASML Holding N.V.',       sec:'Technology', p:745.20,v:.0040,bv:1e6, so:395e6, pe:38.4,div:6.88},
-  {s:'SHOP', n:'Shopify Inc.',            sec:'Technology', p:72.40, v:.0070,bv:12e6,so:1.27e9,pe:0,   div:0},
-  {s:'PYPL', n:'PayPal Holdings Inc.',    sec:'Technology', p:63.20, v:.0055,bv:12e6,so:1.07e9,pe:18.4,div:0},
-  {s:'UBER', n:'Uber Technologies Inc.',  sec:'Technology', p:68.90, v:.0060,bv:18e6,so:2.08e9,pe:0,   div:0},
-  {s:'ABNB', n:'Airbnb Inc.',             sec:'Technology', p:142.30,v:.0065,bv:5e6, so:640e6, pe:38.2,div:0},
-  {s:'SNOW', n:'Snowflake Inc.',          sec:'Technology', p:165.40,v:.0075,bv:5e6, so:345e6, pe:0,   div:0},
-  {s:'PLTR', n:'Palantir Technologies',   sec:'Technology', p:21.40, v:.0085,bv:95e6,so:2.11e9,pe:0,   div:0},
-  {s:'CRWD', n:'CrowdStrike Holdings',    sec:'Technology', p:345.80,v:.0060,bv:5e6, so:248e6, pe:0,   div:0},
-  {s:'NET',  n:'Cloudflare Inc.',         sec:'Technology', p:98.70, v:.0065,bv:7e6, so:328e6, pe:0,   div:0},
-  {s:'ZS',   n:'Zscaler Inc.',            sec:'Technology', p:198.40,v:.0060,bv:3e6, so:153e6, pe:0,   div:0},
-  {s:'DDOG', n:'Datadog Inc.',            sec:'Technology', p:112.30,v:.0065,bv:4e6, so:322e6, pe:0,   div:0},
-  // Finance
-  {s:'JPM',  n:'JPMorgan Chase & Co.',    sec:'Finance',    p:198.70,v:.0018,bv:9e6, so:2.89e9,pe:12.1,div:5.00},
-  {s:'BAC',  n:'Bank of America Corp.',   sec:'Finance',    p:38.20, v:.0022,bv:35e6,so:7.83e9,pe:12.8,div:.96},
-  {s:'WFC',  n:'Wells Fargo & Co.',       sec:'Finance',    p:57.80, v:.0025,bv:20e6,so:3.53e9,pe:11.2,div:1.40},
-  {s:'GS',   n:'Goldman Sachs Group',     sec:'Finance',    p:445.30,v:.0022,bv:3e6, so:330e6, pe:14.8,div:11.0},
-  {s:'MS',   n:'Morgan Stanley',          sec:'Finance',    p:97.80, v:.0022,bv:10e6,so:1.6e9, pe:18.2,div:3.40},
-  {s:'V',    n:'Visa Inc.',               sec:'Finance',    p:276.80,v:.0017,bv:7e6, so:2.08e9,pe:31.4,div:2.08},
-  {s:'MA',   n:'Mastercard Inc.',         sec:'Finance',    p:468.50,v:.0018,bv:4e6, so:940e6, pe:38.2,div:2.64},
-  {s:'AXP',  n:'American Express Co.',    sec:'Finance',    p:212.40,v:.0022,bv:3e6, so:740e6, pe:18.4,div:2.80},
-  {s:'BRK.B',n:'Berkshire Hathaway B',    sec:'Finance',    p:395.10,v:.0014,bv:4e6, so:2.17e9,pe:8.2, div:0},
-  {s:'SCHW', n:'Charles Schwab Corp.',    sec:'Finance',    p:72.40, v:.0032,bv:12e6,so:1.81e9,pe:28.4,div:1.00},
-  {s:'BLK',  n:'BlackRock Inc.',          sec:'Finance',    p:812.30,v:.0020,bv:1e6, so:151e6, pe:22.8,div:20.0},
-  {s:'C',    n:'Citigroup Inc.',          sec:'Finance',    p:64.30, v:.0028,bv:14e6,so:1.91e9,pe:10.8,div:2.12},
-  {s:'HOOD', n:'Robinhood Markets Inc.',  sec:'Finance',    p:21.40, v:.0085,bv:18e6,so:878e6, pe:0,   div:0},
-  // Healthcare
-  {s:'JNJ',  n:'Johnson & Johnson',       sec:'Healthcare', p:147.20,v:.0015,bv:8e6, so:2.4e9, pe:15.8,div:4.76},
-  {s:'UNH',  n:'UnitedHealth Group Inc.', sec:'Healthcare', p:512.80,v:.0018,bv:3e6, so:930e6, pe:22.4,div:8.40},
-  {s:'LLY',  n:'Eli Lilly and Co.',       sec:'Healthcare', p:724.80,v:.0030,bv:4e6, so:956e6, pe:98.4,div:5.20},
-  {s:'PFE',  n:'Pfizer Inc.',             sec:'Healthcare', p:28.40, v:.0025,bv:28e6,so:5.65e9,pe:0,   div:1.68},
-  {s:'MRK',  n:'Merck & Co. Inc.',        sec:'Healthcare', p:128.70,v:.0020,bv:10e6,so:2.54e9,pe:21.4,div:2.92},
-  {s:'ABBV', n:'AbbVie Inc.',             sec:'Healthcare', p:162.30,v:.0020,bv:5e6, so:1.77e9,pe:48.2,div:6.20},
-  {s:'AMGN', n:'Amgen Inc.',              sec:'Healthcare', p:289.70,v:.0022,bv:4e6, so:536e6, pe:18.4,div:9.00},
-  {s:'GILD', n:'Gilead Sciences Inc.',    sec:'Healthcare', p:72.80, v:.0022,bv:8e6, so:1.25e9,pe:18.8,div:3.00},
-  {s:'VRTX', n:'Vertex Pharmaceuticals',  sec:'Healthcare', p:448.20,v:.0030,bv:2e6, so:258e6, pe:32.8,div:0},
-  {s:'REGN', n:'Regeneron Pharma Inc.',   sec:'Healthcare', p:1024.50,v:.0028,bv:1e6,so:104e6, pe:28.4,div:0},
-  {s:'CVS',  n:'CVS Health Corp.',        sec:'Healthcare', p:58.40, v:.0022,bv:8e6, so:1.27e9,pe:10.8,div:2.66},
-  // Consumer
-  {s:'WMT',  n:'Walmart Inc.',            sec:'Consumer',   p:68.20, v:.0015,bv:10e6,so:8.02e9,pe:28.4,div:.83},
-  {s:'TGT',  n:'Target Corp.',            sec:'Consumer',   p:145.30,v:.0025,bv:5e6, so:461e6, pe:14.8,div:4.40},
-  {s:'COST', n:'Costco Wholesale Corp.',  sec:'Consumer',   p:845.20,v:.0020,bv:2e6, so:443e6, pe:52.4,div:4.64},
-  {s:'HD',   n:'Home Depot Inc.',         sec:'Consumer',   p:348.70,v:.0018,bv:4e6, so:1.01e9,pe:22.8,div:9.00},
-  {s:'NKE',  n:'Nike Inc.',               sec:'Consumer',   p:79.40, v:.0025,bv:8e6, so:1.52e9,pe:22.4,div:1.48},
-  {s:'SBUX', n:'Starbucks Corp.',         sec:'Consumer',   p:89.30, v:.0030,bv:8e6, so:1.14e9,pe:24.8,div:2.44},
-  {s:'MCD',  n:"McDonald's Corp.",        sec:'Consumer',   p:285.40,v:.0018,bv:4e6, so:730e6, pe:24.2,div:6.68},
-  {s:'CMG',  n:'Chipotle Mexican Grill',  sec:'Consumer',   p:3245.80,v:.0040,bv:1e6,so:277e6, pe:64.2,div:0},
-  {s:'DIS',  n:'Walt Disney Co.',         sec:'Consumer',   p:112.40,v:.0030,bv:12e6,so:1.82e9,pe:48.2,div:0},
-  {s:'NFLX', n:'Netflix Inc.',            sec:'Consumer',   p:648.20,v:.0055,bv:5e6, so:432e6, pe:42.4,div:0},
-  {s:'CMCSA',n:'Comcast Corp.',           sec:'Consumer',   p:42.80, v:.0020,bv:18e6,so:4.1e9, pe:10.8,div:1.24},
-  // Energy
-  {s:'XOM',  n:'Exxon Mobil Corp.',       sec:'Energy',     p:112.40,v:.0025,bv:15e6,so:3.97e9,pe:14.2,div:3.80},
-  {s:'CVX',  n:'Chevron Corp.',           sec:'Energy',     p:157.80,v:.0022,bv:7e6, so:1.88e9,pe:13.8,div:6.52},
-  {s:'COP',  n:'ConocoPhillips',          sec:'Energy',     p:108.20,v:.0028,bv:6e6, so:1.26e9,pe:13.2,div:3.08},
-  {s:'SLB',  n:'Schlumberger Ltd.',       sec:'Energy',     p:48.70, v:.0030,bv:10e6,so:1.42e9,pe:16.4,div:1.00},
-  {s:'PSX',  n:'Phillips 66',             sec:'Energy',     p:143.20,v:.0025,bv:3e6, so:432e6, pe:8.4, div:4.40},
-  // Industrial
-  {s:'BA',   n:'Boeing Co.',              sec:'Industrial', p:198.40,v:.0035,bv:7e6, so:606e6, pe:0,   div:0},
-  {s:'CAT',  n:'Caterpillar Inc.',        sec:'Industrial', p:345.20,v:.0025,bv:3e6, so:499e6, pe:14.8,div:5.20},
-  {s:'GE',   n:'GE Aerospace',           sec:'Industrial', p:162.80,v:.0028,bv:8e6, so:1.09e9,pe:32.4,div:.32},
-  {s:'HON',  n:'Honeywell International', sec:'Industrial', p:198.30,v:.0020,bv:4e6, so:645e6, pe:21.4,div:4.36},
-  {s:'LMT',  n:'Lockheed Martin Corp.',  sec:'Industrial', p:474.20,v:.0018,bv:2e6, so:249e6, pe:18.8,div:12.6},
-  {s:'RTX',  n:'RTX Corp.',              sec:'Industrial', p:98.40, v:.0022,bv:5e6, so:1.33e9,pe:32.4,div:2.34},
-  {s:'DE',   n:'Deere & Co.',            sec:'Industrial', p:412.80,v:.0025,bv:2e6, so:283e6, pe:14.2,div:5.40},
-  {s:'MMM',  n:'3M Co.',                 sec:'Industrial', p:98.20, v:.0022,bv:4e6, so:550e6, pe:12.4,div:2.80},
-  // ETFs
-  {s:'SPY',  n:'SPDR S&P 500 ETF Trust', sec:'ETF',        p:512.30,v:.0010,bv:75e6,so:928e6, pe:0,   div:6.80},
-  {s:'QQQ',  n:'Invesco QQQ Trust',      sec:'ETF',        p:432.80,v:.0012,bv:45e6,so:910e6, pe:0,   div:1.80},
-  {s:'DIA',  n:'SPDR Dow Jones ETF',     sec:'ETF',        p:382.40,v:.0008,bv:5e6, so:66e6,  pe:0,   div:5.60},
-  {s:'IWM',  n:'iShares Russell 2000',   sec:'ETF',        p:196.30,v:.0014,bv:35e6,so:870e6, pe:0,   div:1.64},
-  {s:'GLD',  n:'SPDR Gold Shares',       sec:'ETF',        p:182.40,v:.0012,bv:10e6,so:371e6, pe:0,   div:0},
-  {s:'TLT',  n:'iShares 20+ Yr Bond ETF',sec:'ETF',        p:95.20, v:.0010,bv:20e6,so:450e6, pe:0,   div:3.80},
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+// {s:symbol, n:name, sec:sector, p:price, v:volatility, bv:base_volume, so:shares_out, pe:P/E, div:annual_div}
+const RAW=[
+// Technology
+['AAPL','Apple Inc.','Technology',189.50,.0028,72e6,15.4e9,31.2,.96],
+['MSFT','Microsoft Corp.','Technology',415.20,.0022,21e6,7.43e9,36.1,3.00],
+['NVDA','NVIDIA Corp.','Technology',875.40,.0075,44e6,24.6e9,72.4,.16],
+['GOOGL','Alphabet Inc. Cl A','Technology',172.30,.0024,26e6,12.3e9,27.8,0],
+['GOOG','Alphabet Inc. Cl C','Technology',173.80,.0024,8e6,12.3e9,27.8,0],
+['META','Meta Platforms Inc.','Technology',512.30,.0042,16e6,2.54e9,29.3,2.00],
+['AMZN','Amazon.com Inc.','Technology',182.60,.0032,40e6,10.4e9,54.2,0],
+['TSLA','Tesla Inc.','Technology',248.90,.0095,98e6,3.18e9,62.1,0],
+['AMD','Advanced Micro Devices','Technology',168.40,.0068,52e6,1.62e9,45.3,0],
+['INTC','Intel Corp.','Technology',43.20,.0045,38e6,4.25e9,18.2,1.46],
+['QCOM','Qualcomm Inc.','Technology',175.80,.0040,9e6,1.11e9,19.8,3.40],
+['AVGO','Broadcom Inc.','Technology',1423.50,.0038,4e6,470e6,34.6,21.00],
+['TXN','Texas Instruments Inc.','Technology',172.40,.0030,5e6,910e6,28.4,5.20],
+['CRM','Salesforce Inc.','Technology',285.60,.0045,5e6,970e6,48.2,0],
+['ORCL','Oracle Corp.','Technology',125.40,.0032,7e6,2.73e9,22.8,1.60],
+['ADBE','Adobe Inc.','Technology',480.20,.0040,3e6,450e6,43.1,0],
+['NOW','ServiceNow Inc.','Technology',745.80,.0050,2e6,204e6,72.3,0],
+['IBM','IBM Corp.','Technology',192.30,.0025,5e6,910e6,21.4,6.64],
+['MU','Micron Technology Inc.','Technology',89.40,.0060,18e6,1.11e9,24.6,.46],
+['AMAT','Applied Materials Inc.','Technology',198.70,.0048,5e6,856e6,22.1,1.28],
+['ASML','ASML Holding N.V.','Technology',745.20,.0040,1e6,395e6,38.4,6.88],
+['LRCX','Lam Research Corp.','Technology',892.40,.0048,2e6,140e6,22.4,8.00],
+['KLAC','KLA Corp.','Technology',672.30,.0045,1e6,142e6,24.8,6.00],
+['MCHP','Microchip Technology','Technology',82.40,.0045,7e6,551e6,18.2,1.76],
+['MRVL','Marvell Technology','Technology',68.20,.0060,18e6,867e6,0,0.24],
+['ON','ON Semiconductor','Technology',62.80,.0058,7e6,430e6,14.2,0],
+['STX','Seagate Technology','Technology',98.40,.0050,4e6,214e6,22.8,2.80],
+['WDC','Western Digital Corp.','Technology',62.30,.0060,12e6,213e6,0,0],
+['HPQ','HP Inc.','Technology',32.80,.0030,10e6,938e6,9.8,1.08],
+['DELL','Dell Technologies Inc.','Technology',128.40,.0045,10e6,743e6,20.4,1.48],
+['HPE','Hewlett Packard Enterprise','Technology',18.40,.0030,18e6,2.43e9,12.4,.52],
+['CSCO','Cisco Systems Inc.','Technology',48.20,.0022,18e6,4.03e9,14.2,1.60],
+['ACN','Accenture Plc','Technology',318.40,.0028,3e6,626e6,28.4,5.28],
+['SAP','SAP SE ADR','Technology',192.40,.0028,2e6,1.16e9,30.8,2.00],
+['SHOP','Shopify Inc.','Technology',72.40,.0070,12e6,1.27e9,0,0],
+['PYPL','PayPal Holdings Inc.','Technology',63.20,.0055,12e6,1.07e9,18.4,0],
+['UBER','Uber Technologies Inc.','Technology',68.90,.0060,18e6,2.08e9,0,0],
+['LYFT','Lyft Inc.','Technology',18.20,.0090,12e6,518e6,0,0],
+['ABNB','Airbnb Inc.','Technology',142.30,.0065,5e6,640e6,38.2,0],
+['DASH','DoorDash Inc.','Technology',142.80,.0070,5e6,413e6,0,0],
+['SNOW','Snowflake Inc.','Technology',165.40,.0075,5e6,345e6,0,0],
+['PLTR','Palantir Technologies','Technology',21.40,.0085,95e6,2.11e9,0,0],
+['CRWD','CrowdStrike Holdings','Technology',345.80,.0060,5e6,248e6,0,0],
+['PANW','Palo Alto Networks','Technology',342.20,.0058,5e6,324e6,0,0],
+['FTNT','Fortinet Inc.','Technology',68.40,.0052,10e6,803e6,28.4,0],
+['ZS','Zscaler Inc.','Technology',198.40,.0060,3e6,153e6,0,0],
+['NET','Cloudflare Inc.','Technology',98.70,.0065,7e6,328e6,0,0],
+['OKTA','Okta Inc.','Technology',95.20,.0065,5e6,163e6,0,0],
+['DDOG','Datadog Inc.','Technology',112.30,.0065,4e6,322e6,0,0],
+['MDB','MongoDB Inc.','Technology',387.40,.0075,2e6,247e6,0,0],
+['WDAY','Workday Inc.','Technology',248.30,.0055,3e6,205e6,0,0],
+['TEAM','Atlassian Corp.','Technology',189.40,.0060,3e6,258e6,0,0],
+['ZM','Zoom Video Comm.','Technology',65.40,.0060,5e6,316e6,0,0],
+['TWLO','Twilio Inc.','Technology',61.20,.0070,5e6,178e6,0,0],
+['VEEV','Veeva Systems Inc.','Technology',192.40,.0050,3e6,162e6,42.8,0],
+['U','Unity Software Inc.','Technology',28.40,.0090,18e6,380e6,0,0],
+['RBLX','Roblox Corp.','Technology',42.80,.0085,18e6,682e6,0,0],
+['SNAP','Snap Inc.','Technology',14.80,.0095,42e6,2.03e9,0,0],
+['PINS','Pinterest Inc.','Technology',31.20,.0070,15e6,650e6,22.4,0],
+['COIN','Coinbase Global Inc.','Technology',215.40,.0110,12e6,256e6,0,0],
+['HOOD','Robinhood Markets Inc.','Technology',21.40,.0090,18e6,878e6,0,0],
+['SQ','Block Inc.','Technology',78.20,.0080,10e6,706e6,0,0],
+['AFRM','Affirm Holdings Inc.','Technology',47.30,.0105,15e6,298e6,0,0],
+['BILL','Bill Holdings Inc.','Technology',72.40,.0085,8e6,114e6,0,0],
+['DBX','Dropbox Inc.','Technology',26.40,.0060,8e6,370e6,18.2,0],
+['GTLB','GitLab Inc.','Technology',56.80,.0080,8e6,158e6,0,0],
+['SMAR','Smartsheet Inc.','Technology',45.20,.0075,5e6,134e6,0,0],
+['ESTC','Elastic N.V.','Technology',118.40,.0075,3e6,95e6,0,0],
+['AI','C3.ai Inc.','Technology',28.40,.0110,12e6,172e6,0,0],
+['PATH','UiPath Inc.','Technology',18.20,.0090,18e6,553e6,0,0],
+['BABA','Alibaba Group Holding','Technology',82.40,.0080,18e6,2.17e9,12.4,0],
+['BIDU','Baidu Inc. ADR','Technology',112.30,.0075,5e6,349e6,14.2,0],
+['JD','JD.com Inc. ADR','Technology',28.40,.0080,18e6,1.57e9,18.2,0],
+['PDD','PDD Holdings Inc.','Technology',148.20,.0085,5e6,2.16e9,22.8,0],
+['SE','Sea Limited ADR','Technology',62.40,.0090,8e6,354e6,0,0],
+['GRAB','Grab Holdings Ltd','Technology',4.20,.0110,42e6,3.74e9,0,0],
+['NIO','NIO Inc. ADR','Technology',5.40,.0120,98e6,10.5e9,0,0],
+['LI','Li Auto Inc. ADR','Technology',21.40,.0100,22e6,2.37e9,18.4,0],
+['XPEV','XPeng Inc. ADR','Technology',9.20,.0115,22e6,894e6,0,0],
+// Finance
+['JPM','JPMorgan Chase & Co.','Finance',198.70,.0018,9e6,2.89e9,12.1,5.00],
+['BAC','Bank of America Corp.','Finance',38.20,.0022,35e6,7.83e9,12.8,.96],
+['WFC','Wells Fargo & Co.','Finance',57.80,.0025,20e6,3.53e9,11.2,1.40],
+['GS','Goldman Sachs Group','Finance',445.30,.0022,3e6,330e6,14.8,11.00],
+['MS','Morgan Stanley','Finance',97.80,.0022,10e6,1.6e9,18.2,3.40],
+['C','Citigroup Inc.','Finance',64.30,.0028,14e6,1.91e9,10.8,2.12],
+['USB','U.S. Bancorp','Finance',42.10,.0025,10e6,1.52e9,11.8,1.96],
+['PNC','PNC Financial Services','Finance',145.20,.0025,5e6,558e6,12.4,6.40],
+['TFC','Truist Financial Corp.','Finance',38.20,.0030,12e6,1.34e9,14.2,2.08],
+['COF','Capital One Financial','Finance',152.40,.0030,5e6,363e6,11.8,2.40],
+['DFS','Discover Financial Svcs','Finance',132.40,.0030,3e6,259e6,10.8,2.80],
+['AXP','American Express Co.','Finance',212.40,.0022,3e6,740e6,18.4,2.80],
+['V','Visa Inc.','Finance',276.80,.0017,7e6,2.08e9,31.4,2.08],
+['MA','Mastercard Inc.','Finance',468.50,.0018,4e6,940e6,38.2,2.64],
+['BRK.B','Berkshire Hathaway B','Finance',395.10,.0014,4e6,2.17e9,8.2,0],
+['SCHW','Charles Schwab Corp.','Finance',72.40,.0032,12e6,1.81e9,28.4,1.00],
+['BLK','BlackRock Inc.','Finance',812.30,.0020,1e6,151e6,22.8,20.00],
+['NDAQ','Nasdaq Inc.','Finance',67.20,.0025,5e6,1.1e9,28.4,2.48],
+['ICE','Intercontinental Exchange','Finance',142.40,.0022,5e6,563e6,24.8,1.52],
+['CME','CME Group Inc.','Finance',214.30,.0020,2e6,360e6,22.8,4.40],
+['CBOE','Cboe Global Markets','Finance',188.40,.0020,2e6,84e6,24.2,2.36],
+['MCO','Moody\'s Corp.','Finance',432.30,.0025,2e6,183e6,42.8,3.64],
+['SPGI','S&P Global Inc.','Finance',472.40,.0022,2e6,323e6,38.2,3.64],
+['MSCI','MSCI Inc.','Finance',542.30,.0025,1e6,82e6,42.8,6.60],
+['FDS','FactSet Research Sys.','Finance',412.30,.0025,1e6,39e6,38.2,4.16],
+['SYF','Synchrony Financial','Finance',49.20,.0035,8e6,440e6,8.4,1.00],
+['ALLY','Ally Financial Inc.','Finance',37.20,.0035,8e6,294e6,9.2,1.20],
+['SOFI','SoFi Technologies Inc.','Finance',9.20,.0095,42e6,960e6,0,0],
+['AFRM','Affirm Holdings Inc.','Finance',47.30,.0105,15e6,298e6,0,0],
+// Healthcare
+['JNJ','Johnson & Johnson','Healthcare',147.20,.0015,8e6,2.4e9,15.8,4.76],
+['UNH','UnitedHealth Group Inc.','Healthcare',512.80,.0018,3e6,930e6,22.4,8.40],
+['LLY','Eli Lilly and Co.','Healthcare',724.80,.0030,4e6,956e6,98.4,5.20],
+['PFE','Pfizer Inc.','Healthcare',28.40,.0025,28e6,5.65e9,0,1.68],
+['MRK','Merck & Co. Inc.','Healthcare',128.70,.0020,10e6,2.54e9,21.4,2.92],
+['ABBV','AbbVie Inc.','Healthcare',162.30,.0020,5e6,1.77e9,48.2,6.20],
+['BMY','Bristol-Myers Squibb','Healthcare',56.40,.0022,10e6,2.03e9,15.2,2.44],
+['AMGN','Amgen Inc.','Healthcare',289.70,.0022,4e6,536e6,18.4,9.00],
+['GILD','Gilead Sciences Inc.','Healthcare',72.80,.0022,8e6,1.25e9,18.8,3.00],
+['VRTX','Vertex Pharmaceuticals','Healthcare',448.20,.0030,2e6,258e6,32.8,0],
+['REGN','Regeneron Pharma Inc.','Healthcare',1024.50,.0028,1e6,104e6,28.4,0],
+['CVS','CVS Health Corp.','Healthcare',58.40,.0022,8e6,1.27e9,10.8,2.66],
+['CI','Cigna Group','Healthcare',338.40,.0022,3e6,275e6,14.2,4.96],
+['HUM','Humana Inc.','Healthcare',298.40,.0025,2e6,125e6,18.4,3.54],
+['MOH','Molina Healthcare Inc.','Healthcare',314.20,.0030,1e6,53e6,14.2,0],
+['CNC','Centene Corp.','Healthcare',72.40,.0028,8e6,344e6,10.2,0],
+['ISRG','Intuitive Surgical Inc.','Healthcare',382.40,.0030,2e6,357e6,68.4,0],
+['MDT','Medtronic Plc','Healthcare',82.40,.0020,8e6,2.11e9,24.8,2.80],
+['ABT','Abbott Laboratories','Healthcare',109.40,.0020,5e6,1.91e9,22.4,2.20],
+['TMO','Thermo Fisher Scientific','Healthcare',548.20,.0025,2e6,388e6,32.4,1.60],
+['DHR','Danaher Corp.','Healthcare',238.40,.0025,3e6,722e6,28.4,1.04],
+['SYK','Stryker Corp.','Healthcare',336.40,.0022,2e6,421e6,28.8,3.12],
+['BDX','Becton Dickinson & Co.','Healthcare',238.40,.0022,2e6,287e6,24.8,3.80],
+['EW','Edwards Lifesciences','Healthcare',83.20,.0030,4e6,51e6,28.4,0],
+['BSX','Boston Scientific Corp.','Healthcare',72.40,.0025,8e6,1.42e9,42.8,0],
+['BAX','Baxter International','Healthcare',38.20,.0030,8e6,506e6,0,1.16],
+['ZBH','Zimmer Biomet Holdings','Healthcare',108.40,.0025,3e6,207e6,18.4,1.00],
+['DXCM','DexCom Inc.','Healthcare',82.40,.0060,5e6,400e6,0,0],
+['IDXX','IDEXX Laboratories','Healthcare',478.40,.0030,2e6,83e6,48.2,0],
+['MTD','Mettler-Toledo Intl','Healthcare',1298.40,.0028,1e6,24e6,32.4,0],
+['A','Agilent Technologies','Healthcare',128.40,.0028,3e6,289e6,22.8,0.92],
+// Consumer Discretionary
+['WMT','Walmart Inc.','Consumer Disc.',68.20,.0015,10e6,8.02e9,28.4,.83],
+['TGT','Target Corp.','Consumer Disc.',145.30,.0025,5e6,461e6,14.8,4.40],
+['COST','Costco Wholesale Corp.','Consumer Disc.',845.20,.0020,2e6,443e6,52.4,4.64],
+['HD','Home Depot Inc.','Consumer Disc.',348.70,.0018,4e6,1.01e9,22.8,9.00],
+['LOW','Lowe\'s Companies Inc.','Consumer Disc.',238.40,.0020,3e6,589e6,18.4,4.60],
+['BKNG','Booking Holdings Inc.','Consumer Disc.',3842.40,.0040,1e6,40e6,22.8,0],
+['EXPE','Expedia Group Inc.','Consumer Disc.',138.40,.0050,3e6,149e6,18.4,0],
+['MAR','Marriott Intl Inc.','Consumer Disc.',238.40,.0025,3e6,282e6,22.8,1.52],
+['HLT','Hilton Worldwide Holdings','Consumer Disc.',198.40,.0025,3e6,252e6,28.4,.60],
+['MGM','MGM Resorts Intl','Consumer Disc.',42.40,.0040,8e6,390e6,18.4,0],
+['LVS','Las Vegas Sands Corp.','Consumer Disc.',48.40,.0040,5e6,375e6,0,.80],
+['WYNN','Wynn Resorts Ltd.','Consumer Disc.',92.40,.0045,3e6,112e6,0,1.00],
+['RCL','Royal Caribbean Cruises','Consumer Disc.',148.40,.0045,5e6,395e6,18.4,0],
+['CCL','Carnival Corp.','Consumer Disc.',18.40,.0055,28e6,1.42e9,0,0],
+['NCLH','Norwegian Cruise Line','Consumer Disc.',19.40,.0060,22e6,425e6,0,0],
+['NKE','Nike Inc.','Consumer Disc.',79.40,.0025,8e6,1.52e9,22.4,1.48],
+['SBUX','Starbucks Corp.','Consumer Disc.',89.30,.0030,8e6,1.14e9,24.8,2.44],
+['MCD','McDonald\'s Corp.','Consumer Disc.',285.40,.0018,4e6,730e6,24.2,6.68],
+['CMG','Chipotle Mexican Grill','Consumer Disc.',3245.80,.0040,1e6,277e6,64.2,0],
+['YUM','Yum Brands Inc.','Consumer Disc.',135.40,.0022,3e6,277e6,22.8,2.60],
+['DPZ','Domino\'s Pizza Inc.','Consumer Disc.',428.40,.0030,1e6,37e6,28.4,6.20],
+['DIS','Walt Disney Co.','Consumer Disc.',112.40,.0030,12e6,1.82e9,48.2,0],
+['NFLX','Netflix Inc.','Consumer Disc.',648.20,.0055,5e6,432e6,42.4,0],
+['CMCSA','Comcast Corp.','Consumer Disc.',42.80,.0020,18e6,4.1e9,10.8,1.24],
+['F','Ford Motor Co.','Consumer Disc.',12.40,.0055,42e6,4.89e9,12.4,.60],
+['GM','General Motors Co.','Consumer Disc.',47.40,.0040,15e6,1.33e9,5.8,.48],
+['RIVN','Rivian Automotive Inc.','Consumer Disc.',12.40,.0120,28e6,1.14e9,0,0],
+['LCID','Lucid Group Inc.','Consumer Disc.',3.20,.0140,98e6,4.24e9,0,0],
+['TJX','TJX Companies Inc.','Consumer Disc.',112.40,.0018,8e6,1.18e9,28.4,1.40],
+['ROST','Ross Stores Inc.','Consumer Disc.',148.40,.0020,3e6,330e6,22.8,1.36],
+['ULTA','Ulta Beauty Inc.','Consumer Disc.',398.40,.0030,1e6,48e6,18.4,0],
+['LULU','Lululemon Athletica','Consumer Disc.',342.40,.0040,2e6,130e6,24.2,0],
+['RH','RH (Restoration Hardware)','Consumer Disc.',248.40,.0050,1e6,26e6,14.2,0],
+// Consumer Staples
+['PG','Procter & Gamble Co.','Consumer Staples',162.40,.0015,5e6,3.84e9,24.8,3.76],
+['KO','Coca-Cola Co.','Consumer Staples',61.20,.0015,12e6,4.31e9,22.8,1.84],
+['PEP','PepsiCo Inc.','Consumer Staples',168.40,.0015,5e6,2.32e9,22.4,5.06],
+['MO','Altria Group Inc.','Consumer Staples',42.40,.0020,8e6,1.84e9,10.2,3.92],
+['PM','Philip Morris Intl','Consumer Staples',98.40,.0018,5e6,1.54e9,18.2,5.20],
+['MDLZ','Mondelez Intl Inc.','Consumer Staples',68.40,.0018,5e6,1.34e9,18.4,1.58],
+['CL','Colgate-Palmolive Co.','Consumer Staples',98.40,.0018,4e6,1.89e9,38.4,2.08],
+['CHD','Church & Dwight Co.','Consumer Staples',98.40,.0018,2e6,242e6,32.4,1.20],
+['KMB','Kimberly-Clark Corp.','Consumer Staples',132.40,.0018,2e6,342e6,22.4,4.88],
+['GIS','General Mills Inc.','Consumer Staples',65.40,.0018,5e6,391e6,14.2,2.40],
+['K','Kellanova','Consumer Staples',58.40,.0018,3e6,341e6,18.4,2.24],
+['CPB','Campbell Soup Co.','Consumer Staples',42.40,.0020,3e6,301e6,18.4,1.48],
+['HRL','Hormel Foods Corp.','Consumer Staples',32.40,.0020,5e6,543e6,22.4,1.10],
+['CAG','Conagra Brands Inc.','Consumer Staples',28.40,.0022,8e6,476e6,12.4,1.40],
+['KHC','Kraft Heinz Co.','Consumer Staples',32.40,.0022,10e6,1.21e9,0,1.60],
+['SJM','J.M. Smucker Co.','Consumer Staples',108.40,.0020,2e6,112e6,14.2,4.16],
+['TSN','Tyson Foods Inc.','Consumer Staples',52.40,.0022,4e6,339e6,0,1.84],
+['ADM','Archer-Daniels-Midland','Consumer Staples',62.40,.0025,5e6,434e6,12.8,1.80],
+// Energy
+['XOM','Exxon Mobil Corp.','Energy',112.40,.0025,15e6,3.97e9,14.2,3.80],
+['CVX','Chevron Corp.','Energy',157.80,.0022,7e6,1.88e9,13.8,6.52],
+['COP','ConocoPhillips','Energy',108.20,.0028,6e6,1.26e9,13.2,3.08],
+['SLB','Schlumberger Ltd.','Energy',48.70,.0030,10e6,1.42e9,16.4,1.00],
+['HAL','Halliburton Co.','Energy',38.40,.0035,12e6,899e6,14.2,.68],
+['MPC','Marathon Petroleum Corp.','Energy',168.40,.0030,3e6,412e6,6.4,3.60],
+['PSX','Phillips 66','Energy',143.20,.0025,3e6,432e6,8.4,4.40],
+['VLO','Valero Energy Corp.','Energy',162.40,.0030,3e6,342e6,7.2,4.40],
+['OXY','Occidental Petroleum','Energy',62.40,.0035,8e6,958e6,14.2,.88],
+['DVN','Devon Energy Corp.','Energy',42.40,.0040,8e6,638e6,8.2,4.40],
+['EOG','EOG Resources Inc.','Energy',124.40,.0030,5e6,742e6,12.8,5.80],
+['PXD','Pioneer Natural Resources','Energy',238.40,.0030,3e6,612e6,11.2,24.00],
+['BKR','Baker Hughes Co.','Energy',35.40,.0030,8e6,1.02e9,18.4,.72],
+['FANG','Diamondback Energy','Energy',168.40,.0035,2e6,293e6,11.2,12.80],
+['MRO','Marathon Oil Corp.','Energy',28.40,.0040,12e6,742e6,10.8,.44],
+['HES','Hess Corp.','Energy',145.40,.0030,3e6,446e6,22.4,1.75],
+['APA','APA Corp.','Energy',28.40,.0040,8e6,301e6,8.2,1.00],
+['CTRA','Coterra Energy Inc.','Energy',26.40,.0040,12e6,1.96e9,9.2,1.40],
+['LNG','Cheniere Energy Inc.','Energy',162.40,.0030,3e6,316e6,12.4,1.72],
+['KMI','Kinder Morgan Inc.','Energy',18.40,.0022,18e6,4.16e9,22.4,1.13],
+// Industrial
+['BA','Boeing Co.','Industrial',198.40,.0035,7e6,606e6,0,0],
+['CAT','Caterpillar Inc.','Industrial',345.20,.0025,3e6,499e6,14.8,5.20],
+['GE','GE Aerospace','Industrial',162.80,.0028,8e6,1.09e9,32.4,.32],
+['HON','Honeywell Intl Inc.','Industrial',198.30,.0020,4e6,645e6,21.4,4.36],
+['LMT','Lockheed Martin Corp.','Industrial',474.20,.0018,2e6,249e6,18.8,12.60],
+['RTX','RTX Corp.','Industrial',98.40,.0022,5e6,1.33e9,32.4,2.34],
+['NOC','Northrop Grumman Corp.','Industrial',472.40,.0018,1e6,153e6,18.4,8.00],
+['GD','General Dynamics Corp.','Industrial',274.40,.0018,2e6,256e6,18.4,5.60],
+['LHX','L3Harris Technologies','Industrial',212.40,.0022,2e6,196e6,22.4,4.56],
+['DE','Deere & Co.','Industrial',412.80,.0025,2e6,283e6,14.2,5.40],
+['MMM','3M Co.','Industrial',98.20,.0022,4e6,550e6,12.4,2.80],
+['EMR','Emerson Electric Co.','Industrial',108.40,.0020,5e6,581e6,18.4,2.08],
+['ETN','Eaton Corp. Plc','Industrial',318.40,.0022,2e6,425e6,28.4,3.44],
+['PH','Parker-Hannifin Corp.','Industrial',548.40,.0025,1e6,129e6,22.8,6.08],
+['ROK','Rockwell Automation','Industrial',278.40,.0025,2e6,114e6,28.4,5.08],
+['TDG','TransDigm Group Inc.','Industrial',1298.40,.0030,1e6,54e6,38.2,0],
+['CARR','Carrier Global Corp.','Industrial',72.40,.0025,8e6,849e6,22.8,.96],
+['OTIS','Otis Worldwide Corp.','Industrial',92.40,.0020,5e6,408e6,24.8,1.32],
+['GWW','W.W. Grainger Inc.','Industrial',1098.40,.0025,1e6,46e6,22.8,7.68],
+['FTV','Fortive Corp.','Industrial',68.40,.0025,5e6,708e6,28.4,.36],
+['WM','Waste Management Inc.','Industrial',218.40,.0018,3e6,403e6,32.4,2.80],
+['RSG','Republic Services Inc.','Industrial',198.40,.0018,2e6,316e6,32.4,2.00],
+['FDX','FedEx Corp.','Industrial',248.40,.0030,3e6,250e6,14.2,5.04],
+['UPS','United Parcel Service','Industrial',142.40,.0025,5e6,855e6,18.4,6.68],
+['DAL','Delta Air Lines Inc.','Industrial',48.40,.0045,8e6,644e6,7.2,.40],
+['UAL','United Airlines Holdings','Industrial',52.40,.0050,5e6,323e6,5.8,0],
+['AAL','American Airlines Group','Industrial',14.40,.0065,22e6,683e6,0,0],
+['LUV','Southwest Airlines Co.','Industrial',28.40,.0040,12e6,600e6,0,0],
+['GNRC','Generac Holdings Inc.','Industrial',148.40,.0050,2e6,96e6,28.4,0],
+// Materials
+['LIN','Linde Plc','Materials',448.40,.0018,2e6,505e6,32.8,5.40],
+['APD','Air Products & Chemicals','Materials',248.40,.0022,2e6,222e6,22.8,7.72],
+['SHW','Sherwin-Williams Co.','Materials',348.40,.0020,2e6,254e6,32.8,2.40],
+['ECL','Ecolab Inc.','Materials',218.40,.0020,3e6,284e6,38.4,2.24],
+['DD','DuPont de Nemours Inc.','Materials',68.40,.0025,5e6,428e6,14.2,1.44],
+['DOW','Dow Inc.','Materials',48.40,.0025,5e6,685e6,18.4,2.80],
+['NEM','Newmont Corp.','Materials',38.40,.0035,12e6,798e6,0,1.00],
+['FCX','Freeport-McMoRan Inc.','Materials',42.40,.0040,18e6,1.51e9,18.4,.60],
+['ALB','Albemarle Corp.','Materials',108.40,.0055,3e6,126e6,0,1.60],
+['CF','CF Industries Holdings','Materials',78.40,.0035,3e6,196e6,8.2,1.60],
+['MOS','Mosaic Co.','Materials',26.40,.0040,8e6,360e6,18.4,.80],
+['IFF','Intl Flavors & Fragrances','Materials',78.40,.0025,3e6,254e6,0,3.20],
+['PKG','Packaging Corp. of America','Materials',182.40,.0025,2e6,74e6,18.4,4.00],
+['IP','International Paper Co.','Materials',38.40,.0025,5e6,363e6,0,1.85],
+// Real Estate
+['AMT','American Tower Corp.','Real Estate',198.40,.0022,3e6,207e6,0,5.72],
+['PLD','Prologis Inc.','Real Estate',112.40,.0022,5e6,929e6,32.4,3.88],
+['EQIX','Equinix Inc.','Real Estate',748.40,.0025,1e6,89e6,0,16.24],
+['SPG','Simon Property Group','Real Estate',148.40,.0025,3e6,322e6,22.4,7.60],
+['O','Realty Income Corp.','Real Estate',58.40,.0020,8e6,848e6,38.4,3.09],
+['PSA','Public Storage','Real Estate',272.40,.0020,2e6,175e6,32.4,12.00],
+['DLR','Digital Realty Trust','Real Estate',142.40,.0025,3e6,284e6,0,4.88],
+['WELL','Welltower Inc.','Real Estate',98.40,.0022,5e6,511e6,0,2.44],
+['AVB','AvalonBay Communities','Real Estate',182.40,.0020,2e6,140e6,32.4,6.96],
+['EQR','Equity Residential','Real Estate',62.40,.0020,4e6,382e6,32.4,2.60],
+['VTR','Ventas Inc.','Real Estate',48.40,.0022,5e6,422e6,0,1.80],
+['CCI','Crown Castle Inc.','Real Estate',98.40,.0022,5e6,432e6,0,6.26],
+['SBAC','SBA Communications Corp.','Real Estate',218.40,.0022,2e6,107e6,0,0],
+// Utilities
+['NEE','NextEra Energy Inc.','Utilities',68.40,.0015,8e6,1.42e9,22.4,2.06],
+['DUK','Duke Energy Corp.','Utilities',98.40,.0015,5e6,770e6,18.4,4.10],
+['SO','Southern Co.','Utilities',72.40,.0015,5e6,1.09e9,18.4,2.80],
+['D','Dominion Energy Inc.','Utilities',48.40,.0018,8e6,842e6,0,2.67],
+['AEP','American Electric Power','Utilities',92.40,.0015,5e6,519e6,18.4,3.68],
+['EXC','Exelon Corp.','Utilities',38.40,.0015,8e6,970e6,14.2,1.45],
+['SRE','Sempra Energy','Utilities',68.40,.0015,3e6,318e6,18.4,2.38],
+['PCG','PG&E Corp.','Utilities',18.40,.0022,18e6,2.0e9,14.2,.44],
+['ED','Consolidated Edison','Utilities',92.40,.0015,3e6,353e6,18.4,3.28],
+['XEL','Xcel Energy Inc.','Utilities',58.40,.0015,5e6,540e6,18.4,2.06],
+['WEC','WEC Energy Group Inc.','Utilities',82.40,.0015,3e6,263e6,18.4,3.14],
+['ETR','Entergy Corp.','Utilities',108.40,.0018,3e6,200e6,18.4,3.93],
+['FE','FirstEnergy Corp.','Utilities',38.40,.0018,8e6,572e6,0,1.56],
+['PPL','PPL Corp.','Utilities',28.40,.0018,8e6,730e6,22.4,1.00],
+['AES','AES Corp.','Utilities',18.40,.0022,12e6,676e6,0,.71],
+// Communication
+['T','AT&T Inc.','Communication',19.40,.0020,28e6,7.08e9,14.4,1.11],
+['VZ','Verizon Communications','Communication',42.40,.0018,18e6,4.22e9,9.2,2.66],
+['TMUS','T-Mobile US Inc.','Communication',168.40,.0020,5e6,1.19e9,22.8,.28],
+['CHTR','Charter Communications','Communication',382.40,.0030,2e6,95e6,14.2,0],
+['CMCSA','Comcast Corp.','Communication',42.80,.0020,18e6,4.1e9,10.8,1.24],
+['FOX','Fox Corp. Cl B','Communication',28.40,.0025,8e6,542e6,12.4,.48],
+['FOXA','Fox Corp. Cl A','Communication',32.40,.0025,5e6,401e6,12.4,.48],
+['NWSA','News Corp. Cl A','Communication',25.40,.0025,8e6,590e6,0,.20],
+['WBD','Warner Bros. Discovery','Communication',9.40,.0060,28e6,3.09e9,0,0],
+['PARA','Paramount Global Cl B','Communication',11.40,.0055,22e6,656e6,0,.20],
+['SIRI','Sirius XM Holdings','Communication',3.20,.0045,42e6,3.94e9,28.4,.10],
+['LUMN','Lumen Technologies','Communication',1.40,.0110,42e6,1.08e9,0,0],
+['DISH','DISH Network Corp.','Communication',3.80,.0110,18e6,263e6,0,0],
+// ETFs
+['SPY','SPDR S&P 500 ETF Trust','ETF',512.30,.0010,75e6,928e6,0,6.80],
+['QQQ','Invesco QQQ Trust','ETF',432.80,.0012,45e6,910e6,0,1.80],
+['DIA','SPDR Dow Jones ETF','ETF',382.40,.0008,5e6,66e6,0,5.60],
+['IWM','iShares Russell 2000 ETF','ETF',196.30,.0014,35e6,870e6,0,1.64],
+['VTI','Vanguard Total Stock Mkt','ETF',248.40,.0010,5e6,802e6,0,3.20],
+['GLD','SPDR Gold Shares','ETF',182.40,.0012,10e6,371e6,0,0],
+['SLV','iShares Silver Trust','ETF',26.40,.0018,12e6,590e6,0,0],
+['TLT','iShares 20+ Yr Bond ETF','ETF',95.20,.0010,20e6,450e6,0,3.80],
+['HYG','iShares High Yield Bond','ETF',78.40,.0008,10e6,312e6,0,5.80],
+['LQD','iShares Investment Grade','ETF',108.40,.0008,5e6,212e6,0,3.80],
+['XLF','Financial Select Sector','ETF',42.40,.0012,35e6,1.01e9,0,1.80],
+['XLK','Technology Select Sector','ETF',212.40,.0015,15e6,442e6,0,1.20],
+['XLE','Energy Select Sector ETF','ETF',92.40,.0015,10e6,394e6,0,4.40],
+['XLV','Health Care Select Sector','ETF',142.40,.0012,5e6,413e6,0,1.80],
+['XLP','Consumer Staples Select','ETF',78.40,.0010,5e6,497e6,0,2.60],
+['XLRE','Real Estate Select Sector','ETF',38.40,.0012,5e6,155e6,0,4.20],
+['XLU','Utilities Select Sector','ETF',68.40,.0010,5e6,240e6,0,3.60],
+['XLB','Materials Select Sector','ETF',88.40,.0015,3e6,116e6,0,2.00],
+['XLI','Industrial Select Sector','ETF',118.40,.0012,5e6,241e6,0,1.80],
+['ARKK','ARK Innovation ETF','ETF',48.40,.0060,12e6,124e6,0,0],
+['ARKG','ARK Genomic Revolution','ETF',22.40,.0070,5e6,75e6,0,0],
+['VNQ','Vanguard Real Estate ETF','ETF',82.40,.0012,5e6,370e6,0,4.60],
+['VGT','Vanguard Info Technology','ETF',498.40,.0015,3e6,149e6,0,1.00],
+['SMH','VanEck Semiconductor ETF','ETF',248.40,.0020,3e6,71e6,0,1.40],
+['SOXX','iShares Semiconductor ETF','ETF',218.40,.0020,3e6,46e6,0,1.20],
 ]
 
-// ─── STATE ────────────────────────────────────────────────────────────────────
-const prices={}, opens={}, hist={}, vols={}
+// Build stock objects
+const STOCKS=RAW.map(r=>({s:r[0],n:r[1],sec:r[2],p:r[3],v:r[4],bv:r[5],so:r[6],pe:r[7],div:r[8]}))
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+const prices={},opens={},hist={},vols={}
 STOCKS.forEach(st=>{
   prices[st.s]=st.p; opens[st.s]=st.p; vols[st.s]=st.bv
-  const h=[], scales=[1,1.5,3,6,10]
-  // Generate multi-timeframe history
-  let p=st.p
-  for(let i=500;i>0;i--){p=p/(1+st.v*1.8*(Math.random()-.5)*2);h.unshift(p)}
+  const h=[]; let p=st.p
+  for(let i=500;i>0;i--){p=p/(1+st.v*2*(Math.random()-.5));h.unshift(p)}
   h.push(st.p); hist[st.s]=h
 })
 
-const INDEX={
-  spx:{v:5432.18, base:5432.18, vol:.0008},
-  comp:{v:17254.42,base:17254.42,vol:.0012},
-  dji:{v:39142.23,base:39142.23,vol:.0006}
+const IDX={
+  spx:{v:5432.18,b:5432.18,vol:.0008},
+  comp:{v:17254.42,b:17254.42,vol:.0012},
+  dji:{v:39142.23,b:39142.23,vol:.0006},
+  rut:{v:2062.84,b:2062.84,vol:.0014},
+  vix:{v:14.82,b:14.82,vol:.0060}
 }
 
-let cash=10000
-const hold={} // {sym:{shares,avgCost}}
 const watchlist=new Set()
-const pendingOrders=[] // {id,sym,side,type,shares,limit,ts}
-const orderHistory=[] // {sym,side,shares,price,ts}
-let orderId=1
-
-let sel=null, tradeMode='buy', orderType='market', period='1D', chartEl=null
-let curTab='all', curSector='', searchQ='', sortKey='', sortDir=1
+let sel=null,period='1D',chartEl=null
+let curTab='all',curSec='',searchQ='',srtKey='',srtDir=-1
 let toastTmr=null
 
 // ─── SIMULATION ───────────────────────────────────────────────────────────────
 function tick(){
-  // Update prices
   STOCKS.forEach(st=>{
     const d=prices[st.s]*st.v*(Math.random()-.5)*2
-    prices[st.s]=Math.max(.5,prices[st.s]+d)
+    prices[st.s]=Math.max(.1,prices[st.s]+d)
     hist[st.s].push(prices[st.s])
-    if(hist[st.s].length>600) hist[st.s].shift()
-    vols[st.s]=Math.round(st.bv*(.7+Math.random()*.6))
+    if(hist[st.s].length>600)hist[st.s].shift()
+    vols[st.s]=Math.round(st.bv*(.65+Math.random()*.7))
   })
-  // Update indices
-  Object.keys(INDEX).forEach(k=>{
-    const idx=INDEX[k]
-    idx.v=Math.max(100,idx.v+idx.v*idx.vol*(Math.random()-.5)*2)
+  Object.values(IDX).forEach(ix=>{
+    ix.v=Math.max(.1,ix.v+ix.v*ix.vol*(Math.random()-.5)*2)
   })
-  // Check limit orders
-  pendingOrders.forEach((o,i)=>{
-    const p=prices[o.sym]
-    const hit=(o.side==='buy'&&p<=o.limit)||(o.side==='sell'&&p>=o.limit)
-    if(hit){ executeFill(o); pendingOrders.splice(i,1); toast(`Limit order filled: ${o.side.toUpperCase()} ${o.shares} ${o.sym} @ $${f2(p)}`,'ok') }
-  })
-  renderTable(); renderIndices(); renderPF()
-  if(sel){refreshDetailHeader();drawChart()}
+  renderTable(); renderIdx()
+  if(sel){refreshHdr();drawChart()}
+  else renderDefault()
 }
 
 // ─── FORMAT ───────────────────────────────────────────────────────────────────
 const f2=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
 const fvol=n=>n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':(n/1e3).toFixed(0)+'K'
-const fcap=n=>{if(n>=1e12)return(n/1e12).toFixed(2)+'T';if(n>=1e9)return(n/1e9).toFixed(1)+'B';return(n/1e6).toFixed(0)+'M'}
+const fcap=n=>n>=1e12?(n/1e12).toFixed(2)+'T':n>=1e9?(n/1e9).toFixed(1)+'B':(n/1e6).toFixed(0)+'M'
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim()
-const sign=n=>n>=0?'+':''
+const sg=n=>n>=0?'+':''
 
-// ─── INDICES ──────────────────────────────────────────────────────────────────
-function renderIndices(){
-  const keys=['spx','comp','dji']
-  keys.forEach(k=>{
-    const idx=INDEX[k]
-    const chg=(idx.v-idx.base)/idx.base*100
-    const el=document.getElementById('i-'+k)
-    const cel=document.getElementById('ic-'+k)
-    if(el)el.textContent=idx.v.toLocaleString('en-US',{maximumFractionDigits:2,minimumFractionDigits:2})
-    if(cel){cel.textContent=sign(chg)+chg.toFixed(2)+'%';cel.className='ichg '+(chg>=0?'up':'dn')}
+// ─── INDICES ─────────────────────────────────────────────────────────────────
+function renderIdx(){
+  const map={spx:'spx',comp:'comp',dji:'dji',rut:'rut',vix:'vix'}
+  Object.entries(map).forEach(([k])=>{
+    const ix=IDX[k],chg=(ix.v-ix.b)/ix.b*100
+    const el=document.getElementById('i-'+k),ce=document.getElementById('ic-'+k)
+    if(el)el.textContent=ix.v.toLocaleString('en-US',{maximumFractionDigits:2})
+    if(ce&&k!=='vix'){ce.textContent=sg(chg)+chg.toFixed(2)+'%';ce.className='ic '+(chg>=0?'up':'dn')}
+    else if(ce&&k==='vix'){ce.textContent='VIX';ce.className='ic';ce.style.color='var(--t2)'}
   })
 }
 
 // ─── SPARKLINE ────────────────────────────────────────────────────────────────
-function drawSpark(canvas,data){
-  const ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height
+function drawSpark(c,data){
+  const ctx=c.getContext('2d'),W=c.width,H=c.height
   ctx.clearRect(0,0,W,H)
   const d=data.slice(-50); if(d.length<2)return
   const mn=Math.min(...d),mx=Math.max(...d),rng=mx-mn||1
@@ -445,28 +605,22 @@ function drawSpark(canvas,data){
 // ─── MAIN CHART ───────────────────────────────────────────────────────────────
 function drawChart(){
   if(!sel||!chartEl)return
-  const canvas=chartEl,W=canvas.width,H=canvas.height
-  const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,W,H)
+  const c=chartEl,W=c.width,H=c.height,ctx=c.getContext('2d')
+  ctx.clearRect(0,0,W,H)
   const full=hist[sel]
   const d=period==='1D'?full.slice(-60):period==='1W'?full.slice(-200):period==='1M'?full.slice(-300):period==='3M'?full.slice(-450):full
   if(d.length<2)return
   const mn=Math.min(...d),mx=Math.max(...d),pad=(mx-mn)*.1||1
   const lo=mn-pad,hi=mx+pad,rng=hi-lo
   const px=i=>i/(d.length-1)*W, py=v=>H-((v-lo)/rng)*H
-  const isUp=d[d.length-1]>=d[0], color=css(isUp?'--green':'--red')
-  // Grid
+  const isUp=d[d.length-1]>=d[0],color=css(isUp?'--green':'--red')
   ctx.lineWidth=.5; ctx.strokeStyle=css('--border'); ctx.fillStyle=css('--t3'); ctx.font='9px SF Mono,Consolas,monospace'
-  for(let i=1;i<5;i++){const y=H*i/5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.fillText('$'+f2(hi-rng*(y/H)),4,y-3)}
-  // Fill
-  const grad=ctx.createLinearGradient(0,0,0,H)
-  grad.addColorStop(0,color+'28'); grad.addColorStop(1,color+'00')
-  ctx.beginPath(); ctx.moveTo(px(0),py(d[0]))
-  d.forEach((p,i)=>ctx.lineTo(px(i),py(p)))
-  ctx.lineTo(px(d.length-1),H); ctx.lineTo(0,H); ctx.closePath(); ctx.fillStyle=grad; ctx.fill()
-  // Line
+  for(let i=1;i<5;i++){const y=H*i/5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.fillText('$'+f2(hi-rng*y/H),3,y-3)}
+  const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,color+'25'); g.addColorStop(1,color+'00')
+  ctx.beginPath(); ctx.moveTo(px(0),py(d[0])); d.forEach((p,i)=>ctx.lineTo(px(i),py(p)))
+  ctx.lineTo(px(d.length-1),H); ctx.lineTo(0,H); ctx.closePath(); ctx.fillStyle=g; ctx.fill()
   ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=1.8; ctx.lineJoin='round'
   d.forEach((p,i)=>i===0?ctx.moveTo(px(i),py(p)):ctx.lineTo(px(i),py(p))); ctx.stroke()
-  // Dot
   const lx=px(d.length-1),ly=py(d[d.length-1])
   ctx.beginPath(); ctx.arc(lx,ly,3.5,0,Math.PI*2); ctx.fillStyle=color; ctx.fill()
 }
@@ -475,21 +629,16 @@ function drawChart(){
 function getVisible(){
   let list=STOCKS.slice()
   const q=searchQ.toLowerCase()
-  if(q) list=list.filter(st=>st.s.toLowerCase().includes(q)||st.n.toLowerCase().includes(q))
-  if(curSector) list=list.filter(st=>st.sec===curSector)
-  if(curTab==='watchlist') list=list.filter(st=>watchlist.has(st.s))
-  if(curTab==='portfolio') list=list.filter(st=>hold[st.s]&&hold[st.s].shares>0)
-  if(curTab==='gainers'){ list=list.slice().sort((a,b)=>((prices[b.s]-opens[b.s])/opens[b.s])-((prices[a.s]-opens[a.s])/opens[a.s])); list=list.slice(0,20) }
-  if(curTab==='losers'){ list=list.slice().sort((a,b)=>((prices[a.s]-opens[a.s])/opens[a.s])-((prices[b.s]-opens[b.s])/opens[b.s])); list=list.slice(0,20) }
-  if(sortKey){
+  if(q)list=list.filter(st=>st.s.toLowerCase().includes(q)||st.n.toLowerCase().includes(q))
+  if(curSec)list=list.filter(st=>st.sec===curSec)
+  if(curTab==='watchlist')list=list.filter(st=>watchlist.has(st.s))
+  if(curTab==='gainers')list=list.slice().sort((a,b)=>((prices[b.s]-opens[b.s])/opens[b.s])-((prices[a.s]-opens[a.s])/opens[a.s])).slice(0,25)
+  if(curTab==='losers')list=list.slice().sort((a,b)=>((prices[a.s]-opens[a.s])/opens[a.s])-((prices[b.s]-opens[b.s])/opens[b.s])).slice(0,25)
+  if(srtKey){
     list=list.slice().sort((a,b)=>{
-      let va,vb
-      if(sortKey==='p'){va=prices[a.s];vb=prices[b.s]}
-      else if(sortKey==='chg'){va=prices[a.s]-opens[a.s];vb=prices[b.s]-opens[b.s]}
-      else if(sortKey==='pct'){va=(prices[a.s]-opens[a.s])/opens[a.s];vb=(prices[b.s]-opens[b.s])/opens[b.s]}
-      else if(sortKey==='cap'){va=prices[a.s]*a.so;vb=prices[b.s]*b.so}
-      else if(sortKey==='vol'){va=vols[a.s];vb=vols[b.s]}
-      return (va-vb)*sortDir
+      const va=srtKey==='p'?prices[a.s]:srtKey==='chg'?prices[a.s]-opens[a.s]:srtKey==='pct'?(prices[a.s]-opens[a.s])/opens[a.s]:srtKey==='cap'?prices[a.s]*a.so:srtKey==='vol'?vols[a.s]:a.s
+      const vb=srtKey==='p'?prices[b.s]:srtKey==='chg'?prices[b.s]-opens[b.s]:srtKey==='pct'?(prices[b.s]-opens[b.s])/opens[b.s]:srtKey==='cap'?prices[b.s]*b.so:srtKey==='vol'?vols[b.s]:b.s
+      return typeof va==='string'?va.localeCompare(vb)*srtDir:(va-vb)*srtDir
     })
   }
   return list
@@ -498,322 +647,176 @@ function getVisible(){
 function renderTable(){
   const tbody=document.getElementById('tbl'); if(!tbody)return
   const visible=getVisible()
-  // Remove rows not in visible
   const visSet=new Set(visible.map(st=>st.s))
   tbody.querySelectorAll('tr').forEach(r=>{if(!visSet.has(r.dataset.sym))r.remove()})
   const existing=new Set([...tbody.querySelectorAll('tr')].map(r=>r.dataset.sym))
+  const badge=document.getElementById('count-badge')
+  if(badge)badge.textContent=visible.length+' stocks'
 
-  visible.forEach((st,idx)=>{
-    const s=st.s, p=prices[s], o=opens[s]
-    const chg=p-o, pct=chg/o*100, up=chg>=0, cls=up?'up':'dn', sg=up?'+':''
-    const cap=p*st.so
-
+  visible.forEach(st=>{
+    const s=st.s,p=prices[s],o=opens[s],chg=p-o,pct=chg/o*100,up=chg>=0,cls=up?'up':'dn',si=up?'+':''
     if(!existing.has(s)){
-      const tr=document.createElement('tr')
-      tr.dataset.sym=s
-      tr.onclick=()=>selectStock(s)
-      tr.innerHTML=`
-        <td class="star-cell"><button class="star ${watchlist.has(s)?'on':''}" id="star-${s}" onclick="toggleStar('${s}',event)">★</button></td>
-        <td class="sym-cell"><div class="sym">${s}</div><div class="co">${st.n}</div></td>
-        <td class="price" id="p-${s}"></td>
-        <td id="c-${s}"></td>
-        <td id="pc-${s}"></td>
+      const tr=document.createElement('tr'); tr.dataset.sym=s; tr.onclick=()=>selectStock(s)
+      tr.innerHTML=`<td><button class="star" id="star-${s}" onclick="toggleStar('${s}',event)">★</button></td>
+        <td><div class="sym">${s}</div><div class="co">${st.n}</div></td>
+        <td class="pr" id="p-${s}"></td><td id="c-${s}"></td><td id="pc-${s}"></td>
         <td><canvas id="sp-${s}" width="72" height="26"></canvas></td>
-        <td class="mktcap" id="mc-${s}"></td>
-        <td class="vol" id="v-${s}"></td>`
+        <td class="vol" id="mc-${s}"></td><td class="vol" id="v-${s}"></td>`
       tbody.appendChild(tr)
     }
-
-    const tr=tbody.querySelector(`tr[data-sym="${s}"]`)
-    if(tr) tr.classList.toggle('sel',sel===s)
-
+    const tr=tbody.querySelector(`tr[data-sym="${s}"]`); if(tr)tr.classList.toggle('sel',sel===s)
     const pe=document.getElementById('p-'+s); if(pe)pe.textContent='$'+f2(p)
-    const ce=document.getElementById('c-'+s); if(ce)ce.innerHTML=`<span class="chg ${cls}">${sg}$${f2(Math.abs(chg))}</span>`
-    const pce=document.getElementById('pc-'+s); if(pce)pce.innerHTML=`<span class="chg ${cls}">${sg}${pct.toFixed(2)}%</span>`
+    const ce=document.getElementById('c-'+s); if(ce)ce.innerHTML=`<span class="chg ${cls}">${si}$${f2(Math.abs(chg))}</span>`
+    const pce=document.getElementById('pc-'+s); if(pce)pce.innerHTML=`<span class="chg ${cls}">${si}${pct.toFixed(2)}%</span>`
     const ve=document.getElementById('v-'+s); if(ve)ve.textContent=fvol(vols[s])
-    const me=document.getElementById('mc-'+s); if(me)me.textContent=fcap(cap)
-    const spe=document.getElementById('sp-'+s); if(spe)drawSpark(spe,hist[s])
+    const me=document.getElementById('mc-'+s); if(me)me.textContent=fcap(p*st.so)
+    const sp=document.getElementById('sp-'+s); if(sp)drawSpark(sp,hist[s])
     const se=document.getElementById('star-'+s); if(se)se.className='star '+(watchlist.has(s)?'on':'')
   })
 }
 
-// ─── PORTFOLIO ────────────────────────────────────────────────────────────────
-function renderPF(){
-  let cur=0,cost=0
-  Object.entries(hold).forEach(([s,h])=>{cur+=prices[s]*h.shares;cost+=h.avgCost*h.shares})
-  const pnl=cur-cost,ret=cost>0?pnl/cost*100:0,total=cash+cur
-  document.getElementById('h-total').textContent='$'+f2(total)
-}
-
 // ─── DEFAULT PANEL ────────────────────────────────────────────────────────────
-function showDefaultPanel(){
-  let cur=0,cost=0
-  Object.entries(hold).forEach(([s,h])=>{cur+=prices[s]*h.shares;cost+=h.avgCost*h.shares})
-  const pnl=cur-cost,ret=cost>0?pnl/cost*100:0,total=cash+cur
-  const pnlCls=pnl>=0?'up':'dn'
+function renderDefault(){
+  const el=document.getElementById('default-panel'); if(!el||sel)return
+  const gainers=STOCKS.slice().sort((a,b)=>((prices[b.s]-opens[b.s])/opens[b.s])-((prices[a.s]-opens[a.s])/opens[a.s])).slice(0,8)
+  const losers=STOCKS.slice().sort((a,b)=>((prices[a.s]-opens[a.s])/opens[a.s])-((prices[b.s]-opens[b.s])/opens[b.s])).slice(0,8)
+  const active=STOCKS.slice().sort((a,b)=>vols[b.s]-vols[a.s]).slice(0,6)
 
-  const holdRows=Object.entries(hold).filter(([,h])=>h.shares>0).map(([s,h])=>{
-    const cv=prices[s]*h.shares,cb=h.avgCost*h.shares,pl=cv-cb,pp=pl/cb*100
-    return `<div class="h-row">
-      <div><div class="h-sym">${s}</div><div class="h-shares">${h.shares} shares @ $${f2(h.avgCost)}</div></div>
-      <div class="h-right"><div class="h-val">$${f2(cv)}</div><div class="h-pnl ${pl>=0?'up':'dn'}">${sign(pl)}$${f2(Math.abs(pl))} (${sign(pp)}${pp.toFixed(2)}%)</div></div>
-    </div>`
-  }).join('')
-
-  const histRows=orderHistory.slice(-10).reverse().map(o=>`
-    <div class="hist-item">
-      <span class="hist-sym ${o.side==='buy'?'up':'dn'}">${o.side.toUpperCase()} ${o.sym}</span>
-      <span class="hist-detail">${o.shares} sh @ $${f2(o.price)}</span>
-      <span class="hist-amt ${o.side==='buy'?'dn':'up'}">${o.side==='buy'?'-':'+'}$${f2(o.shares*o.price)}</span>
-    </div>`).join('')
-
-  const pendRows=pendingOrders.map(o=>`
-    <div class="order-item">
-      <div class="order-info">
-        <div class="oi-main"><span class="${o.side==='buy'?'up':'dn'}">${o.side.toUpperCase()}</span> ${o.shares} ${o.sym}</div>
-        <div class="oi-sub">LIMIT @ $${f2(o.limit)}</div>
-      </div>
-      <button class="cancel-btn" onclick="cancelOrder(${o.id})">Cancel</button>
-    </div>`).join('')
-
-  document.getElementById('right-panel').innerHTML=`
-    <div class="pf-panel">
-      <div class="panel-title">Portfolio Summary</div>
-      <div class="pf-grid">
-        <div class="pf-card"><div class="lbl">Total Value</div><div class="val">$${f2(total)}</div></div>
-        <div class="pf-card"><div class="lbl">Cash</div><div class="val">$${f2(cash)}</div></div>
-        <div class="pf-card"><div class="lbl">Invested</div><div class="val">$${f2(cur)}</div></div>
-        <div class="pf-card"><div class="lbl">P&amp;L</div><div class="val ${pnlCls}">${sign(pnl)}$${f2(Math.abs(pnl))}</div></div>
-      </div>
-      <div class="panel-title">Holdings</div>
-      <div class="h-list">${holdRows||'<div class="no-hold">No positions yet</div>'}</div>
+  el.innerHTML=`
+  <div class="mkt-overview">
+    <div class="ov-title">Market Overview</div>
+    <div class="idx-cards">
+      ${[['S&P 500','spx'],['NASDAQ','comp'],['Dow Jones','dji'],['Russell 2K','rut'],['VIX','vix']].map(([nm,k])=>{
+        const ix=IDX[k],chg=(ix.v-ix.b)/ix.b*100,up=chg>=0
+        return `<div class="idx-card" style="grid-column:${k==='vix'?'3':'auto'}">
+          <div class="icn">${nm}</div>
+          <div class="icv">${ix.v.toLocaleString('en-US',{maximumFractionDigits:2})}</div>
+          <div class="icc ${k!=='vix'?up?'up':'dn':''}">${k!=='vix'?sg(chg)+chg.toFixed(2)+'%':'Fear/Greed'}</div>
+        </div>`}).join('')}
     </div>
-    ${pendingOrders.length?`<div class="pf-panel" style="padding-top:0"><div class="panel-title">Pending Orders</div><div class="orders-list">${pendRows}</div></div>`:''}
-    ${orderHistory.length?`<div class="pf-panel" style="padding-top:0"><div class="panel-title">Order History</div>${histRows}</div>`:''}
-  `
+    <div class="movers-grid">
+      <div class="mover-col">
+        <div class="mover-title" style="color:var(--green)">Top Gainers</div>
+        ${gainers.map(st=>{const p=prices[st.s],pct=(p-opens[st.s])/opens[st.s]*100;return`<div class="mover-row" onclick="selectStock('${st.s}')"><span class="msym">${st.s}</span><span class="mpct up">+${pct.toFixed(2)}%</span></div>`}).join('')}
+      </div>
+      <div class="mover-col">
+        <div class="mover-title" style="color:var(--red)">Top Losers</div>
+        ${losers.map(st=>{const p=prices[st.s],pct=(p-opens[st.s])/opens[st.s]*100;return`<div class="mover-row" onclick="selectStock('${st.s}')"><span class="msym">${st.s}</span><span class="mpct dn">${pct.toFixed(2)}%</span></div>`}).join('')}
+      </div>
+    </div>
+    <div class="ov-title" style="margin-top:4px">Most Active</div>
+    ${active.map(st=>`<div class="act-row" onclick="selectStock('${st.s}')"><span class="msym">${st.s}</span><span class="co" style="flex:1;margin:0 8px">${st.n}</span><span class="avol">${fvol(vols[st.s])}</span></div>`).join('')}
+  </div>`
 }
 
-// ─── SELECT STOCK ─────────────────────────────────────────────────────────────
+// ─── SELECT ───────────────────────────────────────────────────────────────────
 function selectStock(s){
-  sel=s; tradeMode='buy'; orderType='market'; period='1D'
-  renderTable(); buildDetail()
+  sel=s; period='1D'; renderTable(); buildDetail()
 }
 
-function refreshDetailHeader(){
+function refreshHdr(){
   if(!sel)return
-  const p=prices[sel],o=opens[sel],chg=p-o,pct=chg/o*100,up=chg>=0,sg=up?'+':''
-  const cls=up?'up':'dn'
-  const pe=document.getElementById('d-price'); if(pe)pe.textContent='$'+f2(p)
-  const ce=document.getElementById('d-chg'); if(ce){ce.className='sk-chg '+cls;ce.textContent=sg+'$'+f2(Math.abs(chg))+' ('+sg+pct.toFixed(2)+'%)'}
-  updateTotal(); refreshPos()
+  const p=prices[sel],o=opens[sel],chg=p-o,pct=chg/o*100,up=chg>=0,si=up?'+':''
+  const pe=document.getElementById('d-price'),ce=document.getElementById('d-chg')
+  if(pe)pe.textContent='$'+f2(p)
+  if(ce){ce.className='sk-chg '+(up?'up':'dn');ce.textContent=si+'$'+f2(Math.abs(chg))+' ('+si+pct.toFixed(2)+'%)'}
 }
 
 function buildDetail(){
   const st=STOCKS.find(x=>x.s===sel); if(!st)return
-  const p=prices[sel],o=opens[sel],chg=p-o,pct=chg/o*100,up=chg>=0,sg=up?'+':'',cls=up?'up':'dn'
-  const cap=p*st.so
-  const h=hist[sel],hi52=Math.max(...h)*1.02,lo52=Math.min(...h)*.98
+  const p=prices[sel],o=opens[sel],chg=p-o,pct=chg/o*100,up=chg>=0,si=up?'+':'',cls=up?'up':'dn'
+  const cap=p*st.so, h=hist[sel]
+  const hi52=Math.max(...h)*1.02, lo52=Math.min(...h)*.98
   const eps=st.pe>0?p/st.pe:null
-  const divYield=st.div>0?(st.div/p*100):0
+  const divY=st.div>0?st.div/p*100:0
+  const beta=(st.v/0.002).toFixed(2)
+  const prevClose=o*(1+st.v*(Math.random()-.5)*.5)
 
-  document.getElementById('right-panel').innerHTML=`
+  document.getElementById('rpanel').innerHTML=`
     <div class="sk-hdr">
       <div class="sk-top">
-        <div class="sk-left">
-          <div class="sk-sym">${sel}</div>
-          <div class="sk-name">${st.n}</div>
-          <div class="sk-sector">${st.sec}</div>
-        </div>
-        <div class="sk-right">
-          <div class="sk-price" id="d-price">$${f2(p)}</div>
-          <div class="sk-chg ${cls}" id="d-chg">${sg}$${f2(Math.abs(chg))} (${sg}${pct.toFixed(2)}%)</div>
-        </div>
+        <div><div class="sk-sym">${sel}</div><div class="sk-name">${st.n}</div><div class="sk-sec">${st.sec}</div></div>
+        <div class="sk-r"><div class="sk-price" id="d-price">$${f2(p)}</div><div class="sk-chg ${cls}" id="d-chg">${si}$${f2(Math.abs(chg))} (${si}${pct.toFixed(2)}%)</div></div>
       </div>
-      <div class="sk-extra">
+      <div class="sk-meta">
         <span>Vol: ${fvol(vols[sel])}</span>
         <span>Mkt Cap: ${fcap(cap)}</span>
-        ${st.div>0?`<span>Div: $${st.div.toFixed(2)} (${divYield.toFixed(2)}%)</span>`:''}
+        <span>Beta: ${beta}</span>
+        ${st.div>0?`<span>Div: $${st.div.toFixed(2)} (${divY.toFixed(2)}%)</span>`:''}
       </div>
+      <button class="watch-btn${watchlist.has(sel)?' on':''}" onclick="toggleStar('${sel}',event)" style="margin-top:10px">
+        ★ ${watchlist.has(sel)?'In Watchlist':'Add to Watchlist'}
+      </button>
     </div>
-
-    <div class="chart-wrap">
+    <div class="chart-sec">
       <div class="ct-tabs">
-        ${['1D','1W','1M','3M','1Y'].map(t=>`<button class="ct${t===period?' act':''}" onclick="setPeriod('${t}')">${t}</button>`).join('')}
+        ${['1D','1W','1M','3M','1Y','Max'].map(t=>`<button class="ct${t===period?' act':''}" onclick="setPeriod('${t}')">${t}</button>`).join('')}
       </div>
-      <canvas id="main-chart" style="display:block;width:100%;height:150px" width="360" height="150"></canvas>
+      <canvas id="main-chart" style="display:block;width:100%;height:152px" width="370" height="152"></canvas>
     </div>
-
     <div class="stats-grid">
       <div class="stat"><div class="slbl">Open</div><div class="sval">$${f2(o)}</div></div>
-      <div class="stat"><div class="slbl">Market Cap</div><div class="sval">${fcap(cap)}</div></div>
+      <div class="stat"><div class="slbl">Prev Close</div><div class="sval">$${f2(prevClose)}</div></div>
+      <div class="stat"><div class="slbl">Day High</div><div class="sval up">$${f2(Math.max(...h.slice(-60)))}</div></div>
+      <div class="stat"><div class="slbl">Day Low</div><div class="sval dn">$${f2(Math.min(...h.slice(-60)))}</div></div>
       <div class="stat"><div class="slbl">52W High</div><div class="sval up">$${f2(hi52)}</div></div>
       <div class="stat"><div class="slbl">52W Low</div><div class="sval dn">$${f2(lo52)}</div></div>
-      <div class="stat"><div class="slbl">P/E Ratio</div><div class="sval">${st.pe>0?st.pe.toFixed(1):'—'}</div></div>
-      <div class="stat"><div class="slbl">EPS</div><div class="sval">${eps?'$'+f2(eps):'—'}</div></div>
-      <div class="stat"><div class="slbl">Div Yield</div><div class="sval">${divYield>0?divYield.toFixed(2)+'%':'—'}</div></div>
+      <div class="stat"><div class="slbl">Market Cap</div><div class="sval">${fcap(cap)}</div></div>
+      <div class="stat"><div class="slbl">Volume</div><div class="sval">${fvol(vols[sel])}</div></div>
       <div class="stat"><div class="slbl">Avg Volume</div><div class="sval">${fvol(st.bv)}</div></div>
+      <div class="stat"><div class="slbl">Shares Out</div><div class="sval">${fcap(st.so)}</div></div>
+      <div class="stat"><div class="slbl">P/E Ratio</div><div class="sval">${st.pe>0?st.pe.toFixed(1):'—'}</div></div>
+      <div class="stat"><div class="slbl">EPS (TTM)</div><div class="sval">${eps?'$'+f2(eps):'—'}</div></div>
+      <div class="stat"><div class="slbl">Dividend</div><div class="sval">${st.div>0?'$'+st.div.toFixed(2):'—'}</div></div>
+      <div class="stat"><div class="slbl">Div Yield</div><div class="sval">${divY>0?divY.toFixed(2)+'%':'—'}</div></div>
+      <div class="stat"><div class="slbl">Beta</div><div class="sval">${beta}</div></div>
+      <div class="stat"><div class="slbl">Sector</div><div class="sval" style="font-family:inherit;font-size:11px">${st.sec}</div></div>
     </div>
-
-    <div class="trade">
-      <div class="tr-tabs">
-        <button class="tt${tradeMode==='buy'?' b':''}" onclick="setMode('buy')">Buy</button>
-        <button class="tt${tradeMode==='sell'?' s':''}" onclick="setMode('sell')">Sell</button>
-      </div>
-      <div class="ot-row">
-        <button class="ot-btn${orderType==='market'?' act':''}" onclick="setOT('market')">Market</button>
-        <button class="ot-btn${orderType==='limit'?' act':''}" onclick="setOT('limit')">Limit</button>
-        <button class="ot-btn${orderType==='stop'?' act':''}" onclick="setOT('stop')">Stop</button>
-      </div>
-      <div class="tr-row"><span class="tr-lbl">Shares</span><input class="tr-input" id="tr-sh" type="number" min="1" step="1" value="1" oninput="updateTotal()"></div>
-      ${orderType!=='market'?`<div class="tr-row"><span class="tr-lbl">${orderType==='limit'?'Limit':'Stop'} Price</span><input class="tr-input" id="tr-lim" type="number" step="0.01" value="${f2(p)}" oninput="updateTotal()"></div>`:''}
-      <div class="tr-row"><span class="tr-lbl">Market Price</span><span class="tr-val" id="d-mktprice">$${f2(p)}</span></div>
-      <div class="tr-total"><span>Est. Total</span><span class="tv" id="tr-tot">$${f2(p)}</span></div>
-      <button class="exec ${tradeMode}" id="exec-btn" onclick="execute()">${tradeMode==='buy'?'Buy':'Sell'} ${sel}</button>
-      <div class="avail" id="avail-info">Available: $${f2(cash)}</div>
-    </div>
-
-    <div class="pos-wrap" id="pos-section"></div>
-
-    ${pendingOrders.filter(o=>o.sym===sel).length?`
-    <div class="pending-wrap">
-      <div class="panel-title" style="margin-bottom:8px">Pending Orders</div>
-      <div class="orders-list">${pendingOrders.filter(o=>o.sym===sel).map(o=>`
-        <div class="order-item">
-          <div class="order-info"><div class="oi-main"><span class="${o.side==='buy'?'up':'dn'}">${o.side.toUpperCase()}</span> ${o.shares} ${o.sym}</div>
-          <div class="oi-sub">${o.type.toUpperCase()} @ $${f2(o.limit)}</div></div>
-          <button class="cancel-btn" onclick="cancelOrder(${o.id})">Cancel</button>
-        </div>`).join('')}</div>
-    </div>`:''}
   `
-  chartEl=document.getElementById('main-chart'); drawChart(); refreshPos(); updateTotal()
+  chartEl=document.getElementById('main-chart'); drawChart()
 }
 
-function setPeriod(p){period=p;buildDetail()}
-
-function setMode(m){
-  tradeMode=m
-  document.querySelectorAll('.tt').forEach((el,i)=>{el.className='tt'+(i===0&&m==='buy'?' b':i===1&&m==='sell'?' s':'')})
-  const btn=document.getElementById('exec-btn')
-  if(btn){btn.className='exec '+m;btn.textContent=(m==='buy'?'Buy':'Sell')+' '+sel}
-  const ai=document.getElementById('avail-info')
-  if(ai&&m==='buy')ai.textContent='Available: $'+f2(cash)
-  else if(ai&&m==='sell'&&hold[sel])ai.textContent='Available: '+hold[sel].shares+' shares'
-  else if(ai)ai.textContent=''
+function setPeriod(p){
+  period=p
+  document.querySelectorAll('.ct').forEach(el=>el.classList.toggle('act',el.textContent===p))
+  drawChart()
 }
 
-function setOT(t){orderType=t;buildDetail()}
-
-function updateTotal(){
-  if(!sel)return
-  const sh=parseFloat(document.getElementById('tr-sh')?.value)||0
-  const limEl=document.getElementById('tr-lim')
-  const usePrice=orderType==='market'?prices[sel]:(parseFloat(limEl?.value)||prices[sel])
-  const tot=document.getElementById('tr-tot'); if(tot)tot.textContent='$'+f2(sh*usePrice)
-  const mp=document.getElementById('d-mktprice'); if(mp)mp.textContent='$'+f2(prices[sel])
-}
-
-function refreshPos(){
-  const el=document.getElementById('pos-section'); if(!el||!sel)return
-  const h=hold[sel]
-  if(!h||h.shares<=0){el.innerHTML='';return}
-  const cv=prices[sel]*h.shares,cb=h.avgCost*h.shares,pl=cv-cb,pp=pl/cb*100,cls=pl>=0?'up':'dn'
-  el.innerHTML=`
-    <div class="panel-title" style="padding:12px 16px 0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3)">Your Position</div>
-    <div style="padding:0 16px 12px">
-      <div class="pos-row">
-        <div class="pos-left"><div class="pos-sym">${h.shares} shares</div><div class="pos-shares">Avg cost $${f2(h.avgCost)}</div></div>
-        <div class="pos-right"><div class="pos-val">$${f2(cv)}</div><div class="pos-pnl ${cls}">${sign(pl)}$${f2(Math.abs(pl))} (${sign(pp)}${pp.toFixed(2)}%)</div></div>
-      </div>
-    </div>`
-}
-
-// ─── TRADE ────────────────────────────────────────────────────────────────────
-function execute(){
-  if(!sel)return
-  const shares=Math.floor(parseFloat(document.getElementById('tr-sh')?.value)||0)
-  if(shares<=0){toast('Enter a valid number of shares','err');return}
-
-  if(orderType==='market'){
-    const p=prices[sel],total=shares*p
-    if(tradeMode==='buy'){
-      if(total>cash){toast('Insufficient cash','err');return}
-      cash-=total; fillHold(sel,shares,p)
-      orderHistory.push({sym:sel,side:'buy',shares,price:p,ts:Date.now()})
-      toast(`Bought ${shares} share${shares>1?'s':''} of ${sel} @ $${f2(p)}`,'ok')
-    } else {
-      if(!hold[sel]||hold[sel].shares<shares){toast('Not enough shares','err');return}
-      cash+=total; hold[sel].shares-=shares; if(hold[sel].shares===0)delete hold[sel]
-      orderHistory.push({sym:sel,side:'sell',shares,price:p,ts:Date.now()})
-      toast(`Sold ${shares} share${shares>1?'s':''} of ${sel} @ $${f2(p)}`,'ok')
-    }
-    renderPF(); buildDetail()
-  } else {
-    // Limit / Stop
-    const limEl=document.getElementById('tr-lim')
-    const limitPrice=parseFloat(limEl?.value)
-    if(!limitPrice||limitPrice<=0){toast('Enter a valid limit price','err');return}
-    if(tradeMode==='buy'&&shares*limitPrice>cash){toast('Insufficient cash for limit order','err');return}
-    if(tradeMode==='sell'&&(!hold[sel]||hold[sel].shares<shares)){toast('Not enough shares','err');return}
-    pendingOrders.push({id:orderId++,sym:sel,side:tradeMode,type:orderType,shares,limit:limitPrice,ts:Date.now()})
-    toast(`${orderType.toUpperCase()} order placed: ${tradeMode.toUpperCase()} ${shares} ${sel} @ $${f2(limitPrice)}`,'ok')
-    buildDetail()
-  }
-}
-
-function executeFill(o){
-  const p=prices[o.sym]
-  if(o.side==='buy'){cash-=o.shares*p;fillHold(o.sym,o.shares,p)}
-  else{if(hold[o.sym]){hold[o.sym].shares-=o.shares;if(hold[o.sym].shares<=0)delete hold[o.sym];cash+=o.shares*p}}
-  orderHistory.push({sym:o.sym,side:o.side,shares:o.shares,price:p,ts:Date.now()})
-}
-
-function fillHold(s,shares,p){
-  if(!hold[s])hold[s]={shares:0,avgCost:0}
-  const h=hold[s],prev=h.shares*h.avgCost
-  h.shares+=shares; h.avgCost=(prev+shares*p)/h.shares
-}
-
-function cancelOrder(id){
-  const i=pendingOrders.findIndex(o=>o.id===id)
-  if(i>=0){pendingOrders.splice(i,1);toast('Order cancelled','ok')}
-  if(sel)buildDetail(); else showDefaultPanel()
-}
-
-// ─── CONTROLS ────────────────────────────────────────────────────────────────
+// ─── CONTROLS ─────────────────────────────────────────────────────────────────
 function toggleStar(s,e){
   e.stopPropagation()
   watchlist.has(s)?watchlist.delete(s):watchlist.add(s)
-  const el=document.getElementById('star-'+s); if(el)el.className='star '+(watchlist.has(s)?'on':'')
+  toast(watchlist.has(s)?`${s} added to watchlist`:`${s} removed from watchlist`,'ok')
+  renderTable()
+  if(sel===s)buildDetail()
 }
 
-function setTab(tab,el){
-  curTab=tab; sortKey=''; sortDir=1
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('act'))
+function setTab(t,el){
+  curTab=t; srtKey=''; srtDir=-1
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('act'))
   el.classList.add('act')
-  if(tab==='portfolio'){sel=null;showDefaultPanel()}
   renderTable()
 }
 
 function onSearch(){searchQ=document.getElementById('search').value;renderTable()}
-function onSectorChange(){curSector=document.getElementById('sector-sel').value;renderTable()}
-function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=-1};renderTable()}
-function setPeriod(p){period=p;document.querySelectorAll('.ct').forEach(el=>el.classList.toggle('act',el.textContent===p));drawChart()}
+function onSector(){curSec=document.getElementById('sec-sel').value;renderTable()}
+function srt(k){if(srtKey===k)srtDir*=-1;else{srtKey=k;srtDir=-1};renderTable()}
 
 function toggleTheme(){
-  const d=document.documentElement,dark=d.getAttribute('data-theme')==='dark'
-  d.setAttribute('data-theme',dark?'light':'dark')
+  const dark=document.documentElement.getAttribute('data-theme')==='dark'
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark')
   document.getElementById('tbtn').textContent=dark?'Dark':'Light'
   setTimeout(()=>{renderTable();if(sel)drawChart()},30)
 }
 
-function toast(msg,type){
-  const t=document.getElementById('toast'); t.textContent=msg; t.className='toast '+type+' show'
-  clearTimeout(toastTmr); toastTmr=setTimeout(()=>t.classList.remove('show'),2800)
+function toast(msg,t){
+  const el=document.getElementById('toast'); el.textContent=msg; el.className='toast '+t+' show'
+  clearTimeout(toastTmr); toastTmr=setTimeout(()=>el.classList.remove('show'),2500)
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-renderTable(); renderIndices(); renderPF()
-setInterval(tick, 1400)
+// ─── START ────────────────────────────────────────────────────────────────────
+renderTable(); renderIdx(); renderDefault()
+setInterval(tick,1400)
 </script>
 </body>
 </html>
