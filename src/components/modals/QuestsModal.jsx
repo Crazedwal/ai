@@ -1,5 +1,5 @@
-// src/components/ui/QuestsModal.jsx
-import { useQuests } from "../../hooks/useQuests.jsx"
+// src/components/modals/QuestsModal.jsx
+import { useQuests } from "../hooks/useQuests.jsx"
 
 export default function QuestsModal({ onClose }) {
   const { quests, resetLabel } = useQuests()

@@ -24,6 +24,54 @@
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px}
 
+/* PROFILE MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.pmodal{background:var(--s1);border:1px solid var(--border);border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.5);width:100%;overflow:hidden}
+
+/* Choose screen */
+.pchoose{max-width:640px;padding:36px}
+.pchoose h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.pchoose p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:28px}
+.pcards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.pcard{display:flex;flex-direction:column;gap:10px;padding:18px;background:var(--s2);border:1px solid var(--border);border-radius:12px;cursor:pointer;text-align:left;transition:all .15s}
+.pcard:hover{border-color:var(--blue);background:var(--s3)}
+.pcard .picon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pcard .ptitle{font-size:13px;font-weight:700;color:var(--text)}
+.pcard .pdesc{font-size:11px;color:var(--t2);line-height:1.5}
+.pcard .phint{font-size:10px;font-weight:600;margin-top:auto;color:var(--t3)}
+.pcard:hover .phint{color:var(--blue)}
+
+/* Form screens */
+.pform{max-width:480px}
+.pform-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)}
+.pform-hdr h2{font-size:15px;font-weight:700}
+.pform-hdr p{font-size:11px;color:var(--t2);margin-top:2px}
+.pback{background:none;border:1px solid var(--border);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;transition:.15s}
+.pback:hover{color:var(--text)}
+.pfields{padding:18px 22px;display:flex;flex-direction:column;gap:16px;max-height:60vh;overflow-y:auto}
+.pfields::-webkit-scrollbar{width:3px}
+.pfields::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.pfield-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:6px;display:block}
+.ptextinput{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;outline:none;transition:.15s;font-family:inherit}
+.ptextinput:focus{border-color:var(--blue)}
+.ptextinput::placeholder{color:var(--t3)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--s2);color:var(--t2);cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--t2);color:var(--text)}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.pfooter{padding:14px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.pfooter-note{font-size:11px;color:var(--t3)}
+.psave{padding:9px 20px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.psave:hover{opacity:.85}
+.psave:disabled{opacity:.35;cursor:not-allowed}
+
+/* Profile badge in header */
+.profile-badge{display:flex;align-items:center;gap:8px;padding:0 12px;border-left:1px solid var(--border);cursor:pointer}
+.profile-badge .pb-avatar{width:28px;height:28px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.profile-badge .pb-name{font-size:12px;font-weight:600}
+.profile-badge .pb-role{font-size:10px;color:var(--t2)}
+.profile-badge:hover .pb-name{color:var(--blue)}
+
 /* API KEY SCREEN */
 .api-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
 .api-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:36px;width:420px;text-align:center}

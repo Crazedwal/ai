@@ -1,4 +1,4 @@
-// src/components/ui/DevLog.jsx
+// src/components/modals/DevLog.jsx
 
 const CHANGELOG = [
   {

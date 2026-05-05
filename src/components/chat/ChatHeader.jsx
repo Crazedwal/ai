@@ -1,5 +1,5 @@
 // src/components/chat/ChatHeader.jsx
-import { useTheme } from "../../../hooks/useTheme.jsx"
+import { useTheme } from "../../hooks/useTheme.jsx"
 
 function ChatHeader({ title }) {
   const { theme, toggleTheme } = useTheme()

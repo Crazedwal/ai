@@ -1,4 +1,4 @@
-// src/components/ui/AfkCheck.jsx
+// src/components/modals/AfkCheck.jsx
 import { useState, useEffect, useRef } from "react"
 
 const AFK_TIMEOUT = 5 * 60 * 1000 // 5 minutes of inactivity

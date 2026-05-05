@@ -3,20 +3,19 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import ConversationList from "./ConversationList"
 import ModelSelector from "./ModelSelector"
-import PaymentPage from "@/components/ui/PaymentPage"
-import DevLog from "@/components/ui/DevLog"
-import GambleModal from "@/components/ui/GambleModal"
-import { useLanguage } from "../../../hooks/useLanguage.jsx"
-import { useAssistantName } from "../../../hooks/useAssistantName.jsx"
-import { useTokens } from "../../../hooks/useTokens.jsx"
-import { useAuth } from "../../../hooks/useAuth.jsx"
+import PaymentPage from "@/components/modals/PaymentPage"
+import DevLog from "@/components/modals/DevLog"
+import GambleModal from "@/components/modals/GambleModal"
+import { useLanguage } from "../../hooks/useLanguage.jsx"
+import { useAssistantName } from "../../hooks/useAssistantName.jsx"
+import { useTokens } from "../../hooks/useTokens.jsx"
+import { useAuth } from "../../hooks/useAuth.jsx"
 
 function Sidebar({
   conversations,
   activeId,
   onSelectConversation,
-  onNewChat,
-  onEditProfile
+  onNewChat
 }) {
   const { t, language, changeLanguage, availableLanguages, languageNames } = useLanguage()
   const { assistantName, changeName } = useAssistantName()
@@ -169,16 +168,6 @@ function Sidebar({
           >
             Stock Market Simulator
           </a>
-        </div>
-
-        {/* Edit Profile */}
-        <div className="p-3 border-t border-gray-700">
-          <button
-            onClick={onEditProfile}
-            className="w-full text-left text-xs text-gray-500 hover:text-blue-400 transition-colors"
-          >
-            Edit Profile
-          </button>
         </div>
 
         {/* Personality Matchmaker */}

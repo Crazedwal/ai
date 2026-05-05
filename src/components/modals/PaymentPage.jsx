@@ -1,4 +1,4 @@
-// src/components/ui/PaymentPage.jsx
+// src/components/modals/PaymentPage.jsx
 import { useState } from "react"
 import { TOKEN_PACKAGES } from "@/lib/models"
 

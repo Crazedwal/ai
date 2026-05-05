@@ -3,8 +3,8 @@ import {
   signInWithGoogle,
   signInWithEmail,
   signUpWithEmail,
-} from "../../../lib/firebase"
-import { useAuth } from "../../../hooks/useAuth"
+} from "../../lib/firebase"
+import { useAuth } from "../../hooks/useAuth"
 
 function GoogleIcon() {
   return (

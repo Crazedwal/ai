@@ -1,6 +1,6 @@
-// src/components/ui/GambleModal.jsx
+// src/components/modals/GambleModal.jsx
 import { useState, useEffect, useRef, useCallback } from "react"
-import { useTokens } from "../../hooks/useTokens.jsx"
+import { useTokens } from "../hooks/useTokens.jsx"
 
 const BETS       = [5, 10, 25, 50]
 const ROWS       = 15

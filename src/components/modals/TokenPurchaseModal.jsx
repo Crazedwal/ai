@@ -1,4 +1,4 @@
-// src/components/ui/TokenPurchaseModal.jsx
+// src/components/modals/TokenPurchaseModal.jsx
 import { useState } from "react"
 import { TOKEN_PACKAGES } from "@/lib/models"
 
