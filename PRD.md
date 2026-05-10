@@ -132,6 +132,39 @@ Everything lives in localStorage. There is no database.
 
 ---
 
+## 6.5 Stock Market Simulator (Rebuild)
+
+**Status:** Planned — replace the current external HTML page
+
+### Requirements
+
+**Data**
+- Use a real financial API with a proper API key — **Polygon.io** (free tier gives real-time delayed quotes, full ticker list, company details, OHLCV history)
+- Show **every stock** — not a 20% sample or filtered list. Full market coverage: NYSE, NASDAQ, AMEX
+- Real ticker symbols and company names only
+- Accurate price movements: realistic volatility based on market cap, sector-based correlation, no random walk to zero or infinity
+
+**UI — Black, White, and Grey only**
+- No colors except red for loss and green for gain (standard market convention)
+- Clean, dense, data-first layout — no decorative elements
+- Font-heavy, tabular design like a real terminal or Bloomberg-lite
+
+**Charts & Sections every real stock market site has**
+- Top Gainers table (% change, price, volume)
+- Top Losers table (% change, price, volume)
+- Most Active / Highest Volume table
+- Market overview bar (indices: S&P 500, NASDAQ, DOW, Russell 2000)
+- Individual stock chart: candlestick or line, switchable between 1D / 5D / 1M / 6M / 1Y / 5Y
+- Sector performance heatmap (which sectors are up/down today)
+- Stock screener: filter by price, volume, % change, market cap, sector
+- Search bar: type ticker or company name to jump to stock detail page
+- Stock detail page: price, change, market cap, P/E, 52-week high/low, volume, description, chart
+
+**API Key**
+- Replace the current hardcoded or shared key with a proper Polygon.io key stored in `.env` as `VITE_POLYGON_API_KEY`
+
+---
+
 ## 7. Future Planning
 
 These are features that may be built. Not committed, not ordered — just directions.
