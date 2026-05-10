@@ -136,32 +136,68 @@ Everything lives in localStorage. There is no database.
 
 **Status:** Planned — replace the current external HTML page
 
-### Requirements
+---
 
-**Data**
-- Use a real financial API with a proper API key — **Polygon.io** (free tier gives real-time delayed quotes, full ticker list, company details, OHLCV history)
-- Show **every stock** — not a 20% sample or filtered list. Full market coverage: NYSE, NASDAQ, AMEX
-- Real ticker symbols and company names only
-- Accurate price movements: realistic volatility based on market cap, sector-based correlation, no random walk to zero or infinity
+### Implementation Prompt (use this verbatim when building)
 
-**UI — Black, White, and Grey only**
-- No colors except red for loss and green for gain (standard market convention)
-- Clean, dense, data-first layout — no decorative elements
-- Font-heavy, tabular design like a real terminal or Bloomberg-lite
+Rebuild the stock market simulator from scratch. Do not reuse any of the old code.
 
-**Charts & Sections every real stock market site has**
-- Top Gainers table (% change, price, volume)
-- Top Losers table (% change, price, volume)
-- Most Active / Highest Volume table
-- Market overview bar (indices: S&P 500, NASDAQ, DOW, Russell 2000)
-- Individual stock chart: candlestick or line, switchable between 1D / 5D / 1M / 6M / 1Y / 5Y
-- Sector performance heatmap (which sectors are up/down today)
-- Stock screener: filter by price, volume, % change, market cap, sector
-- Search bar: type ticker or company name to jump to stock detail page
-- Stock detail page: price, change, market cap, P/E, 52-week high/low, volume, description, chart
+**API**
+Use Polygon.io as the data source. Store the key in `.env` as `VITE_POLYGON_API_KEY`. Use it for: full ticker list (every stock on NYSE, NASDAQ, AMEX — not a sample), real-time delayed quotes, OHLCV historical data, company details (name, sector, market cap, description, website), and news headlines per ticker. Do not fake, mock, or randomly generate any price data.
 
-**API Key**
-- Replace the current hardcoded or shared key with a proper Polygon.io key stored in `.env` as `VITE_POLYGON_API_KEY`
+**Design — strict black, white, and grey only**
+- Background: `#0a0a0a` or `#111`
+- Surface/cards: `#1a1a1a` or `#1e1e1e`
+- Borders: `#2a2a2a`
+- Primary text: `#f0f0f0`
+- Secondary text: `#888`
+- Gain: `#00c853` (green, only for positive % change)
+- Loss: `#ff1744` (red, only for negative % change)
+- No gradients, no accent colors, no decorative elements. Dense, data-first layout. Monospace font for numbers.
+
+**Pages and sections to build — all of them, nothing skipped**
+
+*Market Overview page (home):*
+- Top bar showing live index values: S&P 500, NASDAQ Composite, DOW Jones, Russell 2000 — each with current value, point change, and % change
+- Top Gainers table: rank, ticker, company name, price, % change, volume
+- Top Losers table: same columns
+- Most Active (by volume) table: same columns
+- Sector performance summary: list all 11 GICS sectors with their average % change today, sorted by performance
+- Recent market news feed: latest headlines with source, time, and link
+
+*Stock Screener page:*
+- Show every stock. Default sort by market cap descending
+- Columns: ticker, company name, price, % change, volume, market cap, sector
+- Filters: price range, % change range, volume minimum, market cap range, sector dropdown, exchange dropdown
+- Search bar that filters by ticker or company name in real time
+- Paginate if needed but load all data, not a capped sample
+- Clicking any row goes to the stock detail page
+
+*Stock Detail page (e.g. /stock/AAPL):*
+- Header: ticker, full company name, current price, change ($ and %), market status (open/closed/pre/after)
+- Key stats row: market cap, P/E ratio, EPS, 52-week high, 52-week low, average volume, dividend yield (if any), beta
+- Price chart: line chart by default, switchable to candlestick. Time range buttons: 1D, 5D, 1M, 3M, 6M, 1Y, 5Y
+- About section: company description, sector, industry, website, employee count, headquarters
+- News feed: latest headlines specific to this ticker, each with headline, source, published time, and link
+- Watchlist button: add/remove this stock from the watchlist
+
+*Watchlist page:*
+- Lists all stocks the user has added
+- Same columns as screener: ticker, name, price, % change, volume, market cap
+- Remove button per row
+- Persisted in localStorage
+- If empty, show a message with a link to the screener
+
+*Price Alerts page:*
+- User can set an alert: pick a ticker, set a target price, choose "above" or "below"
+- List of all active alerts with ticker, condition, target price, current price, and a delete button
+- When the page is open and the current price crosses the threshold, show a visible banner notification at the top of the page
+- Persisted in localStorage
+
+**Navigation**
+Top nav bar with links: Market Overview, Screener, Watchlist, Alerts. Sticky, dark background, no hover animations — just underline on active route.
+
+**No AI features. No fake money. No tokens. No gamification of any kind.** This is a pure market data viewer.
 
 ---
 
