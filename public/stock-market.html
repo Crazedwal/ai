@@ -143,27 +143,43 @@ td:nth-child(2){text-align:left}
 .star:hover,.star.on{color:var(--yellow)}
 .loading{color:var(--t3);font-family:var(--mono);font-size:11px}
 
-/* RIGHT */
-.right{width:400px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1)}
-.rscroll{flex:1;overflow-y:auto}
-.rscroll::-webkit-scrollbar{width:4px}
-.rscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-
-/* DEFAULT */
-.ov{padding:14px}
-.ov-ttl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:10px}
-.idx-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.icard{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:10px}
-.icard .icn{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
-.icard .icv{font-size:14px;font-weight:700;font-family:var(--mono)}
-.icard .icc{font-size:10px;font-family:var(--mono);margin-top:2px}
-.movers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.mv-ttl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
-.mv-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer}
+/* RIGHT — always-visible Gainers / Losers split panels */
+.right{width:300px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1)}
+.right-half{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.right-half+.right-half{border-top:2px solid var(--border)}
+.panel-hdr{padding:9px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:6px}
+.panel-scroll{flex:1;overflow-y:auto;padding:0 0 8px}
+.panel-scroll::-webkit-scrollbar{width:3px}
+.panel-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.mv-row{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s}
 .mv-row:last-child{border-bottom:none}
+.mv-row:hover{background:var(--s2)}
 .mv-row:hover .msym{color:var(--blue)}
+.mv-left{display:flex;flex-direction:column;gap:2px}
 .msym{font-family:var(--mono);font-weight:700;font-size:12px;transition:.1s}
-.mpct{font-family:var(--mono);font-size:11px}
+.mname{font-size:10px;color:var(--t2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mv-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.mpct{font-family:var(--mono);font-size:11px;font-weight:600}
+.mprice{font-family:var(--mono);font-size:10px;color:var(--t2)}
+.panel-empty{padding:20px 14px;font-size:11px;color:var(--t3);font-style:italic}
+
+/* STOCK DETAIL MODAL */
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;justify-content:flex-end}
+.detail-panel{width:480px;height:100%;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;animation:slideIn .15s ease}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.detail-close{background:none;border:none;color:var(--t2);cursor:pointer;font-size:18px;padding:4px 8px;line-height:1;transition:.1s}
+.detail-close:hover{color:var(--text)}
+.detail-scroll{flex:1;overflow-y:auto}
+.detail-scroll::-webkit-scrollbar{width:4px}
+.detail-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* Theme toggle pill */
+.theme-toggle{display:flex;align-items:center;gap:0;background:var(--s2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-left:10px}
+.theme-opt{padding:5px 10px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;border:none;background:none;transition:.15s}
+.theme-opt.act{background:var(--s3);color:var(--text)}
+
+/* legacy compat */
+.ov-ttl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:8px}
 .act-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer}
 .act-row:last-child{border-bottom:none}
 .act-row:hover .msym{color:var(--blue)}
@@ -233,7 +249,10 @@ td:nth-child(2){text-align:left}
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input id="search" type="text" placeholder="Search ticker or company..." oninput="onSearch()">
   </div>
-  <button class="tbtn" id="tbtn" onclick="toggleTheme()">Light</button>
+  <div class="theme-toggle">
+    <button class="theme-opt act" id="opt-dark"  onclick="setTheme('dark')">Dark</button>
+    <button class="theme-opt"     id="opt-light" onclick="setTheme('light')">Light</button>
+  </div>
   <button class="key-btn" onclick="resetKey()">Change Key</button>
 </header>
 
@@ -268,8 +287,57 @@ td:nth-child(2){text-align:left}
       </table>
     </div>
   </div>
-  <div class="right"><div class="rscroll" id="rpanel"><div id="defpanel"></div></div></div>
+  <div class="right">
+    <div class="right-half">
+      <div class="panel-hdr" style="color:var(--green)">
+        <span>▲</span> Top Gainers
+      </div>
+      <div class="panel-scroll" id="gainers-panel">
+        <div class="panel-empty">Loading...</div>
+      </div>
+    </div>
+    <div class="right-half">
+      <div class="panel-hdr" style="color:var(--red)">
+        <span>▼</span> Top Losers
+      </div>
+      <div class="panel-scroll" id="losers-panel">
+        <div class="panel-empty">Loading...</div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Stock Detail Slide-in -->
+<div class="detail-overlay" id="detail-overlay" style="display:none" onclick="closeDetail(event)">
+  <div class="detail-panel" id="detail-panel">
+    <div class="sk-hdr">
+      <div class="sk-top">
+        <div>
+          <div class="sk-sym" id="d-sym">—</div>
+          <div class="sk-name" id="d-name">—</div>
+          <div class="sk-sec" id="d-sec">—</div>
+        </div>
+        <div class="sk-r">
+          <button class="detail-close" onclick="closeDetail()">✕</button>
+          <div class="sk-price" id="d-price">—</div>
+          <div class="sk-chg" id="d-chg">—</div>
+        </div>
+      </div>
+      <div class="sk-meta" id="d-meta"></div>
+      <button class="watch-btn" id="d-watch" onclick="toggleStar(sel,event)">★ Add to Watchlist</button>
+    </div>
+    <div class="detail-scroll" id="d-scroll">
+      <div class="chart-sec">
+        <div class="ct-tabs">
+          ${['1D','1W','1M','3M','6M','1Y'].map(t=>`<button class="ct${t==='1D'?' act':''}" onclick="setPeriod('${t}')">${t}</button>`).join('')}
+        </div>
+        <div id="chart-container"><div class="chart-loading">Loading chart data...</div></div>
+      </div>
+      <div class="stats-grid" id="d-stats"></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -458,7 +526,7 @@ function startApp() {
   document.getElementById('app-hdr').style.display = 'flex'
   document.getElementById('app-main').style.display = 'flex'
   renderTable()
-  renderDefault()
+  renderSidePanels()
   fetchAllQuotes()
   connectWebSocket()
   fetchIndices()
@@ -672,49 +740,57 @@ function updateRow(s) {
   if(me) me.textContent = prof?.marketCapitalization ? fcap(prof.marketCapitalization*1e6) : '—'
 }
 
-// ─── DEFAULT PANEL ────────────────────────────────────────────────────────────
-function renderDefault() {
-  if (sel) return
+// ─── RIGHT PANELS — always-visible Gainers + Losers ──────────────────────────
+function renderSidePanels() {
   const loadedList = UNIVERSE.filter(([s]) => loaded.has(s))
-  const gainers = loadedList.slice().sort((a,b)=>pct(b[0])-pct(a[0])).slice(0,8)
-  const losers  = loadedList.slice().sort((a,b)=>pct(a[0])-pct(b[0])).slice(0,8)
-  const active  = loadedList.slice().sort((a,b)=>(vols[b[0]]||0)-(vols[a[0]]||0)).slice(0,6)
+  const gainers = loadedList.slice().sort((a,b)=>pct(b[0])-pct(a[0])).slice(0,20)
+  const losers  = loadedList.slice().sort((a,b)=>pct(a[0])-pct(b[0])).slice(0,20)
 
-  const dp = document.getElementById('defpanel'); if(!dp)return
-  dp.innerHTML = `
-  <div class="ov">
-    <div class="ov-ttl">Market Overview</div>
-    <div class="idx-cards">
-      ${loadedList.length===0?`<div style="grid-column:1/-1;color:var(--t3);font-size:12px;padding:20px 0">Loading live prices...</div>`:''}
-      ${gainers.slice(0,4).map(([s,,sec])=>{
-        const p=prices[s],o=opens[s],pc=(p-o)/o*100,up=pc>=0
-        return `<div class="icard"><div class="icn">${s}</div><div class="icv">$${f2(p)}</div><div class="icc ${up?'up':'dn'}">${sg(pc)}${pc.toFixed(2)}%</div></div>`
-      }).join('')}
-    </div>
-    ${loadedList.length>0?`
-    <div class="movers">
-      <div>
-        <div class="mv-ttl" style="color:var(--green)">Top Gainers</div>
-        ${gainers.map(([s])=>{const pc=pct(s);return`<div class="mv-row" onclick="selectStock('${s}')"><span class="msym">${s}</span><span class="mpct up">+${pc.toFixed(2)}%</span></div>`}).join('')}
+  const gp = document.getElementById('gainers-panel')
+  const lp = document.getElementById('losers-panel')
+  if (!gp || !lp) return
+
+  if (loadedList.length === 0) {
+    gp.innerHTML = '<div class="panel-empty">Loading live prices...</div>'
+    lp.innerHTML = '<div class="panel-empty">Loading live prices...</div>'
+    return
+  }
+
+  const rowHTML = (list, cls) => list.map(([s, n]) => {
+    const p = prices[s], o = opens[s]
+    const pc = pct(s), up = pc >= 0, si = up ? '+' : ''
+    return `<div class="mv-row" onclick="selectStock('${s}')">
+      <div class="mv-left">
+        <span class="msym">${s}</span>
+        <span class="mname">${n}</span>
       </div>
-      <div>
-        <div class="mv-ttl" style="color:var(--red)">Top Losers</div>
-        ${losers.map(([s])=>{const pc=pct(s);return`<div class="mv-row" onclick="selectStock('${s}')"><span class="msym">${s}</span><span class="mpct dn">${pc.toFixed(2)}%</span></div>`}).join('')}
+      <div class="mv-right">
+        <span class="mpct ${cls}">${si}${pc.toFixed(2)}%</span>
+        <span class="mprice">$${f2(p)}</span>
       </div>
-    </div>
-    <div class="ov-ttl">Most Active</div>
-    ${active.map(([s,n])=>`<div class="act-row" onclick="selectStock('${s}')"><span class="msym">${s}</span><span class="co" style="flex:1;margin:0 8px">${n}</span><span class="avol">${fvol(vols[s])}</span></div>`).join('')}
-    `:''}
-  </div>`
+    </div>`
+  }).join('')
+
+  gp.innerHTML = rowHTML(gainers, 'up')
+  lp.innerHTML = rowHTML(losers, 'dn')
 }
-setInterval(()=>{ if(!sel) renderDefault() }, 5000)
 
-// ─── STOCK DETAIL ─────────────────────────────────────────────────────────────
+function renderDefault() { renderSidePanels() }
+setInterval(renderSidePanels, 5000)
+
+// ─── STOCK DETAIL — slide-in overlay ─────────────────────────────────────────
 function selectStock(s) {
   sel = s; period = '1D'; renderTable()
   fetchProfile(s); fetchMetrics(s)
+  document.getElementById('detail-overlay').style.display = 'flex'
   buildDetail()
   loadChartData(s, period)
+}
+
+function closeDetail(e) {
+  if (e && e.target !== document.getElementById('detail-overlay')) return
+  document.getElementById('detail-overlay').style.display = 'none'
+  sel = null; renderTable()
 }
 
 function refreshHdr() {
@@ -736,53 +812,41 @@ function buildDetail() {
   const prof = profiles[sel] || {}
   const mt   = metrics[sel]  || {}
 
-  document.getElementById('rpanel').innerHTML = `
-    <div class="sk-hdr">
-      <div class="sk-top">
-        <div>
-          <div class="sk-sym">${sel}</div>
-          <div class="sk-name">${prof.name || nm}</div>
-          <div class="sk-sec">${prof.finnhubIndustry || sec}</div>
-        </div>
-        <div class="sk-r">
-          <div class="sk-price" id="d-price">${p?'$'+f2(p):'Loading...'}</div>
-          <div class="sk-chg ${cls}" id="d-chg">${p&&o?si+'$'+f2(Math.abs(p-o))+' ('+si+pc.toFixed(2)+'%)':'—'}</div>
-        </div>
-      </div>
-      <div class="sk-meta">
-        ${vols[sel]?`<span>Vol: ${fvol(vols[sel])}</span>`:''}
-        ${prof.marketCapitalization?`<span>Cap: ${fcap(prof.marketCapitalization*1e6)}</span>`:''}
-        ${prof.exchange?`<span>${prof.exchange}</span>`:''}
-        ${prof.country?`<span>${prof.country}</span>`:''}
-      </div>
-      <button class="watch-btn${watchlist.has(sel)?' on':''}" onclick="toggleStar('${sel}',event)">
-        ★ ${watchlist.has(sel)?'In Watchlist':'Add to Watchlist'}
-      </button>
-    </div>
-    <div class="chart-sec">
-      <div class="ct-tabs">
-        ${['1D','1W','1M','3M','6M','1Y'].map(t=>`<button class="ct${t===period?' act':''}" onclick="setPeriod('${t}')">${t}</button>`).join('')}
-      </div>
-      <div id="chart-container"><div class="chart-loading">Loading chart data...</div></div>
-    </div>
-    <div class="stats-grid">
-      <div class="stat"><div class="slbl">Open</div><div class="sval">${o?'$'+f2(o):'—'}</div></div>
-      <div class="stat"><div class="slbl">Prev Close</div><div class="sval">${prevClose[sel]?'$'+f2(prevClose[sel]):'—'}</div></div>
-      <div class="stat"><div class="slbl">Day High</div><div class="sval up">${highs[sel]?'$'+f2(highs[sel]):'—'}</div></div>
-      <div class="stat"><div class="slbl">Day Low</div><div class="sval dn">${lows[sel]?'$'+f2(lows[sel]):'—'}</div></div>
-      <div class="stat"><div class="slbl">52W High</div><div class="sval up">${mt['52WeekHigh']?'$'+f2(mt['52WeekHigh']):'—'}</div></div>
-      <div class="stat"><div class="slbl">52W Low</div><div class="sval dn">${mt['52WeekLow']?'$'+f2(mt['52WeekLow']):'—'}</div></div>
-      <div class="stat"><div class="slbl">Market Cap</div><div class="sval">${prof.marketCapitalization?fcap(prof.marketCapitalization*1e6):'—'}</div></div>
-      <div class="stat"><div class="slbl">Volume</div><div class="sval">${fvol(vols[sel])}</div></div>
-      <div class="stat"><div class="slbl">Avg Volume (10D)</div><div class="sval">${mt['10DayAverageTradingVolume']?fvol(mt['10DayAverageTradingVolume']*1e6):'—'}</div></div>
-      <div class="stat"><div class="slbl">Shares Out.</div><div class="sval">${mt.shareOutstanding?fcap(mt.shareOutstanding*1e6):'—'}</div></div>
-      <div class="stat"><div class="slbl">P/E Ratio (TTM)</div><div class="sval">${mt.peBasicExclExtraTTM?mt.peBasicExclExtraTTM.toFixed(1):'—'}</div></div>
-      <div class="stat"><div class="slbl">EPS (TTM)</div><div class="sval">${mt.epsBasicExclExtraItemsTTM?'$'+f2(mt.epsBasicExclExtraItemsTTM):'—'}</div></div>
-      <div class="stat"><div class="slbl">Div Yield (TTM)</div><div class="sval">${mt.dividendYieldIndicatedAnnual?(mt.dividendYieldIndicatedAnnual*100).toFixed(2)+'%':'—'}</div></div>
-      <div class="stat"><div class="slbl">Beta</div><div class="sval">${mt.beta?mt.beta.toFixed(2):'—'}</div></div>
-      <div class="stat"><div class="slbl">ROE (TTM)</div><div class="sval">${mt.roeTTM?(mt.roeTTM*100).toFixed(1)+'%':'—'}</div></div>
-      <div class="stat"><div class="slbl">Revenue (TTM)</div><div class="sval">${mt.revenuePerShareTTM?'$'+f2(mt.revenuePerShareTTM)+'/sh':'—'}</div></div>
-    </div>
+  const sym  = document.getElementById('d-sym');  if(sym)  sym.textContent = sel
+  const name = document.getElementById('d-name'); if(name) name.textContent = prof.name || nm
+  const sec2 = document.getElementById('d-sec');  if(sec2) sec2.textContent = prof.finnhubIndustry || sec
+  const meta = document.getElementById('d-meta')
+  if(meta) meta.innerHTML = [
+    vols[sel]?`<span>Vol: ${fvol(vols[sel])}</span>`:'',
+    prof.marketCapitalization?`<span>Cap: ${fcap(prof.marketCapitalization*1e6)}</span>`:'',
+    prof.exchange?`<span>${prof.exchange}</span>`:'',
+  ].filter(Boolean).join('')
+  const wb = document.getElementById('d-watch')
+  if(wb){ wb.className='watch-btn'+(watchlist.has(sel)?' on':''); wb.innerHTML=`★ ${watchlist.has(sel)?'In Watchlist':'Add to Watchlist'}` }
+
+  refreshHdr()
+
+  const ct = document.getElementById('chart-container')
+  if(ct) ct.innerHTML='<div class="chart-loading">Loading chart data...</div>'
+
+  const sg2 = document.getElementById('d-stats')
+  if(sg2) sg2.innerHTML = `
+    <div class="stat"><div class="slbl">Open</div><div class="sval">${o?'$'+f2(o):'—'}</div></div>
+    <div class="stat"><div class="slbl">Prev Close</div><div class="sval">${prevClose[sel]?'$'+f2(prevClose[sel]):'—'}</div></div>
+    <div class="stat"><div class="slbl">Day High</div><div class="sval up">${highs[sel]?'$'+f2(highs[sel]):'—'}</div></div>
+    <div class="stat"><div class="slbl">Day Low</div><div class="sval dn">${lows[sel]?'$'+f2(lows[sel]):'—'}</div></div>
+    <div class="stat"><div class="slbl">52W High</div><div class="sval up">${mt['52WeekHigh']?'$'+f2(mt['52WeekHigh']):'—'}</div></div>
+    <div class="stat"><div class="slbl">52W Low</div><div class="sval dn">${mt['52WeekLow']?'$'+f2(mt['52WeekLow']):'—'}</div></div>
+    <div class="stat"><div class="slbl">Market Cap</div><div class="sval">${prof.marketCapitalization?fcap(prof.marketCapitalization*1e6):'—'}</div></div>
+    <div class="stat"><div class="slbl">Volume</div><div class="sval">${fvol(vols[sel])}</div></div>
+    <div class="stat"><div class="slbl">Avg Vol (10D)</div><div class="sval">${mt['10DayAverageTradingVolume']?fvol(mt['10DayAverageTradingVolume']*1e6):'—'}</div></div>
+    <div class="stat"><div class="slbl">Shares Out.</div><div class="sval">${mt.shareOutstanding?fcap(mt.shareOutstanding*1e6):'—'}</div></div>
+    <div class="stat"><div class="slbl">P/E (TTM)</div><div class="sval">${mt.peBasicExclExtraTTM?mt.peBasicExclExtraTTM.toFixed(1):'—'}</div></div>
+    <div class="stat"><div class="slbl">EPS (TTM)</div><div class="sval">${mt.epsBasicExclExtraItemsTTM?'$'+f2(mt.epsBasicExclExtraItemsTTM):'—'}</div></div>
+    <div class="stat"><div class="slbl">Div Yield</div><div class="sval">${mt.dividendYieldIndicatedAnnual?(mt.dividendYieldIndicatedAnnual*100).toFixed(2)+'%':'—'}</div></div>
+    <div class="stat"><div class="slbl">Beta</div><div class="sval">${mt.beta?mt.beta.toFixed(2):'—'}</div></div>
+    <div class="stat"><div class="slbl">ROE (TTM)</div><div class="sval">${mt.roeTTM?(mt.roeTTM*100).toFixed(1)+'%':'—'}</div></div>
+    <div class="stat"><div class="slbl">Revenue/sh</div><div class="sval">${mt.revenuePerShareTTM?'$'+f2(mt.revenuePerShareTTM):'—'}</div></div>
   `
   chartEl = null
   loadChartData(sel, period)
@@ -863,11 +927,16 @@ function setTab(t,el){
 function onSearch(){searchQ=document.getElementById('search').value; renderTable()}
 function onSec(){curSec=document.getElementById('sec-sel').value; renderTable()}
 function srt(k){if(srtKey===k)srtDir*=-1;else{srtKey=k;srtDir=-1}; renderTable()}
-function toggleTheme(){
-  const dark=document.documentElement.getAttribute('data-theme')==='dark'
-  document.documentElement.setAttribute('data-theme',dark?'light':'dark')
-  document.getElementById('tbtn').textContent=dark?'Dark':'Light'
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t)
+  document.getElementById('opt-dark').classList.toggle('act',t==='dark')
+  document.getElementById('opt-light').classList.toggle('act',t==='light')
+  localStorage.setItem('theme',t)
 }
+window.addEventListener('load',()=>{
+  const saved=localStorage.getItem('theme')
+  if(saved) setTheme(saved)
+})
 function toast(msg,t){
   const el=document.getElementById('toast'); el.textContent=msg; el.className='toast '+t+' show'
   clearTimeout(toastTmr); toastTmr=setTimeout(()=>el.classList.remove('show'),2500)
