@@ -273,80 +273,171 @@ User sets alerts on individual stocks.
 
 ---
 
-## 12. Future Planning
+## 12. Sidebar & Navigation Planning
+
+The sidebar is the primary navigation hub. It needs to stay organized as features grow. Planned structure:
+
+**Top section**
+- App logo / name
+- New Chat button
+- Conversation list (scrollable, sorted by most recent, shows title and relative timestamp)
+
+**Middle section**
+- Token balance display (always visible)
+- Model selector dropdown
+- Plinko button
+- Quests button
+- Buy tokens button
+
+**Bottom section**
+- Assistant name editor
+- Language selector
+- Theme toggle
+- DevLog / Changelog viewer
+- Stock Market link
+- Sign out
+
+The sidebar should be collapsible on smaller screens. When collapsed it should show icon-only shortcuts for the most important actions: new chat, quests, Plinko, and sign out.
+
+---
+
+## 13. Error Handling & Edge Cases
+
+These are states the app needs to handle gracefully — not ignore.
+
+**API failures**
+- If OpenRouter returns an error, show the error message inline in the chat rather than silently failing. Do not add a failed message to the conversation history.
+- If Polygon.io returns an error or rate limit response, show a visible notice on the affected page (e.g. "Data unavailable — rate limit reached. Try again in 60 seconds."). Do not show stale data without labeling it as stale.
+
+**Empty states**
+- New user with no conversations: show a welcome message with a prompt to start chatting
+- Watchlist with no stocks: show a clear empty state with a link to the screener
+- Screener with no results matching filters: show "No stocks match your filters" with a reset filters button
+- Alerts page with no alerts: show a prompt to add one
+
+**Token balance edge cases**
+- User tries to send a message with a paid model but has 0 tokens: block the send, show an inline message explaining why, offer the buy tokens button
+- User tries to start a Plinko round with fewer tokens than the minimum bet: show the minimum bet requirement and disable all bet options they can't afford
+
+**Authentication edge cases**
+- Session expires mid-conversation: show a re-authentication prompt without losing the current chat history
+- Guest user tries to access a feature that requires sign-in: show a prompt explaining what they'd get by signing in, with a sign-in button
+
+**Network**
+- If the user goes offline mid-stream, stop the stream and show a reconnect notice
+- Do not retry API calls automatically — let the user decide when to resend
+
+---
+
+## 14. Performance Considerations
+
+**Chat**
+- Only send the last N messages in the conversation history to the API (not the full history). A rolling window of the last 20 messages is a reasonable default. This prevents hitting model context limits and keeps request size manageable.
+- Virtualize the message list if a conversation gets very long (500+ messages). Do not render all messages in the DOM at once.
+
+**Stock Market**
+- The full ticker list from Polygon.io is large. Fetch it once per session and cache it in memory. Do not re-fetch it on every page navigation.
+- The screener should render rows lazily — only render what's visible in the viewport, not all 10,000+ rows at once.
+- Poll for quote updates on the Market Overview page every 60 seconds. Do not poll on pages the user isn't viewing.
+- Cancel in-flight chart data requests when the user switches time range before the previous request completes.
+
+**General**
+- Debounce the screener search bar — do not filter on every keystroke, wait for the user to stop typing (200ms).
+- Do not block the main thread with synchronous localStorage reads on startup. Load defaults immediately, then hydrate from storage.
+
+---
+
+## 15. Future Planning
 
 These are directions to explore — not committed, not ordered by priority.
 
-### 12.1 Cloud Data Sync
+### 15.1 Cloud Data Sync
 Move conversations, profile data, watchlists, and alerts from localStorage to Firebase Firestore. This would allow:
 - Data to survive clearing the browser
 - Access from multiple devices
-- Seamless guest-to-authenticated migration
+- Seamless guest-to-authenticated migration that preserves existing data
 
-### 12.2 Real Payments
-Wire the existing payment modal to Stripe. Define token pack tiers (e.g. 100 / 500 / 1000 tokens). Handle webhook confirmation before crediting the balance.
+Schema would need: a `users` collection with subcollections for `conversations`, `messages`, `quests`, `watchlist`, and `alerts`.
 
-### 12.3 More LLM Models
-Expand the model selector with more free and paid models from OpenRouter. Paid models should require a positive token balance before allowing a message send.
+### 15.2 Real Payments
+Wire the existing payment modal to Stripe. Token pack tiers to consider: 100 / 500 / 1000 / 5000. Use a Stripe webhook to confirm payment before crediting the balance — never credit on the client alone. Store transaction history in Firestore.
 
-### 12.4 Conversation Management
+### 15.3 More LLM Models
+Expand the model selector with more free and paid models from OpenRouter. Each model entry should define: display name, model ID, cost per message, context window size, and a short description of what it's good at. Paid models gate on token balance before sending.
+
+### 15.4 Conversation Management
 - Export a conversation as markdown or PDF
-- Search across all past conversations by keyword
-- Pin or star important conversations so they stay at the top of the list
-- Share a read-only conversation via a link
+- Full-text search across all past conversations
+- Pin important conversations so they stay at the top of the list regardless of recency
+- Share a read-only conversation via a generated link (requires backend or Firebase hosting)
+- Delete individual conversations or bulk-delete all
 
-### 12.5 Expanded Quest System
-- Separate daily quests from the 30-minute rotating set
-- More quest categories tied to model usage, login streaks, and conversation length
-- Achievement badges for reaching milestones (e.g. 100 messages sent, 500 tokens earned)
-- Quest history log showing past completed quests and rewards
+### 15.5 Expanded Quest System
+- Separate daily quests (reset at midnight) from the 30-minute rotating set
+- Weekly challenge quests with larger token rewards
+- Achievement badges for permanent milestones: first message sent, 100 messages sent, 1000 tokens earned, first Plinko win, first 500x hit
+- Quest history log: see what you completed and when
+- Streak tracking: consecutive days with at least one completed quest
 
-### 12.6 Plinko Improvements
-- Animated ball drops with sound effects
-- One free drop per day that costs no tokens
-- Time-limited board variants with different multiplier layouts
-- Session stats: biggest win, total spent, total earned
+### 15.6 Plinko Improvements
+- Animated ball drops with satisfying bounce physics and sound effects (toggle-able)
+- One free drop per day — no token cost
+- Time-limited special boards with different peg layouts and multiplier distributions
+- Per-session stats panel: balls dropped, total spent, total earned, net gain/loss, biggest single-ball win
+- Historical stats across all sessions stored in localStorage (or Firestore if synced)
 
-### 12.7 Personalization Depth
-- Multiple saved personas the user can switch between
-- Per-conversation persona override (use a different persona for just this chat)
-- Ability to import/export persona settings
+### 15.7 Personalization Depth
+- Multiple saved personas the user can name and switch between
+- Per-conversation persona override: pick a different persona for just this chat without changing the global default
+- Import and export persona settings as JSON so users can share or back them up
 
-### 12.8 Progressive Web App
-- Make the app installable on desktop and mobile as a PWA
-- Responsive layout: sidebar collapses to a bottom nav on small screens
-- Offline fallback page
+### 15.8 Progressive Web App
+- Manifest and service worker so the app is installable on desktop and mobile
+- Responsive layout: sidebar collapses to a bottom navigation bar on screens narrower than 768px
+- Offline fallback page that explains the app needs a connection
+- Cache static assets so the shell loads instantly even on slow connections
 
-### 12.9 Stock Market Enhancements
-- Earnings calendar: which companies are reporting earnings this week and next
-- Economic calendar: upcoming Fed meetings, CPI, jobs report dates
-- Compare mode on the chart: overlay two tickers on the same graph
-- Analyst ratings and price targets per stock
-- Options chain viewer per stock (calls and puts, strike prices, expiry dates)
-- Portfolio tracker: manually enter holdings and track total value and performance over time
+### 15.9 Stock Market Enhancements
+- **Earnings calendar:** which companies are reporting earnings this week and next, with estimated EPS and revenue, and whether they beat/missed after the fact
+- **Economic calendar:** upcoming macro events — Fed meetings, CPI release, jobs report, GDP — with expected vs. actual values after release
+- **Compare mode:** overlay two or more tickers on the same chart with a shared time axis
+- **Analyst ratings:** consensus buy/hold/sell rating and average price target per stock, sourced from Polygon.io or similar
+- **Options chain viewer:** calls and puts for a given ticker, organized by expiry date, showing strike, bid, ask, volume, open interest, and implied volatility
+- **Portfolio tracker:** user manually enters holdings (ticker, shares, average cost), app calculates current value, total gain/loss, and % return. No real brokerage integration.
+- **Pre-market and after-hours data:** show extended-hours price and change where available
 
-### 12.10 Accessibility
-- Full keyboard navigation for all modals, dropdowns, and sidebar
-- Screen reader support for chat message list
-- High-contrast theme option separate from dark/light toggle
-- Focus trap in modals
+### 15.10 Accessibility
+- Full keyboard navigation for all modals, dropdowns, and sidebar links
+- Logical focus order — tab should move through interactive elements in a sensible sequence
+- Screen reader support: ARIA labels on icon buttons, live region announcements for new chat messages
+- High-contrast theme option as a third choice alongside dark and light
+- Respect `prefers-reduced-motion` — disable canvas animations and transitions for users who have set this system preference
+
+### 15.11 Developer Experience
+- Error boundary that catches React render errors and shows a "something went wrong" screen with a reload button instead of a blank page
+- Error reporting via Sentry or a similar service — capture unhandled errors and API failures with context
+- Auto-generated changelog entries from git commit messages (conventional commits format)
+- Local dev environment should work with a `.env.local` file — no hardcoded keys anywhere in the codebase
 
 ---
 
-## 13. Constraints & Limitations
+## 16. Constraints & Limitations
 
 - No custom backend — everything is client-side. Firebase for auth, third-party APIs for all data.
-- localStorage is the only persistence layer until Firestore is integrated. Data does not sync across devices and is lost if the browser is cleared.
-- Polygon.io free tier has rate limits and data delay (15 minutes). Real-time data requires a paid plan.
+- localStorage is the only persistence layer until Firestore is integrated. Data does not sync across devices and is lost if the browser storage is cleared.
+- Polygon.io free tier has rate limits and a 15-minute data delay. Real-time data requires a paid Polygon plan.
 - Payment processing is not yet live — the UI exists but no transactions are processed.
-- No abuse prevention or rate limiting on API calls from the client.
+- No server-side rate limiting or abuse prevention. All API keys are exposed to the client via environment variables — this is acceptable for a personal project but not production-safe at scale.
+- OpenRouter free models may have slow response times or availability issues — this is outside our control.
 
 ---
 
-## 14. Out of Scope
+## 17. Out of Scope
 
 - Native iOS or Android app
 - Self-hosted LLM inference
 - Multi-tenant or team accounts
-- Automated content moderation
-- Server-side rendering
+- Automated content moderation pipeline
+- Server-side rendering or SSR framework (Next.js, Remix, etc.)
+- Real brokerage integration (no actual trading, ever)
+- Email notifications or SMS alerts
