@@ -1,5 +1,5 @@
 # Product Requirements Document
-**Project:** AI Chat Application (temp-project)
+**Project:** AI Chat Application
 **Author:** Askyturi
 **Last Updated:** 2026-05-10
 **Status:** Active Development
@@ -8,16 +8,19 @@
 
 ## 1. Overview
 
-A browser-based AI chat application with a gamified token economy. Users can have multi-turn conversations with a customizable AI assistant, earn and spend tokens, play a Plinko gambling mini-game, and complete rotating quests. Everything runs client-side — no traditional backend, using Firebase for auth and OpenRouter for LLM access.
+A browser-based platform combining an AI chat assistant with a gamified token economy and a full stock market data viewer. The AI side lets users have personalized, multi-turn conversations with a customizable assistant, earn tokens through quests and a Plinko mini-game, and manage their experience through a rich sidebar. The stock market side is a standalone, data-accurate market viewer with real API data, no simulations, and no gamification — just a clean, dense, professional interface for tracking the market.
+
+The entire platform runs client-side. Firebase handles authentication. OpenRouter handles LLM access. Polygon.io handles market data. No custom backend.
 
 ---
 
 ## 2. Goals
 
-- Provide a personalized AI chat experience shaped by user-defined personality and constraints
-- Keep users engaged through gamification (tokens, quests, Plinko)
-- Remain easy to extend with new models, features, and monetization layers
-- Work fully in-browser with minimal infrastructure cost
+- Deliver a personalized AI chat experience shaped by user-defined personality, constraints, and behavior preferences
+- Keep users engaged through a token economy, rotating quests, and a Plinko mini-game
+- Build a stock market viewer that shows real, accurate, complete market data — every stock, real prices, real charts
+- Keep the architecture simple and extensible: client-side first, easy to add features without restructuring
+- Support monetization later through a real payment layer without rebuilding the token system
 
 ---
 
@@ -25,260 +28,325 @@ A browser-based AI chat application with a gamified token economy. Users can hav
 
 | Type | Description |
 |---|---|
-| Guest | No account, chats not saved, limited features |
-| Authenticated | Google OAuth or email/password, full feature access |
+| Guest | No account required. Chat sessions are not saved. Some features are restricted. |
+| Authenticated | Signed in via Google OAuth or email/password. Full access to all features. Data persists across sessions. |
 
 ---
 
-## 4. What's Built
+## 4. Authentication
 
-### 4.1 Authentication
-- Google OAuth sign-in
-- Email/password signup and login
-- Guest mode (ephemeral session, chats not persisted)
-- Sign out
+The app should support three entry paths:
 
-### 4.2 AI Chat
-- Multi-turn conversation with full message history
-- Non-streaming message send via OpenRouter API
-- Streaming infrastructure exists (`sendMessageStreaming`) but not wired to UI yet
-- Conversation list in sidebar with auto-generated titles from first message
-- Per-conversation persistence in localStorage
-- Message timestamps and markdown rendering (code highlighting, GFM tables, etc.)
+**Google OAuth** — one-click sign-in using Firebase Google provider. Fastest path to full access.
 
-### 4.3 Model Selection
-- Dropdown with free and premium sections
-- Currently one active free model: `nvidia/nemotron-3-nano-30b-a3b:free`
-- Token cost per message defined per model (0 for free models)
-- Selected model persisted in localStorage
+**Email / Password** — standard signup and login form. Includes basic validation (valid email format, password length). No email verification required for initial release.
 
-### 4.4 Personalization
-- **Assistant Name:** Editable, defaults to "Assistant"
-- **User Profile:** Optional setup modal (name, age, occupation, industry, expertise, use cases, response style, tone) — detailed or quick flow
-- **User Constraints:** Who the user is, what frustrates them, what they're comfortable with — injected into every system message
-- **KCD System:** Keep / Change / Delete flags to shape AI behavior
-- All persona data is sent to the LLM as part of the system message on every request
+**Guest Mode** — user can use the chat without signing in. Conversations are not saved. Token balance resets on refresh. The UI should surface a prompt to sign in, but never block the guest from using the core chat.
 
-### 4.5 Token Economy
-- Starting balance: 50 tokens
-- Peak balance tracked separately
-- Free models cost 0 tokens; premium models deduct tokens
-- Tokens can be earned through quests and Plinko winnings
-- "Buy tokens" UI exists (PaymentPage modal with card, PayPal, Apple Pay, Google Pay, bank transfer tabs) — demo only, no real payments
-
-### 4.6 Plinko
-- Canvas-based physics simulation
-- 15-row peg pyramid, 16 outcome slots
-- Multipliers: 500x, 20x, 5x, 3x, 0x, 0x, 1x, 1x, 1x, 1x, 0x, 0x, 3x, 5x, 20x, 500x
-- Bet 5 / 10 / 25 / 50 balls at a time (1 token per ball)
-- Winnings paid out after all balls settle
-
-### 4.7 Quests
-- 4 active quests, rotated every 30 minutes
-- Drawn from a pool of 20+ quest templates
-- Seeded random selection per 30-minute window (same quests for everyone in a window)
-- Tracks: messages sent, messages in a single chat, chats created, gambles played/won/lost, balls dropped, peak token balance
-- Countdown timer to next rotation
-- Auto-grants token rewards on completion
-
-### 4.8 UI & Settings
-- Dark / light theme toggle (persisted)
-- 6 language options: EN, ES, FR, DE, ZH, JA (i18n keys implemented)
-- AFK detection: 5-minute idle triggers a 30-second warning popup; blocks chat if dismissed
-- DevLog / Changelog / Reflection modal (version history v1.0–v1.7)
-- Sidebar: conversation list, new chat, token balance, Plinko, buy tokens, model selector, assistant name, language, devlog, external links, radio (rickroll), sign out
-
-### 4.9 External Pages
-- Stock Market Simulator (external HTML, shares API key via localStorage)
-- Personality Matchmaker (external HTML)
+Sign-out should be accessible from the sidebar at all times.
 
 ---
 
-## 5. Tech Stack
+## 5. AI Chat
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 19, TypeScript/JSX |
-| Build | Vite 7 |
-| Styling | Tailwind CSS 4 (dark mode via class) |
-| UI Components | shadcn/ui |
-| Markdown | react-markdown + rehype-highlight + remark-gfm |
-| Auth | Firebase Authentication |
-| LLM API | OpenRouter |
-| Icons | Lucide React |
-| State | React Context + localStorage (no external state lib) |
+### 5.1 Core Chat Behavior
+The chat should support multi-turn conversations with full message history sent to the model on every request. Messages should render markdown — including code blocks with syntax highlighting, tables, bold/italic, and lists.
 
----
+Each conversation has an auto-generated title derived from the first user message. Conversations are listed in the sidebar sorted by most recent. Users can create new chats and switch between existing ones.
 
-## 6. Data Storage
+### 5.2 Streaming
+Responses should stream token-by-token so the user sees the reply as it's generated rather than waiting for the full response. The message bubble should update in real time as tokens arrive. A subtle indicator should show when the model is generating.
 
-Everything lives in localStorage. There is no database.
+### 5.3 System Message & Personalization Injection
+Every API request should include a system message built from the user's saved profile data:
+- Who the user is (name, occupation, expertise level)
+- What they want the assistant to keep doing, change, or stop doing (KCD system)
+- Their constraints: things that frustrate them, things they're comfortable with
+- Their preferred response style and tone
 
-| Key | Contents |
-|---|---|
-| `tokenBalance` | Current token count |
-| `peakBalance` | All-time highest balance |
-| `selectedModel` | Active model ID |
-| `assistantName` | Custom name for the assistant |
-| `theme` | "dark" or "light" |
-| `language` | Language code |
-| `userPersona` | Personality matchmaker data |
-| `userConstraints` | Who / frustrations / comforts |
-| `userKCD` | Keep / Change / Delete flags |
-| `userProfile` | Detailed profile fields |
-| `profileSetupDone` | First-time setup flag |
-| `questSession` | Active quest stats, completed IDs, seed |
-| `openrouter_api_key` | Shared with external HTML pages |
+If the user hasn't set up a profile, use a neutral default system message.
+
+### 5.4 Model Selection
+The sidebar should include a model selector. Models are split into free and paid sections. Free models cost 0 tokens per message. Paid models deduct tokens from the user's balance before sending. The selected model persists across sessions.
+
+The goal is to support many models. Start with at least one working free model and expand the list over time without changing the underlying architecture.
+
+### 5.5 Input Behavior
+- Enter sends the message
+- Shift+Enter inserts a newline
+- The input should grow vertically with the text up to a max height, then scroll
+- Disable send while a response is streaming
 
 ---
 
-## 6.5 Stock Market Simulator (Rebuild)
+## 6. Personalization
 
-**Status:** Planned — replace the current external HTML page
+### 6.1 Assistant Name
+The user can rename the assistant from the sidebar. The name appears in the chat header and in message bubbles. Defaults to "Assistant". Persists in localStorage.
+
+### 6.2 User Profile Setup
+On first visit (authenticated), show a setup modal with two paths:
+- **Quick setup:** just name and preferred response style (2 fields)
+- **Detailed setup:** name, age, occupation, industry, expertise level, main use cases, preferred response style, preferred tone
+
+The profile is optional. Users can skip it and set it up later from the sidebar. All fields feed directly into the system message.
+
+### 6.3 User Constraints Modal
+A dedicated modal where users define:
+- Who they are (free text, injected as context)
+- What frustrates them in AI responses
+- What they're comfortable with
+
+These are sent with every message to shape how the model responds.
+
+### 6.4 KCD System
+Keep / Change / Delete — a list of specific behaviors the user wants to reinforce or suppress. Examples:
+- Keep: "Always give code examples"
+- Change: "Be more concise"
+- Delete: "Stop adding disclaimers"
+
+The KCD list is injected into the system message alongside constraints.
+
+### 6.5 Language
+Support 6 languages for the UI: English, Spanish, French, German, Chinese, Japanese. The language setting changes UI labels and sidebar text. It does not change the model's response language unless the user also specifies that in their constraints. Persists in localStorage.
+
+### 6.6 Theme
+Dark and light mode toggle in the chat header. Persists in localStorage. Default to dark.
 
 ---
 
-### Implementation Prompt (use this verbatim when building)
+## 7. Token Economy
 
-Rebuild the stock market simulator from scratch. Do not reuse any of the old code.
+### 7.1 Balance
+Every authenticated user starts with 50 tokens. The current balance is always visible in the sidebar. The all-time peak balance is tracked separately and used for certain quest conditions.
 
-**API**
-Use Polygon.io as the data source. Store the key in `.env` as `VITE_POLYGON_API_KEY`. Use it for: full ticker list (every stock on NYSE, NASDAQ, AMEX — not a sample), real-time delayed quotes, OHLCV historical data, company details (name, sector, market cap, description, website), and news headlines per ticker. Do not fake, mock, or randomly generate any price data.
+### 7.2 Spending
+- Free models: 0 tokens per message
+- Paid models: deduct the model's defined cost before sending. If the user's balance is insufficient, show an error and do not send.
 
-**Design — strict black, white, and grey only**
-- Background: `#0a0a0a` or `#111`
-- Surface/cards: `#1a1a1a` or `#1e1e1e`
+### 7.3 Earning
+Tokens are earned by completing quests and through Plinko winnings. No other earning mechanisms for now.
+
+### 7.4 Purchasing
+A payment modal should be accessible from the sidebar. It should support multiple payment methods in the UI (card, PayPal, Apple Pay, Google Pay, bank transfer). Real payment processing via Stripe is planned for a later phase — for now the UI exists but transactions are not processed.
+
+---
+
+## 8. Plinko
+
+A canvas-based physics game accessible from the sidebar.
+
+### 8.1 Board
+- 15-row pyramid of pegs
+- 16 outcome slots at the bottom
+- Multipliers (left to right): 500x, 20x, 5x, 3x, 0x, 0x, 1x, 1x, 1x, 1x, 0x, 0x, 3x, 5x, 20x, 500x
+
+### 8.2 Betting
+User selects how many balls to drop: 5, 10, 25, or 50. Each ball costs 1 token. The total cost is shown before confirming. Tokens are deducted upfront.
+
+### 8.3 Physics
+Balls should have realistic gravity and peg bounce behavior. Horizontal velocity should decay on each bounce. Balls should not pass through pegs or walls.
+
+### 8.4 Payout
+After all balls have settled, calculate total payout (sum of each ball's slot multiplier × 1 token). Add the payout to the user's token balance. Show a results summary.
+
+### 8.5 Quest Integration
+Track: total gambles played, gambles won (payout > cost), gambles lost, total balls dropped. These stats feed the quest system.
+
+---
+
+## 9. Quests
+
+### 9.1 Rotation
+4 quests are active at any given time. They rotate every 30 minutes on a fixed schedule. The selection is seeded by the current 30-minute window so everyone sees the same 4 quests at the same time.
+
+### 9.2 Quest Pool
+Quests are drawn from a pool of 20+ templates across categories:
+- **Chat:** send N messages, send N messages in a single conversation, create N new chats
+- **Plinko:** play N rounds, win N rounds, lose N rounds, drop N balls
+- **Token:** reach a peak balance of N
+
+### 9.3 Progress & Completion
+Each quest shows a progress bar based on the tracked stat vs. the goal. When a quest is completed, tokens are awarded automatically. Completed quests are marked and not re-awarded if the window resets before the user refreshes.
+
+### 9.4 UI
+The quests modal shows: all 4 active quests with their progress bars, token reward per quest, and a countdown timer to the next rotation.
+
+---
+
+## 10. AFK Detection
+
+After 5 minutes of no user activity (no mouse movement, keyboard input, or clicks), show a modal warning. The user has 30 seconds to confirm they're still there. If they don't, block the chat input until they interact. Reset the timer on any activity.
+
+---
+
+## 11. Stock Market Simulator
+
+### 11.1 Purpose
+A standalone market data viewer integrated into the app. No fake money, no tokens, no gamification. Real data only. The design is strict black, white, and grey — functional and data-dense.
+
+### 11.2 API
+Use **Polygon.io** as the sole data source. API key stored in `.env` as `VITE_POLYGON_API_KEY`. Use it for:
+- Full ticker list: every stock on NYSE, NASDAQ, and AMEX — no sampling, no filtering by popularity
+- Real-time delayed quotes
+- OHLCV historical data for charts
+- Company details: name, description, sector, industry, market cap, employee count, website, headquarters
+- News headlines per ticker and market-wide
+
+Do not generate, mock, or simulate any price data.
+
+### 11.3 Design
+- Background: `#0a0a0a`
+- Surface / cards: `#1a1a1a`
 - Borders: `#2a2a2a`
 - Primary text: `#f0f0f0`
 - Secondary text: `#888`
-- Gain: `#00c853` (green, only for positive % change)
-- Loss: `#ff1744` (red, only for negative % change)
-- No gradients, no accent colors, no decorative elements. Dense, data-first layout. Monospace font for numbers.
+- Positive change: `#00c853`
+- Negative change: `#ff1744`
+- Monospace font for all numbers
+- No gradients, no accent colors, no decorative elements
+- Dense tabular layout — maximize data per screen
 
-**Pages and sections to build — all of them, nothing skipped**
+### 11.4 Navigation
+Sticky top nav with four links: Market Overview, Screener, Watchlist, Alerts. Active route is underlined. No animations.
 
-*Market Overview page (home):*
-- Top bar showing live index values: S&P 500, NASDAQ Composite, DOW Jones, Russell 2000 — each with current value, point change, and % change
-- Top Gainers table: rank, ticker, company name, price, % change, volume
-- Top Losers table: same columns
-- Most Active (by volume) table: same columns
-- Sector performance summary: list all 11 GICS sectors with their average % change today, sorted by performance
-- Recent market news feed: latest headlines with source, time, and link
+### 11.5 Market Overview Page
+The home page of the stock market section.
 
-*Stock Screener page:*
-- Show every stock. Default sort by market cap descending
-- Columns: ticker, company name, price, % change, volume, market cap, sector
-- Filters: price range, % change range, volume minimum, market cap range, sector dropdown, exchange dropdown
-- Search bar that filters by ticker or company name in real time
-- Paginate if needed but load all data, not a capped sample
-- Clicking any row goes to the stock detail page
+**Index bar** — always visible at the top: S&P 500, NASDAQ Composite, DOW Jones, Russell 2000. Each shows current value, point change, and % change.
 
-*Stock Detail page (e.g. /stock/AAPL):*
-- Header: ticker, full company name, current price, change ($ and %), market status (open/closed/pre/after)
-- Key stats row: market cap, P/E ratio, EPS, 52-week high, 52-week low, average volume, dividend yield (if any), beta
-- Price chart: line chart by default, switchable to candlestick. Time range buttons: 1D, 5D, 1M, 3M, 6M, 1Y, 5Y
-- About section: company description, sector, industry, website, employee count, headquarters
-- News feed: latest headlines specific to this ticker, each with headline, source, published time, and link
-- Watchlist button: add/remove this stock from the watchlist
+**Top Gainers table** — columns: rank, ticker, company name, price, % change, volume. Sorted by % change descending.
 
-*Watchlist page:*
-- Lists all stocks the user has added
-- Same columns as screener: ticker, name, price, % change, volume, market cap
-- Remove button per row
-- Persisted in localStorage
-- If empty, show a message with a link to the screener
+**Top Losers table** — same columns. Sorted by % change ascending.
 
-*Price Alerts page:*
-- User can set an alert: pick a ticker, set a target price, choose "above" or "below"
-- List of all active alerts with ticker, condition, target price, current price, and a delete button
-- When the page is open and the current price crosses the threshold, show a visible banner notification at the top of the page
-- Persisted in localStorage
+**Most Active table** — same columns. Sorted by volume descending.
 
-**Navigation**
-Top nav bar with links: Market Overview, Screener, Watchlist, Alerts. Sticky, dark background, no hover animations — just underline on active route.
+**Sector performance** — all 11 GICS sectors listed with their average % change for the day, sorted by performance. Shows at a glance which sectors are leading and which are lagging.
 
-**No AI features. No fake money. No tokens. No gamification of any kind.** This is a pure market data viewer.
+**Market news feed** — latest market-wide headlines. Each entry shows: headline text, source name, published time, and a link to the full article.
 
----
+### 11.6 Stock Screener Page
+Shows every stock. Default sort: market cap descending.
 
-## 7. Future Planning
+**Columns:** ticker, company name, price, change ($), % change, volume, market cap, sector, exchange.
 
-These are features that may be built. Not committed, not ordered — just directions.
+**Filters:**
+- Price range (min / max)
+- % change range (e.g. only show stocks up more than 5%)
+- Minimum volume
+- Market cap range with preset buckets (Mega, Large, Mid, Small, Micro)
+- Sector dropdown (all 11 GICS sectors)
+- Exchange dropdown (NYSE, NASDAQ, AMEX)
 
-### 7.1 Message Streaming
-Wire up `sendMessageStreaming()` to the chat UI so responses appear token-by-token instead of all at once. Already implemented in `api.js`, just needs to be connected in `useChat.js` and rendered progressively in `MessageBubble`.
+**Search bar** — filters by ticker symbol or company name in real time as the user types.
 
-### 7.2 Cloud Persistence (Firebase Firestore)
-Move conversations and user data from localStorage to Firestore so:
-- Chat history syncs across devices
-- Guest → authenticated migration preserves history
-- Data survives clearing the browser
+Pagination is acceptable for performance but all data must be available — no hard cap on results. Clicking any row navigates to the stock detail page.
 
-### 7.3 More Models
-Add more models to the model selector — both free (OpenRouter has many) and paid. Paid models would actually gate behind token balance.
+### 11.7 Stock Detail Page
+Route: `/stock/:ticker`
 
-### 7.4 Real Payments
-Replace the demo PaymentPage with actual Stripe integration. Connect purchase to token balance increment. Consider token pack tiers (e.g., 100 / 500 / 1000 tokens).
+**Header:** ticker symbol, full company name, current price, change in dollars, % change, market status badge (Open / Closed / Pre-market / After-hours).
 
-### 7.5 Expanded Quest System
-- More quest categories (model usage, streaks, social)
-- Daily quests separate from the 30-minute rotating set
-- Achievement badges for milestone completions
-- Quest history log
+**Key stats row:** market cap, P/E ratio, EPS, 52-week high, 52-week low, average daily volume, dividend yield (show "—" if none), beta.
 
-### 7.6 Conversation Features
-- Export conversation as markdown or PDF
-- Search across all conversations
-- Pin / star important conversations
-- Share a conversation via link
+**Price chart:** line chart by default. Toggle to candlestick. Time range buttons: 1D, 5D, 1M, 3M, 6M, 1Y, 5Y. Chart updates when time range changes.
 
-### 7.7 Plinko Improvements
-- Animated ball drop with sound
-- Daily free drops (no token cost)
-- Jackpot events or time-limited high-multiplier boards
-- Leaderboard for biggest single-session wins
+**About section:** company description (full text), sector, industry, website, employee count, headquarters city/state.
 
-### 7.8 Personalization Depth
-- Multiple saved personas (switch between them)
-- Per-conversation persona override
-- AI-suggested KCD tweaks based on conversation history
+**Ticker news feed:** latest headlines specific to this stock. Each entry: headline, source, published time, link.
 
-### 7.9 Social / Multiplayer
-- Public chat rooms powered by the same LLM (multiple users, one AI)
-- Challenge a friend to a Plinko run
-- Shared quests or co-op goals
+**Watchlist button:** add or remove this stock from the watchlist. Shows current state (added / not added).
 
-### 7.10 Mobile / PWA
-- Make the app installable as a PWA
-- Responsive sidebar that collapses to a bottom nav on small screens
-- Push notifications for quest resets
+### 11.8 Watchlist Page
+Lists all stocks the user has saved.
 
-### 7.11 Analytics & DevLog Automation
-- Auto-generate changelog entries from git commits
-- Usage stats dashboard for the developer (messages sent, models used, token flows)
-- Error reporting (Sentry or similar)
+Columns: ticker, company name, price, % change, volume, market cap. Remove button on each row. Persists in localStorage. If empty, show a prompt with a link to the screener.
 
-### 7.12 Accessibility
-- Full keyboard navigation for modals and sidebar
-- Screen reader support for chat messages
-- High-contrast theme option
+### 11.9 Price Alerts Page
+User sets alerts on individual stocks.
+
+**Creating an alert:** pick a ticker (typeahead search), set a target price, choose "above" or "below". Save to list.
+
+**Alert list:** ticker, direction, target price, current price, delete button.
+
+**Triggering:** while the page is open and data is being polled, if any alert condition is met, show a banner at the top of the page with the ticker and the triggered condition. Alerts persist in localStorage.
 
 ---
 
-## 8. Known Limitations
+## 12. Future Planning
 
-- All data is localStorage — cleared on browser wipe, not cross-device
-- Payments are demo UI only — no real transactions
-- Only one active LLM model (free tier)
-- Streaming not connected to UI
-- No error recovery if OpenRouter API is down
-- No rate limiting or abuse prevention on the client
+These are directions to explore — not committed, not ordered by priority.
+
+### 12.1 Cloud Data Sync
+Move conversations, profile data, watchlists, and alerts from localStorage to Firebase Firestore. This would allow:
+- Data to survive clearing the browser
+- Access from multiple devices
+- Seamless guest-to-authenticated migration
+
+### 12.2 Real Payments
+Wire the existing payment modal to Stripe. Define token pack tiers (e.g. 100 / 500 / 1000 tokens). Handle webhook confirmation before crediting the balance.
+
+### 12.3 More LLM Models
+Expand the model selector with more free and paid models from OpenRouter. Paid models should require a positive token balance before allowing a message send.
+
+### 12.4 Conversation Management
+- Export a conversation as markdown or PDF
+- Search across all past conversations by keyword
+- Pin or star important conversations so they stay at the top of the list
+- Share a read-only conversation via a link
+
+### 12.5 Expanded Quest System
+- Separate daily quests from the 30-minute rotating set
+- More quest categories tied to model usage, login streaks, and conversation length
+- Achievement badges for reaching milestones (e.g. 100 messages sent, 500 tokens earned)
+- Quest history log showing past completed quests and rewards
+
+### 12.6 Plinko Improvements
+- Animated ball drops with sound effects
+- One free drop per day that costs no tokens
+- Time-limited board variants with different multiplier layouts
+- Session stats: biggest win, total spent, total earned
+
+### 12.7 Personalization Depth
+- Multiple saved personas the user can switch between
+- Per-conversation persona override (use a different persona for just this chat)
+- Ability to import/export persona settings
+
+### 12.8 Progressive Web App
+- Make the app installable on desktop and mobile as a PWA
+- Responsive layout: sidebar collapses to a bottom nav on small screens
+- Offline fallback page
+
+### 12.9 Stock Market Enhancements
+- Earnings calendar: which companies are reporting earnings this week and next
+- Economic calendar: upcoming Fed meetings, CPI, jobs report dates
+- Compare mode on the chart: overlay two tickers on the same graph
+- Analyst ratings and price targets per stock
+- Options chain viewer per stock (calls and puts, strike prices, expiry dates)
+- Portfolio tracker: manually enter holdings and track total value and performance over time
+
+### 12.10 Accessibility
+- Full keyboard navigation for all modals, dropdowns, and sidebar
+- Screen reader support for chat message list
+- High-contrast theme option separate from dark/light toggle
+- Focus trap in modals
 
 ---
 
-## 9. Out of Scope (for now)
+## 13. Constraints & Limitations
 
-- Native mobile app
+- No custom backend — everything is client-side. Firebase for auth, third-party APIs for all data.
+- localStorage is the only persistence layer until Firestore is integrated. Data does not sync across devices and is lost if the browser is cleared.
+- Polygon.io free tier has rate limits and data delay (15 minutes). Real-time data requires a paid plan.
+- Payment processing is not yet live — the UI exists but no transactions are processed.
+- No abuse prevention or rate limiting on API calls from the client.
+
+---
+
+## 14. Out of Scope
+
+- Native iOS or Android app
 - Self-hosted LLM inference
-- Multi-tenant / team accounts
-- Content moderation pipeline
+- Multi-tenant or team accounts
+- Automated content moderation
+- Server-side rendering
