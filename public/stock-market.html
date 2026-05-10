@@ -215,6 +215,51 @@ td:nth-child(2){text-align:left}
 .mprice{font-family:var(--mono);font-size:10px;color:var(--t2)}
 .panel-empty{padding:20px 14px;font-size:11px;color:var(--t3);font-style:italic}
 
+/* OVERVIEW VIEW */
+.overview-view{flex:1;overflow-y:auto;display:none}
+.overview-view::-webkit-scrollbar{width:4px}
+.overview-view::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.ov-section{padding:14px 14px 0}
+.ov-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:10px}
+
+/* Index cards */
+.idx-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.idx-card{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.idx-card .ic-name{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:4px}
+.idx-card .ic-val{font-size:16px;font-weight:700;font-family:var(--mono);letter-spacing:-.5px;line-height:1}
+.idx-card .ic-chg{font-size:10px;font-family:var(--mono);margin-top:3px}
+
+/* Sector performance */
+.sector-list{display:flex;flex-direction:column;gap:0;margin-bottom:14px}
+.sector-row{display:flex;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);gap:8px}
+.sector-row:last-child{border-bottom:none}
+.sector-name{font-size:11px;color:var(--t2);width:150px;flex-shrink:0}
+.sector-bar-wrap{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.sector-bar{height:100%;border-radius:2px;transition:width .3s}
+.sector-pct{font-family:var(--mono);font-size:11px;font-weight:600;width:52px;text-align:right;flex-shrink:0}
+
+/* Most Active mini table */
+.active-table{width:100%;border-collapse:collapse;margin-bottom:14px}
+.active-table td{padding:6px 8px;border-bottom:1px solid var(--border);font-size:11px;vertical-align:middle;cursor:pointer}
+.active-table tr:last-child td{border-bottom:none}
+.active-table tr:hover td{background:var(--s2)}
+.active-table .at-sym{font-family:var(--mono);font-weight:700;font-size:12px}
+.active-table .at-co{font-size:10px;color:var(--t2)}
+.active-table .at-vol{font-family:var(--mono);font-size:11px;color:var(--t2);text-align:right}
+.active-table .at-pct{font-family:var(--mono);font-size:11px;text-align:right}
+
+/* News feed */
+.news-list{display:flex;flex-direction:column;gap:0;padding-bottom:16px}
+.news-item{padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.news-item:last-child{border-bottom:none}
+.news-item:hover .news-headline{color:var(--blue)}
+.news-headline{font-size:12px;font-weight:500;line-height:1.4;color:var(--text);transition:.1s;margin-bottom:4px}
+.news-meta{display:flex;gap:8px;font-size:10px;color:var(--t3)}
+.news-source{font-weight:600}
+.news-tickers{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.news-ticker-tag{font-size:9px;font-family:var(--mono);background:var(--s3);border:1px solid var(--border);color:var(--t2);padding:1px 5px;border-radius:3px;cursor:pointer}
+.news-ticker-tag:hover{color:var(--blue)}
+
 /* STOCK DETAIL MODAL */
 .detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;justify-content:flex-end}
 .detail-panel{width:480px;height:100%;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;animation:slideIn .15s ease}
@@ -311,7 +356,8 @@ td:nth-child(2){text-align:left}
 <div class="main" id="app-main" style="display:none">
   <div class="left">
     <div class="filter-bar">
-      <button class="tab act" id="nav-all"       onclick="setNav('all',this)">All</button>
+      <button class="tab act" id="nav-overview"  onclick="setNav('overview',this)">Overview</button>
+      <button class="tab"     id="nav-all"       onclick="setNav('all',this)">All Stocks</button>
       <button class="tab"     id="nav-watchlist" onclick="setNav('watchlist',this)">Watchlist</button>
       <button class="tab"     id="nav-gainers"   onclick="setNav('gainers',this)">Gainers</button>
       <button class="tab"     id="nav-losers"    onclick="setNav('losers',this)">Losers</button>
@@ -326,8 +372,37 @@ td:nth-child(2){text-align:left}
       </select>
     </div>
 
+    <!-- Overview view -->
+    <div class="overview-view" id="overview-view">
+      <div class="ov-section">
+        <div class="ov-title">Market Indices</div>
+        <div class="idx-cards" id="ov-indices">
+          <div class="idx-card"><div class="ic-name">S&amp;P 500</div><div class="ic-val" id="ovc-spx">—</div><div class="ic-chg" id="ovcc-spx">—</div></div>
+          <div class="idx-card"><div class="ic-name">NASDAQ</div><div class="ic-val" id="ovc-comp">—</div><div class="ic-chg" id="ovcc-comp">—</div></div>
+          <div class="idx-card"><div class="ic-name">DOW</div><div class="ic-val" id="ovc-dji">—</div><div class="ic-chg" id="ovcc-dji">—</div></div>
+          <div class="idx-card"><div class="ic-name">VIX</div><div class="ic-val" id="ovc-vix">—</div><div class="ic-chg" id="ovcc-vix" style="color:var(--t3)">Volatility</div></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)">
+        <div class="ov-section" style="border-right:1px solid var(--border)">
+          <div class="ov-title">Sector Performance</div>
+          <div class="sector-list" id="ov-sectors"><div class="panel-empty">Loading...</div></div>
+        </div>
+        <div class="ov-section">
+          <div class="ov-title">Most Active</div>
+          <table class="active-table" id="ov-active"><tbody><tr><td colspan="3" style="color:var(--t3);font-size:11px;padding:12px 8px">Loading...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border)" class="ov-section">
+        <div class="ov-title">Market News</div>
+        <div class="news-list" id="ov-news"><div class="panel-empty">Loading news...</div></div>
+      </div>
+    </div>
+
     <!-- Screener filter row (hidden on Alerts tab) -->
-    <div class="filter-row" id="filter-row">
+    <div class="filter-row" id="filter-row" style="display:none">
       <span class="filter-lbl">Price</span>
       <input id="f-pmin" type="number" placeholder="Min $" min="0" oninput="applyFilters()">
       <input id="f-pmax" type="number" placeholder="Max $" min="0" oninput="applyFilters()">
@@ -631,11 +706,15 @@ function startApp() {
   document.getElementById('api-screen').style.display = 'none'
   document.getElementById('app-hdr').style.display = 'flex'
   document.getElementById('app-main').style.display = 'flex'
-  renderTable()
+  // start on Overview tab
+  document.getElementById('overview-view').style.display = 'block'
+  document.getElementById('nav-overview').classList.add('act')
+  document.querySelectorAll('.tab:not(#nav-overview)').forEach(t => t.classList.remove('act'))
   renderSidePanels()
   fetchAllQuotes()
   connectWebSocket()
   fetchIndices()
+  fetchNews().then(() => renderOverview())
 }
 
 window.addEventListener('load', () => {
@@ -710,6 +789,11 @@ async function fetchIndices() {
           ce.textContent = (chg >= 0 ? '+' : '') + pct.toFixed(2) + '%'
           ce.className = 'ic ' + (chg >= 0 ? 'up' : 'dn')
         }
+        // mirror to overview cards
+        const ovVal = document.getElementById('ovc-' + id)
+        const ovChg = document.getElementById('ovcc-' + id)
+        if (ovVal && el) ovVal.textContent = el.textContent
+        if (ovChg && ce && id !== 'vix') { ovChg.textContent = ce.textContent; ovChg.className = 'ic-chg ' + (chg >= 0 ? 'up' : 'dn') }
       }
     })
   }
@@ -887,7 +971,31 @@ function renderSidePanels() {
 }
 
 function renderDefault() { renderSidePanels() }
-setInterval(renderSidePanels, 5000)
+setInterval(() => {
+  renderSidePanels()
+  if (curNav === 'overview') {
+    const secs = calcSectorPerf()
+    const secEl = document.getElementById('ov-sectors')
+    const activeEl = document.getElementById('ov-active')
+    if (secEl && secs.length > 0) {
+      const maxAbs = Math.max(...secs.map(s => Math.abs(s.avg)), 0.01)
+      secEl.innerHTML = secs.map(({ sec, avg }) => {
+        const up = avg >= 0, si = up ? '+' : ''
+        const barW = Math.min(Math.abs(avg) / maxAbs * 100, 100)
+        return `<div class="sector-row"><span class="sector-name">${sec}</span><div class="sector-bar-wrap"><div class="sector-bar" style="width:${barW}%;background:${up ? 'var(--green)' : 'var(--red)'}"></div></div><span class="sector-pct ${up ? 'up' : 'dn'}">${si}${avg.toFixed(2)}%</span></div>`
+      }).join('')
+    }
+    if (activeEl) {
+      const active = UNIVERSE.filter(([s]) => loaded.has(s)).sort((a, b) => (vols[b[0]] || 0) - (vols[a[0]] || 0)).slice(0, 10)
+      if (active.length > 0) {
+        activeEl.innerHTML = '<tbody>' + active.map(([s, n]) => {
+          const pc = pct(s), up = pc >= 0, si = up ? '+' : ''
+          return `<tr onclick="selectStock('${s}')"><td><div class="at-sym">${s}</div><div class="at-co">${n}</div></td><td class="at-vol">${fvol(vols[s])}</td><td class="at-pct ${up ? 'up' : 'dn'}">${si}${pc.toFixed(2)}%</td></tr>`
+        }).join('') + '</tbody>'
+      }
+    }
+  }
+}, 5000)
 
 // ─── STOCK DETAIL — slide-in overlay ─────────────────────────────────────────
 function selectStock(s) {
@@ -1024,37 +1132,161 @@ function setPeriod(p) {
 }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-let curNav = 'all'
+let curNav = 'overview'
 
 function setNav(t, el) {
   curNav = t; srtKey = ''; srtDir = -1
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('act'))
   el.classList.add('act')
 
+  const ovView    = document.getElementById('overview-view')
   const tblView   = document.getElementById('tbl-view')
   const alertsView= document.getElementById('alerts-view')
   const filterRow = document.getElementById('filter-row')
   const secSel    = document.getElementById('sec-sel')
   const cnt       = document.getElementById('cnt')
 
-  if (t === 'alerts') {
-    tblView.style.display    = 'none'
+  // hide all
+  ovView.style.display     = 'none'
+  tblView.style.display    = 'none'
+  alertsView.style.display = 'none'
+  filterRow.style.display  = 'none'
+  secSel.style.display     = 'none'
+  cnt.textContent          = ''
+
+  if (t === 'overview') {
+    ovView.style.display = 'block'
+    renderOverview()
+  } else if (t === 'alerts') {
     alertsView.style.display = 'block'
-    filterRow.style.display  = 'none'
-    secSel.style.display     = 'none'
-    cnt.textContent          = ''
     renderAlerts()
   } else {
     tblView.style.display    = 'flex'
     tblView.style.flexDirection = 'column'
-    alertsView.style.display = 'none'
     filterRow.style.display  = 'flex'
     secSel.style.display     = ''
-    // map nav → tab for legacy filter logic
     curTab = t
     renderTable()
   }
 }
+
+// ─── OVERVIEW ─────────────────────────────────────────────────────────────────
+const newsCache = { data: null, expiry: 0 }
+
+async function fetchNews() {
+  if (newsCache.data && Date.now() < newsCache.expiry) return newsCache.data
+  try {
+    const d = await apiFetch(`/news?category=general&minId=0`)
+    if (Array.isArray(d)) {
+      newsCache.data = d.slice(0, 30)
+      newsCache.expiry = Date.now() + 5 * 60 * 1000
+      return newsCache.data
+    }
+  } catch(e) { console.warn('news fetch failed', e) }
+  return []
+}
+
+function calcSectorPerf() {
+  const map = {}
+  for (const [sym,, sec] of UNIVERSE) {
+    if (!loaded.has(sym)) continue
+    const pc = pct(sym)
+    if (!map[sec]) map[sec] = { total: 0, count: 0 }
+    map[sec].total += pc
+    map[sec].count++
+  }
+  return Object.entries(map)
+    .map(([sec, { total, count }]) => ({ sec, avg: total / count }))
+    .sort((a, b) => b.avg - a.avg)
+}
+
+function relTime(ts) {
+  const diff = Math.floor((Date.now() - ts * 1000) / 1000)
+  if (diff < 60) return `${diff}s ago`
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`
+  return `${Math.floor(diff/86400)}d ago`
+}
+
+async function renderOverview() {
+  // Update index cards from header data already fetched
+  const idxMap = { spx: ['^GSPC','S&P 500'], comp: ['^IXIC','NASDAQ'], dji: ['^DJI','DOW'], vix: ['^VIX','VIX'] }
+  for (const [id] of Object.entries(idxMap)) {
+    const valEl = document.getElementById('i-' + id)
+    const chgEl = document.getElementById('ic-' + id)
+    const ovVal = document.getElementById('ovc-' + id)
+    const ovChg = document.getElementById('ovcc-' + id)
+    if (valEl && ovVal) ovVal.textContent = valEl.textContent
+    if (chgEl && ovChg && id !== 'vix') {
+      ovChg.textContent  = chgEl.textContent
+      ovChg.className    = 'ic-chg ' + (chgEl.classList.contains('up') ? 'up' : chgEl.classList.contains('dn') ? 'dn' : '')
+    }
+  }
+
+  // Sector performance
+  const secs = calcSectorPerf()
+  const secEl = document.getElementById('ov-sectors')
+  if (secEl) {
+    if (secs.length === 0) {
+      secEl.innerHTML = '<div class="panel-empty">Loading prices...</div>'
+    } else {
+      const maxAbs = Math.max(...secs.map(s => Math.abs(s.avg)), 0.01)
+      secEl.innerHTML = secs.map(({ sec, avg }) => {
+        const up = avg >= 0, si = up ? '+' : ''
+        const barW = Math.min(Math.abs(avg) / maxAbs * 100, 100)
+        const barColor = up ? 'var(--green)' : 'var(--red)'
+        return `<div class="sector-row">
+          <span class="sector-name">${sec}</span>
+          <div class="sector-bar-wrap"><div class="sector-bar" style="width:${barW}%;background:${barColor}"></div></div>
+          <span class="sector-pct ${up ? 'up' : 'dn'}">${si}${avg.toFixed(2)}%</span>
+        </div>`
+      }).join('')
+    }
+  }
+
+  // Most active
+  const activeEl = document.getElementById('ov-active')
+  if (activeEl) {
+    const active = UNIVERSE.filter(([s]) => loaded.has(s))
+      .sort((a, b) => (vols[b[0]] || 0) - (vols[a[0]] || 0)).slice(0, 10)
+    if (active.length === 0) {
+      activeEl.innerHTML = '<tbody><tr><td colspan="3" style="color:var(--t3);font-size:11px;padding:12px 8px">Loading...</td></tr></tbody>'
+    } else {
+      activeEl.innerHTML = '<tbody>' + active.map(([s, n]) => {
+        const pc = pct(s), up = pc >= 0, si = up ? '+' : ''
+        return `<tr onclick="selectStock('${s}')">
+          <td><div class="at-sym">${s}</div><div class="at-co">${n}</div></td>
+          <td class="at-vol">${fvol(vols[s])}</td>
+          <td class="at-pct ${up ? 'up' : 'dn'}">${si}${pc.toFixed(2)}%</td>
+        </tr>`
+      }).join('') + '</tbody>'
+    }
+  }
+
+  // News
+  const newsEl = document.getElementById('ov-news')
+  if (newsEl) {
+    newsEl.innerHTML = '<div class="panel-empty">Loading news...</div>'
+    const articles = await fetchNews()
+    if (articles.length === 0) {
+      newsEl.innerHTML = '<div class="panel-empty">No news available.</div>'
+    } else {
+      newsEl.innerHTML = articles.map(a => {
+        const tickers = (a.related || '').split(',').filter(t => t && t.length <= 5).slice(0, 4)
+        return `<div class="news-item" onclick="window.open('${a.url}','_blank')">
+          <div class="news-headline">${a.headline}</div>
+          <div class="news-meta">
+            <span class="news-source">${a.source}</span>
+            <span>${relTime(a.datetime)}</span>
+          </div>
+          ${tickers.length ? `<div class="news-tickers">${tickers.map(t => `<span class="news-ticker-tag" onclick="event.stopPropagation();selectStock('${t.trim()}')">${t.trim()}</span>`).join('')}</div>` : ''}
+        </div>`
+      }).join('')
+    }
+  }
+}
+
+setInterval(() => { if (curNav === 'overview') renderOverview() }, 60000)
 
 // ─── SCREENER FILTERS ─────────────────────────────────────────────────────────
 let fMcap = ''
