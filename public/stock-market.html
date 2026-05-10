@@ -143,6 +143,58 @@ td:nth-child(2){text-align:left}
 .star:hover,.star.on{color:var(--yellow)}
 .loading{color:var(--t3);font-family:var(--mono);font-size:11px}
 
+/* SCREENER FILTER ROW */
+.filter-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:7px 10px;border-bottom:1px solid var(--border);background:var(--s2)}
+.filter-row input{background:var(--s1);border:1px solid var(--border);color:var(--text);padding:4px 7px;border-radius:5px;font-size:11px;width:80px;outline:none;font-family:var(--mono)}
+.filter-row input:focus{border-color:var(--blue)}
+.filter-row input::placeholder{color:var(--t3)}
+.filter-lbl{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.mcap-btns{display:flex;gap:3px}
+.mcap-btn{padding:3px 8px;font-size:10px;font-weight:600;border:1px solid var(--border);border-radius:4px;background:var(--s1);color:var(--t2);cursor:pointer;transition:.12s}
+.mcap-btn:hover{color:var(--text)}
+.mcap-btn.act{background:var(--blue);border-color:var(--blue);color:#fff}
+.filter-reset{margin-left:auto;font-size:10px;color:var(--t3);cursor:pointer;background:none;border:none;padding:3px 6px;transition:.1s}
+.filter-reset:hover{color:var(--text)}
+
+/* ALERTS VIEW */
+.alerts-view{flex:1;overflow-y:auto;padding:16px}
+.alerts-view::-webkit-scrollbar{width:4px}
+.alerts-view::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.alerts-form{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px}
+.alerts-form-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:12px}
+.alerts-form-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.alerts-field{display:flex;flex-direction:column;gap:5px}
+.alerts-field label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--t3)}
+.alerts-field input,.alerts-field select{background:var(--s1);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;outline:none;font-family:inherit;transition:.15s}
+.alerts-field input:focus,.alerts-field select:focus{border-color:var(--blue)}
+.alerts-field input::placeholder{color:var(--t3)}
+.add-alert-btn{padding:7px 16px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.add-alert-btn:hover{opacity:.85}
+.alerts-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:8px}
+.alert-empty{font-size:12px;color:var(--t3);font-style:italic;padding:12px 0}
+.alert-table{width:100%;border-collapse:collapse;font-size:12px}
+.alert-table thead th{text-align:left;padding:6px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);border-bottom:1px solid var(--border)}
+.alert-table thead th:last-child{text-align:center}
+.alert-table tbody tr{border-bottom:1px solid var(--border);transition:background .08s}
+.alert-table tbody tr:hover{background:var(--s2)}
+.alert-table td{padding:9px 10px;vertical-align:middle}
+.alert-status{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.alert-status.active{background:var(--s3);color:var(--t2)}
+.alert-status.triggered-up{background:var(--gdim);color:var(--green)}
+.alert-status.triggered-dn{background:var(--rdim);color:var(--red)}
+.alert-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;padding:2px 6px;transition:.1s}
+.alert-del:hover{color:var(--red)}
+
+/* ALERT BANNER */
+.alert-banner-wrap{position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.alert-banner{background:var(--s1);border:1px solid var(--border);border-radius:7px;padding:10px 16px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);display:flex;align-items:center;gap:12px;pointer-events:all;animation:bannerIn .2s ease;min-width:320px}
+@keyframes bannerIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.alert-banner.up{border-left:3px solid var(--green)}
+.alert-banner.dn{border-left:3px solid var(--red)}
+.alert-banner-text{flex:1}
+.alert-banner-sym{font-family:var(--mono);font-weight:700}
+.alert-banner-close{background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;line-height:1;padding:0}
+
 /* RIGHT — always-visible Gainers / Losers split panels */
 .right{width:300px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1)}
 .right-half{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
@@ -259,10 +311,11 @@ td:nth-child(2){text-align:left}
 <div class="main" id="app-main" style="display:none">
   <div class="left">
     <div class="filter-bar">
-      <button class="tab act" onclick="setTab('all',this)">All</button>
-      <button class="tab" onclick="setTab('watchlist',this)">Watchlist</button>
-      <button class="tab" onclick="setTab('gainers',this)">Gainers</button>
-      <button class="tab" onclick="setTab('losers',this)">Losers</button>
+      <button class="tab act" id="nav-all"       onclick="setNav('all',this)">All</button>
+      <button class="tab"     id="nav-watchlist" onclick="setNav('watchlist',this)">Watchlist</button>
+      <button class="tab"     id="nav-gainers"   onclick="setNav('gainers',this)">Gainers</button>
+      <button class="tab"     id="nav-losers"    onclick="setNav('losers',this)">Losers</button>
+      <button class="tab"     id="nav-alerts"    onclick="setNav('alerts',this)">Alerts</button>
       <span class="cnt" id="cnt"></span>
       <select class="sec-sel" id="sec-sel" onchange="onSec()">
         <option value="">All Sectors</option>
@@ -272,7 +325,30 @@ td:nth-child(2){text-align:left}
         <option>Real Estate</option><option>Utilities</option><option>Communication</option><option>ETF</option>
       </select>
     </div>
-    <div class="tbl-wrap">
+
+    <!-- Screener filter row (hidden on Alerts tab) -->
+    <div class="filter-row" id="filter-row">
+      <span class="filter-lbl">Price</span>
+      <input id="f-pmin" type="number" placeholder="Min $" min="0" oninput="applyFilters()">
+      <input id="f-pmax" type="number" placeholder="Max $" min="0" oninput="applyFilters()">
+      <span class="filter-lbl">% Chg</span>
+      <input id="f-cmin" type="number" placeholder="Min %" oninput="applyFilters()">
+      <input id="f-cmax" type="number" placeholder="Max %" oninput="applyFilters()">
+      <span class="filter-lbl">Vol ≥</span>
+      <input id="f-vmin" type="number" placeholder="e.g. 1000000" style="width:110px" oninput="applyFilters()">
+      <span class="filter-lbl">Cap</span>
+      <div class="mcap-btns">
+        <button class="mcap-btn act" data-cap="" onclick="setMcap(this,'')">All</button>
+        <button class="mcap-btn" data-cap="mega"  onclick="setMcap(this,'mega')">Mega</button>
+        <button class="mcap-btn" data-cap="large" onclick="setMcap(this,'large')">Large</button>
+        <button class="mcap-btn" data-cap="mid"   onclick="setMcap(this,'mid')">Mid</button>
+        <button class="mcap-btn" data-cap="small" onclick="setMcap(this,'small')">Small</button>
+      </div>
+      <button class="filter-reset" onclick="resetFilters()">✕ Reset</button>
+    </div>
+
+    <!-- Stock table (shown on All/Watchlist/Gainers/Losers) -->
+    <div class="tbl-wrap" id="tbl-view">
       <table>
         <thead><tr>
           <th></th>
@@ -285,6 +361,33 @@ td:nth-child(2){text-align:left}
         </tr></thead>
         <tbody id="tbl"></tbody>
       </table>
+    </div>
+
+    <!-- Alerts view (shown on Alerts tab) -->
+    <div class="alerts-view" id="alerts-view" style="display:none">
+      <div class="alerts-form">
+        <div class="alerts-form-title">New Price Alert</div>
+        <div class="alerts-form-row">
+          <div class="alerts-field">
+            <label>Ticker</label>
+            <input id="al-sym" type="text" placeholder="e.g. AAPL" style="width:100px;text-transform:uppercase" maxlength="6">
+          </div>
+          <div class="alerts-field">
+            <label>Direction</label>
+            <select id="al-dir">
+              <option value="above">Above ↑</option>
+              <option value="below">Below ↓</option>
+            </select>
+          </div>
+          <div class="alerts-field">
+            <label>Target Price ($)</label>
+            <input id="al-price" type="number" placeholder="e.g. 200.00" min="0" step="0.01" style="width:130px">
+          </div>
+          <button class="add-alert-btn" onclick="addAlert()">+ Add Alert</button>
+        </div>
+      </div>
+      <div class="alerts-section-title">Active Alerts</div>
+      <div id="alerts-list"><div class="alert-empty">No alerts set. Add one above.</div></div>
     </div>
   </div>
   <div class="right">
@@ -306,6 +409,9 @@ td:nth-child(2){text-align:left}
     </div>
   </div>
 </div>
+
+<!-- Alert banners -->
+<div class="alert-banner-wrap" id="banner-wrap"></div>
 
 <!-- Stock Detail Slide-in -->
 <div class="detail-overlay" id="detail-overlay" style="display:none" onclick="closeDetail(event)">
@@ -656,6 +762,7 @@ function connectWebSocket() {
           if (sel === t.s) refreshHdr()
         }
       })
+      checkAlerts()
     }
   }
   ws.onerror = () => setTimeout(connectWebSocket, 5000)
@@ -683,6 +790,10 @@ function getVisible() {
   if (curTab === 'losers') {
     list = list.filter(([s]) => loaded.has(s))
       .sort((a,b) => pct(a[0]) - pct(b[0])).slice(0,30)
+  }
+  // apply screener filters (skip for gainers/losers since they're already filtered)
+  if (curTab === 'all' || curTab === 'watchlist') {
+    list = list.filter(([s]) => passesFilters(s))
   }
   if (srtKey) {
     list = list.slice().sort((a,b) => {
@@ -912,6 +1023,195 @@ function setPeriod(p) {
   loadChartData(sel, p)
 }
 
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+let curNav = 'all'
+
+function setNav(t, el) {
+  curNav = t; srtKey = ''; srtDir = -1
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('act'))
+  el.classList.add('act')
+
+  const tblView   = document.getElementById('tbl-view')
+  const alertsView= document.getElementById('alerts-view')
+  const filterRow = document.getElementById('filter-row')
+  const secSel    = document.getElementById('sec-sel')
+  const cnt       = document.getElementById('cnt')
+
+  if (t === 'alerts') {
+    tblView.style.display    = 'none'
+    alertsView.style.display = 'block'
+    filterRow.style.display  = 'none'
+    secSel.style.display     = 'none'
+    cnt.textContent          = ''
+    renderAlerts()
+  } else {
+    tblView.style.display    = 'flex'
+    tblView.style.flexDirection = 'column'
+    alertsView.style.display = 'none'
+    filterRow.style.display  = 'flex'
+    secSel.style.display     = ''
+    // map nav → tab for legacy filter logic
+    curTab = t
+    renderTable()
+  }
+}
+
+// ─── SCREENER FILTERS ─────────────────────────────────────────────────────────
+let fMcap = ''
+
+function setMcap(el, val) {
+  fMcap = val
+  document.querySelectorAll('.mcap-btn').forEach(b => b.classList.remove('act'))
+  el.classList.add('act')
+  applyFilters()
+}
+
+function applyFilters() { renderTable() }
+
+function resetFilters() {
+  fMcap = ''
+  document.querySelectorAll('.mcap-btn').forEach(b => { b.classList.toggle('act', b.dataset.cap === '') })
+  ;['f-pmin','f-pmax','f-cmin','f-cmax','f-vmin'].forEach(id => { const el=document.getElementById(id); if(el) el.value='' })
+  renderTable()
+}
+
+function mcapRange(s) {
+  const prof = profiles[s]
+  const mc = prof?.marketCapitalization ? prof.marketCapitalization * 1e6 : 0
+  return mc
+}
+
+function passesFilters(sym) {
+  const p  = prices[sym]
+  const o  = opens[sym]
+  const pc = p && o ? (p - o) / o * 100 : null
+
+  const pmin = parseFloat(document.getElementById('f-pmin')?.value)
+  const pmax = parseFloat(document.getElementById('f-pmax')?.value)
+  const cmin = parseFloat(document.getElementById('f-cmin')?.value)
+  const cmax = parseFloat(document.getElementById('f-cmax')?.value)
+  const vmin = parseFloat(document.getElementById('f-vmin')?.value)
+
+  if (!isNaN(pmin) && p < pmin) return false
+  if (!isNaN(pmax) && p > pmax) return false
+  if (pc !== null && !isNaN(cmin) && pc < cmin) return false
+  if (pc !== null && !isNaN(cmax) && pc > cmax) return false
+  if (!isNaN(vmin) && (vols[sym] || 0) < vmin) return false
+
+  if (fMcap) {
+    const mc = mcapRange(sym)
+    if (fMcap === 'mega'  && mc < 200e9)  return false
+    if (fMcap === 'large' && (mc < 10e9  || mc >= 200e9)) return false
+    if (fMcap === 'mid'   && (mc < 2e9   || mc >= 10e9))  return false
+    if (fMcap === 'small' && (mc < 300e6 || mc >= 2e9))   return false
+  }
+
+  return true
+}
+
+// ─── ALERTS ───────────────────────────────────────────────────────────────────
+let alerts = JSON.parse(localStorage.getItem('stock_alerts') || '[]')
+let alertPollTimer = null
+
+function saveAlerts() { localStorage.setItem('stock_alerts', JSON.stringify(alerts)) }
+
+function addAlert() {
+  const sym    = document.getElementById('al-sym').value.trim().toUpperCase()
+  const dir    = document.getElementById('al-dir').value
+  const target = parseFloat(document.getElementById('al-price').value)
+
+  if (!sym)        { toast('Enter a ticker symbol', 'err'); return }
+  if (isNaN(target) || target <= 0) { toast('Enter a valid price', 'err'); return }
+  if (!UNIVERSE.find(([s]) => s === sym)) { toast(`${sym} not found in universe`, 'err'); return }
+
+  alerts.push({ id: Date.now(), sym, dir, target, triggered: false })
+  saveAlerts()
+  document.getElementById('al-sym').value   = ''
+  document.getElementById('al-price').value = ''
+  renderAlerts()
+  toast(`Alert set: ${sym} ${dir} $${target.toFixed(2)}`, 'ok')
+  startAlertPolling()
+}
+
+function deleteAlert(id) {
+  alerts = alerts.filter(a => a.id !== id)
+  saveAlerts()
+  renderAlerts()
+}
+
+function renderAlerts() {
+  const el = document.getElementById('alerts-list')
+  if (!el) return
+  if (alerts.length === 0) { el.innerHTML = '<div class="alert-empty">No alerts set. Add one above.</div>'; return }
+
+  el.innerHTML = `<table class="alert-table">
+    <thead><tr>
+      <th>Ticker</th><th>Direction</th><th>Target</th><th>Current</th><th>Status</th><th>Delete</th>
+    </tr></thead>
+    <tbody>
+    ${alerts.map(a => {
+      const cur = prices[a.sym]
+      const curStr = cur ? '$' + f2(cur) : '—'
+      let statusClass = 'active', statusLabel = 'Active'
+      if (a.triggered) {
+        statusClass = a.dir === 'above' ? 'triggered-up' : 'triggered-dn'
+        statusLabel = 'Triggered'
+      }
+      return `<tr>
+        <td><span class="sym">${a.sym}</span></td>
+        <td>${a.dir === 'above' ? '↑ Above' : '↓ Below'}</td>
+        <td style="font-family:var(--mono)">$${f2(a.target)}</td>
+        <td style="font-family:var(--mono)">${curStr}</td>
+        <td><span class="alert-status ${statusClass}">${statusLabel}</span></td>
+        <td style="text-align:center"><button class="alert-del" onclick="deleteAlert(${a.id})" title="Delete">✕</button></td>
+      </tr>`
+    }).join('')}
+    </tbody>
+  </table>`
+}
+
+function checkAlerts() {
+  alerts.forEach(a => {
+    if (a.triggered) return
+    const cur = prices[a.sym]
+    if (!cur) return
+    const hit = (a.dir === 'above' && cur >= a.target) || (a.dir === 'below' && cur <= a.target)
+    if (hit) {
+      a.triggered = true
+      saveAlerts()
+      showAlertBanner(a, cur)
+      if (curNav === 'alerts') renderAlerts()
+    }
+  })
+}
+
+function showAlertBanner(a, cur) {
+  const wrap = document.getElementById('banner-wrap')
+  const div  = document.createElement('div')
+  const cls  = a.dir === 'above' ? 'up' : 'dn'
+  div.className = `alert-banner ${cls}`
+  div.innerHTML = `
+    <div class="alert-banner-text">
+      <span class="alert-banner-sym">${a.sym}</span>
+      crossed ${a.dir} <strong>$${f2(a.target)}</strong> — now at <strong>$${f2(cur)}</strong>
+    </div>
+    <button class="alert-banner-close" onclick="this.closest('.alert-banner').remove()">✕</button>
+  `
+  wrap.appendChild(div)
+  setTimeout(() => div.remove(), 10000)
+}
+
+function startAlertPolling() {
+  clearInterval(alertPollTimer)
+  const active = alerts.filter(a => !a.triggered)
+  if (active.length === 0) return
+  alertPollTimer = setInterval(() => {
+    // fetch quotes for all tickers with active alerts
+    active.forEach(a => { if (!prices[a.sym]) enqueue(() => fetchQuote(a.sym)) })
+    checkAlerts()
+  }, 60000)
+}
+
 // ─── CONTROLS ─────────────────────────────────────────────────────────────────
 function toggleStar(s,e){
   e.stopPropagation()
@@ -936,6 +1236,7 @@ function setTheme(t){
 window.addEventListener('load',()=>{
   const saved=localStorage.getItem('theme')
   if(saved) setTheme(saved)
+  startAlertPolling()
 })
 function toast(msg,t){
   const el=document.getElementById('toast'); el.textContent=msg; el.className='toast '+t+' show'
