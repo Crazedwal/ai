@@ -192,6 +192,17 @@ function Sidebar({
           </button>
         </div>
 
+        {/* easter egg */}
+        <div className="px-4 pb-1 flex justify-end">
+          <a
+            href="/shooter.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-900 hover:text-gray-900 text-xs leading-none select-none"
+            title=""
+          >·</a>
+        </div>
+
         {/* Sign Out / Guest prompt */}
         <div className="p-3 border-t border-gray-700">
           {isGuest ? (
