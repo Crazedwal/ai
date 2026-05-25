@@ -338,6 +338,7 @@ function update() {
     wave++;
     credits+=50+wave*12;
     score+=120*wave;
+    if (wave>=5) { state='victory'; hiScore=Math.max(hiScore,score); return; }
     state='upgrade';
     openShop();
   }
@@ -620,6 +621,22 @@ function drawMenu() {
   }
 }
 
+function drawVictory() {
+  ctx.fillStyle='rgba(0,0,0,0.88)'; ctx.fillRect(0,0,W,H);
+  ctx.shadowColor='#2ecc71'; ctx.shadowBlur=20;
+  ctx.fillStyle='#2ecc71'; ctx.font='bold 30px Courier New'; ctx.textAlign='center';
+  ctx.fillText('YOU WIN!',W/2,H/2-70);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#ddd'; ctx.font='13px Courier New';
+  ctx.fillText(`Score: ${score}`,W/2,H/2-30);
+  ctx.fillText('All 5 waves cleared',W/2,H/2-10);
+  ctx.fillStyle='#f1c40f';
+  ctx.fillText(`High Score: ${hiScore}`,W/2,H/2+15);
+  ctx.fillStyle=`rgba(170,170,170,${0.5+Math.sin(frame*0.07)*0.5})`;
+  ctx.font='12px Courier New';
+  ctx.fillText('PRESS ENTER TO PLAY AGAIN',W/2,H/2+65);
+}
+
 function drawGameOver() {
   ctx.fillStyle='rgba(0,0,0,0.88)'; ctx.fillRect(0,0,W,H);
   ctx.shadowColor='#e74c3c'; ctx.shadowBlur=16;
@@ -654,7 +671,7 @@ function endGame() {
 
 function handleMenuKey(code) {
   if (code==='Enter') {
-    if (state==='menu'||state==='gameover') { startGame(); return; }
+    if (state==='menu'||state==='gameover'||state==='victory') { startGame(); return; }
     if (state==='upgrade') {
       if (shopSel>=0&&shopChoices[shopSel]&&credits>=shopChoices[shopSel].cost(P)) {
         buyUpgrade(shopChoices[shopSel]);
@@ -688,6 +705,7 @@ function loop() {
 
   if (state==='menu')     { drawMenu(); ctx.restore(); return; }
   if (state==='gameover') { drawGameOver(); ctx.restore(); return; }
+  if (state==='victory')  { drawVictory(); ctx.restore(); return; }
 
   if (state==='playing') update();
 
