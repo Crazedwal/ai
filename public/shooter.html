@@ -18,8 +18,8 @@ const C = document.getElementById('c');
 const ctx = C.getContext('2d');
 const W = C.width, H = C.height;
 
-// ── STATE ──────────────────────────────────────────────────────────────────
-let state = 'menu'; // menu | playing | upgrade | gameover
+// Game state: menu | playing | upgrade | gameover
+let state = 'menu';
 let wave = 0, score = 0, credits = 0, hiScore = 0;
 let combo = 1, comboTimer = 0;
 let shakeX = 0, shakeY = 0;
@@ -33,7 +33,7 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('keyup', e => { keys[e.code] = false; });
 
-// ── PLAYER ─────────────────────────────────────────────────────────────────
+// Player object
 let P;
 function newPlayer() {
   return {
@@ -52,10 +52,10 @@ function newPlayer() {
   };
 }
 
-// ── ENTITY POOLS ───────────────────────────────────────────────────────────
+// Entity arrays
 let bullets=[], enemies=[], eBullets=[], particles=[];
 
-// ── HELPERS ────────────────────────────────────────────────────────────────
+// Utility functions
 function rand(a, b) { return a + Math.random()*(b-a); }
 function overlap(a, b) {
   return a.x-a.w/2 < b.x+b.w/2 && a.x+a.w/2 > b.x-b.w/2 &&
@@ -70,7 +70,7 @@ function burst(x, y, col, n=14, spd=3) {
   }
 }
 
-// ── ENEMIES ────────────────────────────────────────────────────────────────
+// Enemy definitions
 const DEFS = {
   drone:   { hp:18, spd:1.3, w:20, h:20, col:'#e74c3c', cr:5,  sc:10, pat:'straight', shootRate:0,   eDmg:14, cDmg:13 },
   speeder: { hp:9,  spd:2.9, w:14, h:14, col:'#e67e22', cr:7,  sc:15, pat:'zigzag',   shootRate:0,   eDmg:10, cDmg:10 },
@@ -118,7 +118,7 @@ function makeBoss(wn) {
   };
 }
 
-// ── WAVE SPAWNING ───────────────────────────────────────────────────────────
+// Spawn enemies for a wave
 function spawnWave(wn) {
   enemies=[]; eBullets=[];
   if (wn%5===0) { enemies.push(makeBoss(wn)); return; }
@@ -140,7 +140,7 @@ function spawnWave(wn) {
   }
 }
 
-// ── SHOOTING ───────────────────────────────────────────────────────────────
+// Shooting logic
 function playerFire() {
   const bspd = 10.5;
   const x=P.x, y=P.y-P.h/2;
@@ -199,7 +199,7 @@ function bossFire(b) {
   }
 }
 
-// ── DAMAGE ─────────────────────────────────────────────────────────────────
+// Damage handling
 function hurtPlayer(dmg) {
   if (P.invuln>0) return;
   if (P.shield>0) {
@@ -225,7 +225,7 @@ function killEnemy(e) {
   if (e.type==='boss') { shakeX=22;shakeY=22; }
 }
 
-// ── UPGRADES ───────────────────────────────────────────────────────────────
+// Upgrade shop options
 const UPG_POOL = [
   { id:'fr',  name:'Fire Rate+',    desc:'Fire 20% faster each level',  cost:u=>80+45*(u.ups.fr||0),     max:8,  apply:p=>{p.fireRate=Math.max(5,Math.floor(p.fireRate*0.8));p.ups.fr=(p.ups.fr||0)+1} },
   { id:'dmg', name:'Damage+',       desc:'+28% bullet damage',          cost:u=>100+55*(u.ups.dmg||0),   max:8,  apply:p=>{p.dmg=Math.floor(p.dmg*1.28);p.ups.dmg=(p.ups.dmg||0)+1} },
@@ -237,7 +237,6 @@ const UPG_POOL = [
   { id:'pirc',name:'Piercing',      desc:'Bullets pierce up to 3 enemies',cost:()=>190,                  max:1,  apply:p=>{p.pierce=true} },
   { id:'shld',name:'Shield',        desc:'Block 3 hits, no damage',     cost:u=>160+80*(u.ups.shld||0),  max:5,  apply:p=>{p.shield+=3;p.ups.shld=(p.ups.shld||0)+1} },
   { id:'regen',name:'Nanobots',     desc:'Slowly regenerate health',    cost:u=>130+65*(u.ups.regen||0), max:4,  apply:p=>{p.regen+=0.35;p.ups.regen=(p.ups.regen||0)+1} },
-  { id:'nuke', name:'NUKE',         desc:'Obliterate all enemies now',  cost:()=>270,                    max:99, apply:p=>{enemies.forEach(e=>{burst(e.x,e.y,e.col,16,4);credits+=e.cr;score+=Math.floor(e.sc*combo)});enemies=[];eBullets=[]} },
 ];
 
 let shopChoices=[], shopSel=-1;
@@ -268,7 +267,7 @@ function startNextWave() {
   spawnWave(wave+1);
 }
 
-// ── UPDATE ──────────────────────────────────────────────────────────────────
+// Main update loop
 function update() {
   shakeX*=0.72; shakeY*=0.72;
   if (comboTimer>0) { comboTimer--; if(!comboTimer) combo=1; }
@@ -378,7 +377,7 @@ function updateBoss(b) {
   if (b.shootCd<=0) { bossFire(b); b.shootCd=sr; }
 }
 
-// ── DRAW ───────────────────────────────────────────────────────────────────
+// Drawing functions
 function drawStars() {
   ctx.fillStyle='rgba(255,255,255,0.45)';
   for (let i=0;i<90;i++) {
@@ -637,7 +636,7 @@ function drawGameOver() {
   ctx.fillText('PRESS ENTER TO RETRY',W/2,H/2+65);
 }
 
-// ── GAME CONTROL ────────────────────────────────────────────────────────────
+// Game control
 function startGame() {
   P=newPlayer();
   bullets=[]; enemies=[]; eBullets=[]; particles=[];
@@ -672,7 +671,7 @@ function handleMenuKey(code) {
   }
 }
 
-// ── MAIN LOOP ───────────────────────────────────────────────────────────────
+// Animation loop
 function loop() {
   requestAnimationFrame(loop);
   frame++;
