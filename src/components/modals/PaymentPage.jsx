@@ -286,7 +286,7 @@ function Summary({ pkg }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
         </div>
-        <span className="font-semibold text-gray-800 dark:text-white text-sm">Syntharix AI</span>
+        <span className="font-semibold text-gray-800 dark:text-white text-sm">{pkg?.interval ? "Syntharix Stock" : "AI Chat Pro"}</span>
       </div>
       <div className="mb-6">
         <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
@@ -354,7 +354,7 @@ export default function PaymentPage({ onClose, initialPlan = null }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/>
               </svg>
             </div>
-            <h2 className="font-bold text-gray-900 dark:text-white">Syntharix AI</h2>
+            <h2 className="font-bold text-gray-900 dark:text-white">Choose a plan</h2>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl">×</button>
         </div>

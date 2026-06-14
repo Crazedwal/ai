@@ -8,23 +8,15 @@ export const MODELS = [
     tier: "free",
     tokensPerMessage: 0,
     description: "Fast & lightweight"
-  },
-  {
-    id: "anthropic/claude-opus-4",
-    name: "Syntharix Premium",
-    provider: "Syntharix",
-    tier: "subscription",
-    tokensPerMessage: 0,
-    description: "Unlimited · Smartest model"
   }
 ]
 
 export const SUBSCRIPTION_PLAN = {
-  id: "syntharix-premium",
-  label: "Syntharix Premium",
+  id: "syntharix-stock",
+  label: "Syntharix Stock",
   price: 5.99,
   interval: "month",
-  description: "Unlimited messages · Access to the smartest model · Priority responses"
+  description: "Live stock data · AI analyst · Real-time advice"
 }
 
 export const DEFAULT_MODEL_ID = "nvidia/nemotron-3-nano-30b-a3b:free"

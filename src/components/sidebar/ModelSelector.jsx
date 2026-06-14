@@ -1,19 +1,16 @@
 // src/components/sidebar/ModelSelector.jsx
 import { useState } from "react"
-import { MODELS, SUBSCRIPTION_PLAN } from "@/lib/models"
+import { MODELS } from "@/lib/models"
 import { useModel } from "@/hooks/useModel"
 import { useTokens } from "@/hooks/useTokens"
-import PaymentPage from "@/components/modals/PaymentPage"
 
 function ModelSelector() {
   const { selectedModel, selectModel } = useModel()
   const { balance } = useTokens()
   const [open, setOpen] = useState(false)
-  const [showSubscribe, setShowSubscribe] = useState(false)
 
   const freeModels = MODELS.filter(m => m.tier === "free")
   const paidModels = MODELS.filter(m => m.tier === "paid")
-  const subModels  = MODELS.filter(m => m.tier === "subscription")
 
   return (
     <div className="relative">
@@ -76,10 +73,16 @@ function ModelSelector() {
                     }`}
                   >
                     <div>
-                      <div className={`font-medium ${affordable ? "text-white" : "text-gray-500"}`}>{model.name}</div>
+                      <div className={`font-medium ${affordable ? "text-white" : "text-gray-500"}`}>
+                        {model.name}
+                      </div>
                       <div className="text-xs text-gray-400">{model.description}</div>
                     </div>
-                    <span className={`text-xs px-1.5 py-0.5 rounded ml-2 shrink-0 ${affordable ? "bg-yellow-800 text-yellow-300" : "bg-gray-700 text-gray-500"}`}>
+                    <span className={`text-xs px-1.5 py-0.5 rounded ml-2 shrink-0 ${
+                      affordable
+                        ? "bg-yellow-800 text-yellow-300"
+                        : "bg-gray-700 text-gray-500"
+                    }`}>
                       {model.tokensPerMessage}🪙/msg
                     </span>
                   </button>
@@ -87,33 +90,7 @@ function ModelSelector() {
               })}
             </div>
           </>}
-
-          {subModels.length > 0 && <>
-            <div className="border-t border-gray-700 mx-2" />
-            <div className="px-2 pt-1 pb-2">
-              <p className="text-xs text-indigo-400 font-semibold px-1 mb-1 mt-1">Subscription</p>
-              {subModels.map(model => (
-                <button
-                  key={model.id}
-                  onClick={() => { setShowSubscribe(true); setOpen(false) }}
-                  className="w-full text-left px-2 py-1.5 rounded text-sm flex items-center justify-between hover:bg-gray-700 transition-colors"
-                >
-                  <div>
-                    <div className="font-medium text-indigo-300">{model.name}</div>
-                    <div className="text-xs text-gray-400">{model.description}</div>
-                  </div>
-                  <span className="text-xs px-1.5 py-0.5 rounded ml-2 shrink-0 bg-indigo-800 text-indigo-300">
-                    $5.99/mo
-                  </span>
-                </button>
-              ))}
-            </div>
-          </>}
         </div>
-      )}
-
-      {showSubscribe && (
-        <PaymentPage initialPlan={SUBSCRIPTION_PLAN} onClose={() => setShowSubscribe(false)} />
       )}
     </div>
   )

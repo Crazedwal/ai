@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import ConversationList from "./ConversationList"
 import ModelSelector from "./ModelSelector"
 import PaymentPage from "@/components/modals/PaymentPage"
+import { SUBSCRIPTION_PLAN } from "@/lib/models"
 import DevLog from "@/components/modals/DevLog"
 import GambleModal from "@/components/modals/GambleModal"
 import { useLanguage } from "../../hooks/useLanguage.jsx"
@@ -24,6 +25,7 @@ function Sidebar({
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState("")
   const [showPurchase, setShowPurchase] = useState(false)
+  const [showStockSub, setShowStockSub] = useState(false)
   const [showDevLog, setShowDevLog] = useState(false)
   const [showGamble, setShowGamble] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -160,14 +162,12 @@ function Sidebar({
 
         {/* Syntharix Stock */}
         <div className="p-3 border-t border-gray-700">
-          <a
-            href="/stock-market.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full text-xs text-gray-500 hover:text-green-400 transition-colors"
+          <button
+            onClick={() => setShowStockSub(true)}
+            className="w-full text-left text-xs text-gray-500 hover:text-green-400 transition-colors"
           >
-            Syntharix Stock
-          </a>
+            Syntharix Stock — $5.99/mo
+          </button>
         </div>
 
         {/* Personality Matchmaker */}
@@ -226,6 +226,7 @@ function Sidebar({
       </aside>
 
       {showPurchase && <PaymentPage onClose={() => setShowPurchase(false)} />}
+      {showStockSub && <PaymentPage initialPlan={SUBSCRIPTION_PLAN} onClose={() => setShowStockSub(false)} />}
       {showDevLog && <DevLog onClose={() => setShowDevLog(false)} />}
       {showGamble && <GambleModal onClose={() => setShowGamble(false)} />}
     </>
