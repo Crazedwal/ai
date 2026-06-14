@@ -315,6 +315,60 @@ td:nth-child(2){text-align:left}
 .toast.err{border-left:3px solid var(--red)}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* NAV SIDEBAR */
+.nav-sidebar{width:160px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:8px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:.12s;border-left:2px solid transparent}
+.nav-item:hover{color:var(--text);background:var(--s2)}
+.nav-item.act{color:var(--blue);background:var(--s2);border-left-color:var(--blue)}
+.nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.nav-section{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:10px 14px 4px}
+
+/* PORTFOLIO VIEW */
+.portfolio-view{flex:1;overflow-y:auto;display:none;flex-direction:column}
+.port-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--border);flex-shrink:0}
+.port-stat{padding:12px 16px;border-right:1px solid var(--border)}
+.port-stat:last-child{border-right:none}
+.port-stat-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:4px}
+.port-stat-val{font-size:18px;font-weight:700;font-family:var(--mono)}
+.port-buy-form{display:flex;align-items:flex-end;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--s2);flex-shrink:0;flex-wrap:wrap}
+.port-buy-form input{background:var(--s1);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:12px;outline:none;font-family:inherit;transition:.15s}
+.port-buy-form input:focus{border-color:var(--blue)}
+.port-buy-form input::placeholder{color:var(--t3)}
+.port-buy-btn{padding:6px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.port-buy-btn:hover{opacity:.85}
+.port-sell-btn{padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.port-sell-btn:hover{opacity:.85}
+.port-empty{padding:40px;text-align:center;color:var(--t3);font-size:13px}
+
+/* HISTORY VIEW */
+.history-view{flex:1;overflow-y:auto;display:none;flex-direction:column}
+.hist-empty{padding:40px;text-align:center;color:var(--t3);font-size:13px}
+.hist-table{width:100%;border-collapse:collapse;font-size:12px}
+.hist-table thead th{position:sticky;top:0;background:var(--s1);padding:7px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);border-bottom:1px solid var(--border)}
+.hist-table tbody tr{border-bottom:1px solid var(--border);transition:background .08s}
+.hist-table tbody tr:hover{background:var(--s2)}
+.hist-table td{padding:8px 12px;vertical-align:middle}
+.hist-badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.hist-buy{background:var(--gdim);color:var(--green)}
+.hist-sell{background:var(--rdim);color:var(--red)}
+
+/* LEARN VIEW */
+.learn-view{flex:1;overflow-y:auto;display:none;flex-direction:column;padding:16px}
+.learn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.learn-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:.15s}
+.learn-card:hover{border-color:var(--blue);background:var(--s3)}
+.learn-card-icon{font-size:22px;margin-bottom:8px}
+.learn-card-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.learn-card-desc{font-size:11px;color:var(--t2);line-height:1.5}
+.learn-article{display:none;flex-direction:column;gap:12px}
+.learn-article.open{display:flex}
+.learn-back{background:none;border:1px solid var(--border);color:var(--t2);padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;margin-bottom:4px;width:fit-content;transition:.15s}
+.learn-back:hover{color:var(--text)}
+.learn-art-title{font-size:17px;font-weight:800}
+.learn-art-body{font-size:12px;color:var(--t2);line-height:1.7}
+.learn-art-body h3{font-size:13px;font-weight:700;color:var(--text);margin:12px 0 4px}
+.learn-art-body strong{color:var(--text)}
 </style>
 </head>
 <body>
@@ -407,14 +461,24 @@ td:nth-child(2){text-align:left}
 </div>
 
 <div class="main" id="app-main" style="display:none">
+  <!-- SIDEBAR NAV -->
+  <nav class="nav-sidebar">
+    <div class="nav-section">Market</div>
+    <button class="nav-item act" id="nav-overview"  onclick="setNav('overview',this)"><span class="nav-icon">◉</span>Overview</button>
+    <button class="nav-item"     id="nav-all"       onclick="setNav('all',this)"><span class="nav-icon">▦</span>All Stocks</button>
+    <button class="nav-item"     id="nav-gainers"   onclick="setNav('gainers',this)"><span class="nav-icon">▲</span>Gainers</button>
+    <button class="nav-item"     id="nav-losers"    onclick="setNav('losers',this)"><span class="nav-icon">▼</span>Losers</button>
+    <div class="nav-section">Tools</div>
+    <button class="nav-item"     id="nav-watchlist" onclick="setNav('watchlist',this)"><span class="nav-icon">★</span>Watchlist</button>
+    <button class="nav-item"     id="nav-alerts"    onclick="setNav('alerts',this)"><span class="nav-icon">🔔</span>Alerts</button>
+    <button class="nav-item"     id="nav-portfolio" onclick="setNav('portfolio',this)"><span class="nav-icon">💼</span>Portfolio</button>
+    <button class="nav-item"     id="nav-history"   onclick="setNav('history',this)"><span class="nav-icon">📋</span>History</button>
+    <div class="nav-section">Education</div>
+    <button class="nav-item"     id="nav-learn"     onclick="setNav('learn',this)"><span class="nav-icon">📖</span>Learn</button>
+  </nav>
+
   <div class="left">
     <div class="filter-bar">
-      <button class="tab act" id="nav-overview"  onclick="setNav('overview',this)">Overview</button>
-      <button class="tab"     id="nav-all"       onclick="setNav('all',this)">All Stocks</button>
-      <button class="tab"     id="nav-watchlist" onclick="setNav('watchlist',this)">Watchlist</button>
-      <button class="tab"     id="nav-gainers"   onclick="setNav('gainers',this)">Gainers</button>
-      <button class="tab"     id="nav-losers"    onclick="setNav('losers',this)">Losers</button>
-      <button class="tab"     id="nav-alerts"    onclick="setNav('alerts',this)">Alerts</button>
       <span class="cnt" id="cnt"></span>
       <select class="sec-sel" id="sec-sel" onchange="onSec()">
         <option value="">All Sectors</option>
@@ -489,6 +553,79 @@ td:nth-child(2){text-align:left}
         </tr></thead>
         <tbody id="tbl"></tbody>
       </table>
+    </div>
+
+    <!-- Portfolio view -->
+    <div class="portfolio-view" id="portfolio-view">
+      <div class="port-summary">
+        <div class="port-stat">
+          <div class="port-stat-lbl">Cash Balance</div>
+          <div class="port-stat-val" id="port-cash">$100,000.00</div>
+        </div>
+        <div class="port-stat">
+          <div class="port-stat-lbl">Holdings Value</div>
+          <div class="port-stat-val" id="port-holdings">$0.00</div>
+        </div>
+        <div class="port-stat">
+          <div class="port-stat-lbl">Total P&amp;L</div>
+          <div class="port-stat-val" id="port-pnl">$0.00</div>
+        </div>
+      </div>
+      <div class="port-buy-form">
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:4px">Ticker</div>
+          <input id="pb-sym" type="text" placeholder="e.g. AAPL" style="width:90px;text-transform:uppercase" maxlength="6">
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:4px">Shares</div>
+          <input id="pb-shares" type="number" placeholder="10" min="0.01" step="0.01" style="width:80px">
+        </div>
+        <button class="port-buy-btn" onclick="executeTrade('buy')">Buy</button>
+        <button class="port-sell-btn" onclick="executeTrade('sell')">Sell</button>
+        <span id="pb-err" style="font-size:11px;color:var(--red);align-self:center"></span>
+      </div>
+      <div class="tbl-wrap" style="flex:1">
+        <table>
+          <thead><tr>
+            <th style="text-align:left;padding-left:14px">Symbol</th>
+            <th>Shares</th>
+            <th>Avg Cost</th>
+            <th>Price</th>
+            <th>Mkt Value</th>
+            <th>P&amp;L</th>
+            <th>P&amp;L %</th>
+          </tr></thead>
+          <tbody id="port-tbl"><tr><td colspan="7" class="port-empty">No positions yet. Use the form above to buy your first stock.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- History view -->
+    <div class="history-view" id="history-view">
+      <div id="hist-content"><div class="hist-empty">No trades yet. Buy or sell stocks in the Portfolio tab.</div></div>
+    </div>
+
+    <!-- Learn view -->
+    <div class="learn-view" id="learn-view">
+      <div id="learn-home">
+        <div style="margin-bottom:14px">
+          <div style="font-size:16px;font-weight:800;margin-bottom:4px">Stock Market Basics</div>
+          <div style="font-size:12px;color:var(--t2)">Learn how investing works, from fundamentals to reading charts.</div>
+        </div>
+        <div class="learn-grid">
+          <div class="learn-card" onclick="openArticle('stocks')"><div class="learn-card-icon">📈</div><div class="learn-card-title">What is a Stock?</div><div class="learn-card-desc">Understand ownership, shares, and why companies go public.</div></div>
+          <div class="learn-card" onclick="openArticle('pe')"><div class="learn-card-icon">🔢</div><div class="learn-card-title">P/E Ratio</div><div class="learn-card-desc">The most-used valuation metric and how to read it correctly.</div></div>
+          <div class="learn-card" onclick="openArticle('mcap')"><div class="learn-card-icon">🏦</div><div class="learn-card-title">Market Cap</div><div class="learn-card-desc">How company size is measured and what it tells investors.</div></div>
+          <div class="learn-card" onclick="openArticle('charts')"><div class="learn-card-icon">📊</div><div class="learn-card-title">Reading Charts</div><div class="learn-card-desc">Candlesticks, support/resistance, and trend lines explained.</div></div>
+          <div class="learn-card" onclick="openArticle('diversify')"><div class="learn-card-icon">🎯</div><div class="learn-card-title">Diversification</div><div class="learn-card-desc">Why spreading risk across sectors protects your portfolio.</div></div>
+          <div class="learn-card" onclick="openArticle('terms')"><div class="learn-card-icon">📝</div><div class="learn-card-title">Key Terms</div><div class="learn-card-desc">Bull, bear, dividend, short-selling, ETF — all defined simply.</div></div>
+        </div>
+      </div>
+      <div id="learn-article" class="learn-article">
+        <button class="learn-back" onclick="closeArticle()">← Back</button>
+        <div class="learn-art-title" id="art-title"></div>
+        <div class="learn-art-body" id="art-body"></div>
+      </div>
     </div>
 
     <!-- Alerts view (shown on Alerts tab) -->
@@ -759,10 +896,8 @@ function startApp() {
   document.getElementById('api-screen').style.display = 'none'
   document.getElementById('app-hdr').style.display = 'flex'
   document.getElementById('app-main').style.display = 'flex'
-  // start on Overview tab
+  // start on Overview
   document.getElementById('overview-view').style.display = 'block'
-  document.getElementById('nav-overview').classList.add('act')
-  document.querySelectorAll('.tab:not(#nav-overview)').forEach(t => t.classList.remove('act'))
   renderSidePanels()
   fetchAllQuotes()
   connectWebSocket()
@@ -1025,6 +1160,7 @@ function renderSidePanels() {
 
 function renderDefault() { renderSidePanels() }
 setInterval(() => {
+  if (curNav === 'portfolio') renderPortfolio()
   renderSidePanels()
   if (curNav === 'overview') {
     const secs = calcSectorPerf()
@@ -1189,20 +1325,26 @@ let curNav = 'overview'
 
 function setNav(t, el) {
   curNav = t; srtKey = ''; srtDir = -1
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('act'))
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('act'))
   el.classList.add('act')
 
-  const ovView    = document.getElementById('overview-view')
-  const tblView   = document.getElementById('tbl-view')
-  const alertsView= document.getElementById('alerts-view')
-  const filterRow = document.getElementById('filter-row')
-  const secSel    = document.getElementById('sec-sel')
-  const cnt       = document.getElementById('cnt')
+  const ovView      = document.getElementById('overview-view')
+  const tblView     = document.getElementById('tbl-view')
+  const alertsView  = document.getElementById('alerts-view')
+  const portView    = document.getElementById('portfolio-view')
+  const histView    = document.getElementById('history-view')
+  const learnView   = document.getElementById('learn-view')
+  const filterRow   = document.getElementById('filter-row')
+  const secSel      = document.getElementById('sec-sel')
+  const cnt         = document.getElementById('cnt')
 
-  // hide all
+  // hide all views
   ovView.style.display     = 'none'
   tblView.style.display    = 'none'
   alertsView.style.display = 'none'
+  portView.style.display   = 'none'
+  histView.style.display   = 'none'
+  learnView.style.display  = 'none'
   filterRow.style.display  = 'none'
   secSel.style.display     = 'none'
   cnt.textContent          = ''
@@ -1213,11 +1355,19 @@ function setNav(t, el) {
   } else if (t === 'alerts') {
     alertsView.style.display = 'block'
     renderAlerts()
+  } else if (t === 'portfolio') {
+    portView.style.display = 'flex'
+    renderPortfolio()
+  } else if (t === 'history') {
+    histView.style.display = 'flex'
+    renderHistory()
+  } else if (t === 'learn') {
+    learnView.style.display = 'flex'
   } else {
-    tblView.style.display    = 'flex'
+    tblView.style.display       = 'flex'
     tblView.style.flexDirection = 'column'
-    filterRow.style.display  = 'flex'
-    secSel.style.display     = ''
+    filterRow.style.display     = 'flex'
+    secSel.style.display        = ''
     curTab = t
     renderTable()
   }
@@ -1526,6 +1676,224 @@ window.addEventListener('load',()=>{
 function toast(msg,t){
   const el=document.getElementById('toast'); el.textContent=msg; el.className='toast '+t+' show'
   clearTimeout(toastTmr); toastTmr=setTimeout(()=>el.classList.remove('show'),2500)
+}
+
+// ─── PORTFOLIO ────────────────────────────────────────────────────────────────
+const PORT_KEY = 'syntharix_portfolio'
+const HIST_KEY = 'syntharix_history'
+const CASH_KEY = 'syntharix_cash'
+const STARTING_CASH = 100000
+
+let portCash = parseFloat(localStorage.getItem(CASH_KEY) ?? STARTING_CASH)
+let positions = JSON.parse(localStorage.getItem(PORT_KEY) || '{}')  // { SYM: { shares, avgCost } }
+let tradeHistory = JSON.parse(localStorage.getItem(HIST_KEY) || '[]')
+
+function savePort() {
+  localStorage.setItem(PORT_KEY, JSON.stringify(positions))
+  localStorage.setItem(HIST_KEY, JSON.stringify(tradeHistory))
+  localStorage.setItem(CASH_KEY, portCash.toString())
+}
+
+function executeTrade(type) {
+  const sym    = document.getElementById('pb-sym').value.trim().toUpperCase()
+  const shares = parseFloat(document.getElementById('pb-shares').value)
+  const err    = document.getElementById('pb-err')
+  err.textContent = ''
+
+  if (!sym) { err.textContent = 'Enter a ticker.'; return }
+  if (!UNIVERSE.find(([s]) => s === sym)) { err.textContent = `${sym} not in universe.`; return }
+  if (isNaN(shares) || shares <= 0) { err.textContent = 'Enter valid share count.'; return }
+
+  const price = prices[sym]
+  if (!price) { err.textContent = 'Price not loaded yet — wait a moment.'; return }
+
+  const total = price * shares
+
+  if (type === 'buy') {
+    if (total > portCash) { err.textContent = `Not enough cash. Need $${f2(total)}, have $${f2(portCash)}.`; return }
+    portCash -= total
+    if (!positions[sym]) positions[sym] = { shares: 0, avgCost: 0 }
+    const pos = positions[sym]
+    const prevValue = pos.shares * pos.avgCost
+    pos.shares += shares
+    pos.avgCost = (prevValue + total) / pos.shares
+    tradeHistory.unshift({ time: Date.now(), type: 'buy', sym, shares, price, total })
+    toast(`Bought ${shares} ${sym} @ $${f2(price)}`, 'ok')
+  } else {
+    const pos = positions[sym]
+    if (!pos || pos.shares < shares) { err.textContent = `You only own ${pos?.shares?.toFixed(2) || 0} shares of ${sym}.`; return }
+    portCash += total
+    pos.shares -= shares
+    if (pos.shares < 0.0001) delete positions[sym]
+    tradeHistory.unshift({ time: Date.now(), type: 'sell', sym, shares, price, total })
+    toast(`Sold ${shares} ${sym} @ $${f2(price)}`, 'ok')
+  }
+
+  savePort()
+  renderPortfolio()
+  document.getElementById('pb-sym').value = ''
+  document.getElementById('pb-shares').value = ''
+}
+
+function renderPortfolio() {
+  const cashEl     = document.getElementById('port-cash')
+  const holdingsEl = document.getElementById('port-holdings')
+  const pnlEl      = document.getElementById('port-pnl')
+  const tbody      = document.getElementById('port-tbl')
+
+  let holdingsValue = 0
+  let totalCost = 0
+
+  const syms = Object.keys(positions)
+
+  if (syms.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="port-empty">No positions yet. Use the form above to buy your first stock.</td></tr>'
+  } else {
+    tbody.innerHTML = syms.map(sym => {
+      const pos = positions[sym]
+      const price = prices[sym] || pos.avgCost
+      const mktVal = price * pos.shares
+      const costBasis = pos.avgCost * pos.shares
+      const pnl = mktVal - costBasis
+      const pnlPct = costBasis > 0 ? (pnl / costBasis * 100) : 0
+      holdingsValue += mktVal
+      totalCost += costBasis
+      const cls = pnl >= 0 ? 'up' : 'dn'
+      const si = pnl >= 0 ? '+' : ''
+      return `<tr onclick="selectStock('${sym}')">
+        <td style="text-align:left;padding-left:14px"><div class="sym">${sym}</div></td>
+        <td>${pos.shares.toFixed(pos.shares < 1 ? 4 : 2)}</td>
+        <td>$${f2(pos.avgCost)}</td>
+        <td>$${f2(price)}</td>
+        <td style="font-family:var(--mono);font-weight:600">$${f2(mktVal)}</td>
+        <td><span class="chg ${cls}">${si}$${f2(Math.abs(pnl))}</span></td>
+        <td><span class="chg ${cls}">${si}${pnlPct.toFixed(2)}%</span></td>
+      </tr>`
+    }).join('')
+  }
+
+  const totalPnl = holdingsValue - totalCost
+  const pnlCls = totalPnl >= 0 ? 'var(--green)' : 'var(--red)'
+  if (cashEl) cashEl.textContent = '$' + f2(portCash)
+  if (holdingsEl) holdingsEl.textContent = '$' + f2(holdingsValue)
+  if (pnlEl) { pnlEl.textContent = (totalPnl >= 0 ? '+' : '') + '$' + f2(Math.abs(totalPnl)); pnlEl.style.color = pnlCls }
+}
+
+// ─── HISTORY ──────────────────────────────────────────────────────────────────
+function renderHistory() {
+  const el = document.getElementById('hist-content')
+  if (!el) return
+  if (tradeHistory.length === 0) {
+    el.innerHTML = '<div class="hist-empty">No trades yet. Buy or sell stocks in the Portfolio tab.</div>'
+    return
+  }
+  el.innerHTML = `<table class="hist-table">
+    <thead><tr>
+      <th>Date &amp; Time</th><th>Type</th><th>Symbol</th><th>Shares</th><th>Price</th><th>Total</th>
+    </tr></thead>
+    <tbody>
+    ${tradeHistory.map(h => {
+      const d = new Date(h.time)
+      const dt = d.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' ' + d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})
+      return `<tr>
+        <td style="color:var(--t2)">${dt}</td>
+        <td><span class="hist-badge hist-${h.type}">${h.type.toUpperCase()}</span></td>
+        <td><span class="sym">${h.sym}</span></td>
+        <td style="font-family:var(--mono)">${h.shares.toFixed(h.shares < 1 ? 4 : 2)}</td>
+        <td style="font-family:var(--mono)">$${f2(h.price)}</td>
+        <td style="font-family:var(--mono);font-weight:600">$${f2(h.total)}</td>
+      </tr>`
+    }).join('')}
+    </tbody>
+  </table>`
+}
+
+// ─── LEARN ────────────────────────────────────────────────────────────────────
+const ARTICLES = {
+  stocks: {
+    title: 'What is a Stock?',
+    body: `<p>A <strong>stock</strong> (or share) represents a tiny slice of ownership in a company. When a company wants to raise money, it can sell pieces of itself to the public through a process called an <strong>IPO (Initial Public Offering)</strong>.</p>
+<h3>Why Buy Stocks?</h3>
+<p>As a shareholder you benefit in two ways: <strong>price appreciation</strong> (the stock goes up in value) and <strong>dividends</strong> (a portion of profits paid to you periodically). Historically, the stock market has returned ~10% per year on average — beating savings accounts and bonds over long periods.</p>
+<h3>Risk</h3>
+<p>Stock prices move constantly based on earnings, news, and market sentiment. You can lose money too — there's no guarantee. The key is holding quality companies over a long time horizon and not panic-selling during downturns.</p>
+<h3>Where Are They Traded?</h3>
+<p>Stocks are listed on exchanges like the <strong>NYSE</strong> and <strong>NASDAQ</strong>. Trades happen in milliseconds through brokers (Robinhood, Fidelity, etc.). You're matched with someone willing to sell at your price.</p>`
+  },
+  pe: {
+    title: 'P/E Ratio Explained',
+    body: `<p>The <strong>Price-to-Earnings ratio</strong> is the #1 valuation metric on Wall Street. It tells you how much investors are paying for each dollar of company earnings.</p>
+<h3>Formula</h3>
+<p><strong>P/E = Stock Price ÷ Earnings Per Share (EPS)</strong><br>Example: Stock at $100, EPS of $5 → P/E of 20. You're paying $20 for every $1 the company earns.</p>
+<h3>What's a "Good" P/E?</h3>
+<p>The S&P 500 historically averages around 15–25x. Growth stocks (like tech) often trade at 40–100x because investors expect big future earnings. Value stocks trade at 8–15x. There's no universal "good" — compare within the same sector.</p>
+<h3>Limitations</h3>
+<p>P/E is backward-looking and can be distorted by one-time events. A company losing money has no P/E. Always combine it with other metrics like revenue growth, margins, and debt levels.</p>`
+  },
+  mcap: {
+    title: 'Market Capitalization',
+    body: `<p><strong>Market Cap = Share Price × Total Shares Outstanding</strong>. It's the total market value of a company — the price to buy the whole thing.</p>
+<h3>Size Categories</h3>
+<p><strong>Mega Cap:</strong> $200B+ (Apple, Microsoft, NVIDIA) — most stable, liquid<br>
+<strong>Large Cap:</strong> $10B–$200B — established companies, lower risk<br>
+<strong>Mid Cap:</strong> $2B–$10B — growth potential, moderate risk<br>
+<strong>Small Cap:</strong> $300M–$2B — higher growth ceiling, higher volatility</p>
+<h3>Why It Matters</h3>
+<p>Market cap shows company size, not stock price. A $5 stock can be a bigger company than a $500 stock if it has more shares outstanding. Larger companies are generally safer but grow slower. Smaller companies are riskier but can multiply faster.</p>`
+  },
+  charts: {
+    title: 'Reading Stock Charts',
+    body: `<p>Charts visualize price movement over time. Understanding them helps you spot trends and time entries and exits better.</p>
+<h3>Line vs Candlestick</h3>
+<p>A <strong>line chart</strong> connects closing prices — simple, good for spotting trends. A <strong>candlestick</strong> shows open, high, low, and close for each period. Green candles = price went up. Red = went down.</p>
+<h3>Support &amp; Resistance</h3>
+<p><strong>Support</strong> is a price floor — the level buyers step in. <strong>Resistance</strong> is a ceiling where sellers appear. When price breaks through resistance, it often becomes new support.</p>
+<h3>Trends</h3>
+<p><strong>Uptrend:</strong> higher highs and higher lows. <strong>Downtrend:</strong> lower highs and lower lows. Trading with the trend is generally safer than against it.</p>
+<h3>Volume</h3>
+<p>High volume on a price move confirms it. Low volume moves are often fake-outs. Always check volume when a stock breaks a key level.</p>`
+  },
+  diversify: {
+    title: 'Diversification',
+    body: `<p>Diversification means spreading your money across many investments so one bad pick doesn't wipe you out. It's the only free lunch in investing.</p>
+<h3>Across Sectors</h3>
+<p>If you hold only tech stocks and tech crashes, your whole portfolio crashes. Owning Finance, Healthcare, Energy, and Consumer stocks means a bad quarter in one sector is cushioned by others.</p>
+<h3>Across Asset Classes</h3>
+<p>Stocks, bonds, real estate, and commodities (gold, oil) often move differently. Adding bonds gives stability during stock market crashes.</p>
+<h3>The Rule of Thumb</h3>
+<p>Most financial advisors suggest holding 20–30 individual stocks across at least 5 sectors, or simply buying broad ETFs like <strong>SPY</strong> (tracks S&P 500) or <strong>QQQ</strong> (tracks NASDAQ-100) for instant diversification.</p>
+<h3>Over-Diversification</h3>
+<p>Holding 100+ stocks reduces your ability to beat the market. The top positions in your portfolio drive most of your returns. Don't diversify away performance.</p>`
+  },
+  terms: {
+    title: 'Key Stock Market Terms',
+    body: `<p>A quick glossary of the terms you'll hear most often:</p>
+<h3>Bull vs Bear</h3>
+<p><strong>Bull market:</strong> prices rising 20%+ from a recent low — optimism, growth. <strong>Bear market:</strong> prices falling 20%+ from a recent high — pessimism, contraction.</p>
+<h3>Dividend</h3>
+<p>A cash payment companies make to shareholders, usually quarterly. Expressed as a yield (annual dividend ÷ stock price). Mature companies like Coca-Cola pay reliable dividends.</p>
+<h3>Short Selling</h3>
+<p>Borrowing shares to sell now, hoping to buy them back cheaper later and pocket the difference. High risk — losses are theoretically unlimited if the price rises.</p>
+<h3>ETF</h3>
+<p>Exchange-Traded Fund — a basket of stocks that trades like a single stock. SPY holds all 500 S&P 500 companies. Great for passive investors.</p>
+<h3>EPS</h3>
+<p>Earnings Per Share — company profit divided by shares outstanding. Growing EPS over time is a sign of a healthy business.</p>
+<h3>52-Week High/Low</h3>
+<p>The highest and lowest price a stock hit in the past year. Breaking above the 52W high is a bullish signal; falling to a new low is bearish.</p>`
+  }
+}
+
+function openArticle(id) {
+  const art = ARTICLES[id]; if (!art) return
+  document.getElementById('learn-home').style.display = 'none'
+  document.getElementById('learn-article').style.display = 'flex'
+  document.getElementById('art-title').textContent = art.title
+  document.getElementById('art-body').innerHTML = art.body
+}
+
+function closeArticle() {
+  document.getElementById('learn-home').style.display = 'block'
+  document.getElementById('learn-article').style.display = 'none'
 }
 
 // ─── PREMIUM MODAL ────────────────────────────────────────────────────────────
