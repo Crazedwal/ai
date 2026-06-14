@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StockSim</title>
+<title>Syntharix Stock</title>
 <style>
 :root{
   --bg:#0c0c0f;--s1:#111115;--s2:#18181e;--s3:#222228;
@@ -335,7 +335,7 @@ td:nth-child(2){text-align:left}
 </div>
 
 <header class="hdr" id="app-hdr" style="display:none">
-  <div class="logo">Stock<b>Sim</b></div>
+  <div class="logo">Syntharix<b>Stock</b></div>
   <div class="indices">
     <div class="idx"><div class="in"><span class="live-dot"></span>Live</div><div class="iv" id="i-spx">—</div><div class="ic" id="ic-spx" style="color:var(--t2)">S&amp;P 500</div></div>
     <div class="idx"><div class="in">NASDAQ</div><div class="iv" id="i-comp">—</div><div class="ic" id="ic-comp">—</div></div>
@@ -351,7 +351,60 @@ td:nth-child(2){text-align:left}
     <button class="theme-opt"     id="opt-light" onclick="setTheme('light')">Light</button>
   </div>
   <button class="key-btn" onclick="resetKey()">Change Key</button>
+  <button id="premium-btn" onclick="openPremium()" style="margin-left:8px;padding:5px 12px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px">★ Go Premium</button>
 </header>
+
+<!-- PREMIUM PAYMENT MODAL -->
+<div id="premium-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center">
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:16px;width:420px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)">
+    <!-- Header -->
+    <div id="pm-header" style="padding:24px 24px 0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--yellow);margin-bottom:4px">Syntharix Stock Premium</div>
+          <div style="font-size:20px;font-weight:800">Unlock Full Analysis</div>
+          <div style="font-size:13px;color:var(--t2);margin-top:4px">$5.99 / month · Cancel anytime</div>
+        </div>
+        <button onclick="closePremium()" style="background:none;border:none;color:var(--t2);font-size:18px;cursor:pointer;padding:0 0 0 12px">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin:16px 0 20px;font-size:12px;color:var(--t2)">
+        <div>✓ &nbsp;AI stock analyst — buy / hold / avoid recommendations</div>
+        <div>✓ &nbsp;Advanced screener with premium metrics</div>
+        <div>✓ &nbsp;Unlimited price alerts</div>
+        <div>✓ &nbsp;Priority real-time WebSocket data</div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div id="pm-form" style="padding:0 24px 24px;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:6px">Card Number</div>
+        <input id="pm-card" maxlength="19" placeholder="1234 5678 9012 3456" oninput="fmtCard(this)" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;outline:none;font-family:var(--mono)" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:6px">Expiry</div>
+          <input id="pm-exp" maxlength="5" placeholder="MM/YY" oninput="fmtExp(this)" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;outline:none;font-family:var(--mono)" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:6px">CVV</div>
+          <input id="pm-cvv" maxlength="4" placeholder="123" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;outline:none;font-family:var(--mono)" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+      </div>
+      <div id="pm-err" style="color:var(--red);font-size:12px;min-height:16px"></div>
+      <button onclick="submitPremium()" style="width:100%;padding:11px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Subscribe — $5.99/mo</button>
+      <div style="font-size:10px;color:var(--t3);text-align:center">Simulated payment · No real charge</div>
+    </div>
+
+    <!-- Success state -->
+    <div id="pm-success" style="display:none;padding:40px 24px;text-align:center">
+      <div style="font-size:48px;margin-bottom:12px">✅</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:6px">You're Premium!</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:20px">All premium features are now unlocked.</div>
+      <button onclick="closePremium()" style="padding:9px 24px;background:var(--blue);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Start Exploring</button>
+    </div>
+  </div>
+</div>
 
 <div class="main" id="app-main" style="display:none">
   <div class="left">
@@ -1474,6 +1527,56 @@ function toast(msg,t){
   const el=document.getElementById('toast'); el.textContent=msg; el.className='toast '+t+' show'
   clearTimeout(toastTmr); toastTmr=setTimeout(()=>el.classList.remove('show'),2500)
 }
+
+// ─── PREMIUM MODAL ────────────────────────────────────────────────────────────
+let isPremium = localStorage.getItem('syntharix_stock_premium') === 'true'
+
+function openPremium() {
+  if (isPremium) { toast('You already have Premium!', 'ok'); return }
+  document.getElementById('premium-overlay').style.display = 'flex'
+}
+
+function closePremium() {
+  document.getElementById('premium-overlay').style.display = 'none'
+  document.getElementById('pm-form').style.display = 'flex'
+  document.getElementById('pm-success').style.display = 'none'
+  document.getElementById('pm-err').textContent = ''
+}
+
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16)
+  el.value = v.match(/.{1,4}/g)?.join(' ') || v
+}
+
+function fmtExp(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,4)
+  if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2)
+  el.value = v
+}
+
+function submitPremium() {
+  const card = document.getElementById('pm-card').value.replace(/\s/g,'')
+  const exp  = document.getElementById('pm-exp').value
+  const cvv  = document.getElementById('pm-cvv').value
+  const err  = document.getElementById('pm-err')
+  if (card.length < 16) { err.textContent = 'Enter a valid 16-digit card number.'; return }
+  if (!/^\d{2}\/\d{2}$/.test(exp)) { err.textContent = 'Enter expiry as MM/YY.'; return }
+  if (cvv.length < 3) { err.textContent = 'Enter a valid CVV.'; return }
+  err.textContent = ''
+  isPremium = true
+  localStorage.setItem('syntharix_stock_premium', 'true')
+  document.getElementById('pm-form').style.display = 'none'
+  document.getElementById('pm-success').style.display = 'block'
+  document.getElementById('premium-btn').textContent = '★ Premium'
+  document.getElementById('premium-btn').style.background = 'var(--green)'
+}
+
+window.addEventListener('load', () => {
+  if (isPremium) {
+    document.getElementById('premium-btn').textContent = '★ Premium'
+    document.getElementById('premium-btn').style.background = 'var(--green)'
+  }
+})
 </script>
 </body>
 </html>
