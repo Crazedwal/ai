@@ -162,6 +162,23 @@ function Sidebar({
         </div>
 
 
+        {/* Syntharix Stock */}
+        <div className="p-3 border-t border-gray-700">
+          {subscribed ? (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-green-400 font-medium">Syntharix Stock ✓</span>
+              <span className="text-[10px] text-green-600 bg-green-900/30 px-1.5 py-0.5 rounded">Premium</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowStockSub(true)}
+              className="w-full text-left text-xs text-gray-500 hover:text-green-400 transition-colors"
+            >
+              Syntharix Stock
+            </button>
+          )}
+        </div>
+
         {/* Personality Matchmaker */}
         <div className="p-3 border-t border-gray-700">
           <a
