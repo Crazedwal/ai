@@ -8,7 +8,9 @@ function ChatArea({
   conversation,
   messages,
   onSendMessage,
-  isLoading
+  isLoading,
+  stockMode,
+  setStockMode
 }) {
   const [error, setError] = useState(null)
 
@@ -25,7 +27,7 @@ function ChatArea({
     <main
       className="flex-1 flex flex-col bg-white dark:bg-gray-900 transition-colors duration-300"
     >
-      <ChatHeader title={conversation?.title || "New Chat"} />
+      <ChatHeader title={conversation?.title || "New Chat"} stockMode={stockMode} setStockMode={setStockMode} />
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded m-4">

@@ -18,7 +18,9 @@ function AppContent() {
     isLoading,
     sendMessage,
     setActiveId,
-    createNewChat
+    createNewChat,
+    stockMode,
+    setStockMode
   } = useChat()
 
   return (
@@ -34,6 +36,8 @@ function AppContent() {
         messages={messages}
         onSendMessage={sendMessage}
         isLoading={isLoading}
+        stockMode={stockMode}
+        setStockMode={setStockMode}
       />
     </div>
   )
