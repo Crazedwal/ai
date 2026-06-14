@@ -25,7 +25,6 @@ function Sidebar({
   const { user, isGuest, logOut } = useAuth()
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState("")
-  const [showPurchase, setShowPurchase] = useState(false)
   const [showStockSub, setShowStockSub] = useState(false)
   const { subscribed, subscribe } = useStockSubscription()
   const [showDevLog, setShowDevLog] = useState(false)
@@ -72,7 +71,7 @@ function Sidebar({
               Plinko
             </button>
             <button
-              onClick={() => setShowPurchase(true)}
+              onClick={() => setShowStockSub(true)}
               className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded font-medium transition-colors"
             >
               Buy
@@ -234,8 +233,7 @@ function Sidebar({
 
       </aside>
 
-      {showPurchase && <PaymentPage onClose={() => setShowPurchase(false)} />}
-      {showStockSub && <PaymentPage initialPlan={SUBSCRIPTION_PLAN} onClose={() => setShowStockSub(false)} onSuccess={() => { subscribe(); setShowStockSub(false) }} />}
+{showStockSub && <PaymentPage initialPlan={SUBSCRIPTION_PLAN} onClose={() => setShowStockSub(false)} onSuccess={() => { subscribe(); setShowStockSub(false) }} />}
       {showDevLog && <DevLog onClose={() => setShowDevLog(false)} />}
       {showGamble && <GambleModal onClose={() => setShowGamble(false)} />}
     </>
