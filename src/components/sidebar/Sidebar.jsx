@@ -158,7 +158,7 @@ function Sidebar({
           </button>
         </div>
 
-        {/* Stock Market */}
+        {/* Syntharix Stock */}
         <div className="p-3 border-t border-gray-700">
           <a
             href="/stock-market.html"
@@ -166,7 +166,7 @@ function Sidebar({
             rel="noopener noreferrer"
             className="w-full text-xs text-gray-500 hover:text-green-400 transition-colors"
           >
-            Stock Market Simulator
+            Syntharix Stock
           </a>
         </div>
 

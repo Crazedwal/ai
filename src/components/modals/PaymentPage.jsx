@@ -1,6 +1,6 @@
 // src/components/modals/PaymentPage.jsx
 import { useState } from "react"
-import { TOKEN_PACKAGES } from "@/lib/models"
+import { TOKEN_PACKAGES, SUBSCRIPTION_PLAN } from "@/lib/models"
 
 /* ── helpers ──────────────────────────────────────────────── */
 function fmtCard(v) { return v.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim() }
@@ -277,6 +277,7 @@ function Declined({ onRetry, onClose }) {
 
 /* ── Summary (left panel) ─────────────────────────────────── */
 function Summary({ pkg }) {
+  const isSub = !!pkg.interval
   return (
     <div className="bg-[#f6f9fc] dark:bg-gray-800 p-8 flex flex-col min-h-full">
       <div className="flex items-center gap-2 mb-8">
@@ -285,26 +286,38 @@ function Summary({ pkg }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
         </div>
-        <span className="font-semibold text-gray-800 dark:text-white text-sm">AI Chat Pro</span>
+        <span className="font-semibold text-gray-800 dark:text-white text-sm">Syntharix AI</span>
       </div>
       <div className="mb-6">
-        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Total due today</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+          {isSub ? "Due today, then monthly" : "Total due today"}
+        </p>
         <p className="text-4xl font-bold text-gray-900 dark:text-white">${pkg.price.toFixed(2)}</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">USD</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{isSub ? "USD / month" : "USD"}</p>
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700 pt-5 space-y-3 flex-1">
         <div className="flex justify-between text-sm">
           <div>
             <p className="font-medium text-gray-800 dark:text-gray-200">{pkg.label}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{pkg.tokens.toLocaleString()} tokens · one-time</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+              {isSub ? pkg.description : `${pkg.tokens.toLocaleString()} tokens · one-time`}
+            </p>
           </div>
           <span className="text-gray-800 dark:text-gray-200 font-medium">${pkg.price.toFixed(2)}</span>
         </div>
+        {isSub && (
+          <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-3 text-xs text-indigo-700 dark:text-indigo-300 space-y-1">
+            <p className="font-semibold">What's included:</p>
+            {pkg.description.split(" · ").map((f, i) => (
+              <p key={i}>✓ {f}</p>
+            ))}
+          </div>
+        )}
         <div className="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-1.5 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex justify-between"><span>Subtotal</span><span>${pkg.price.toFixed(2)}</span></div>
           <div className="flex justify-between"><span>Tax</span><span>$0.00</span></div>
           <div className="flex justify-between font-semibold text-sm text-gray-800 dark:text-gray-200 pt-1 border-t border-gray-200 dark:border-gray-700">
-            <span>Total</span><span>${pkg.price.toFixed(2)}</span>
+            <span>Total</span><span>${pkg.price.toFixed(2)}{isSub ? "/mo" : ""}</span>
           </div>
         </div>
       </div>
@@ -319,8 +332,8 @@ function Summary({ pkg }) {
 }
 
 /* ── Main ─────────────────────────────────────────────────── */
-export default function PaymentPage({ onClose }) {
-  const [pkg, setPkg]         = useState(null)
+export default function PaymentPage({ onClose, initialPlan = null }) {
+  const [pkg, setPkg]         = useState(initialPlan)
   const [tab, setTab]         = useState("card")
   const [loading, setLoading] = useState(false)
   const [declined, setDeclined] = useState(false)
@@ -335,16 +348,45 @@ export default function PaymentPage({ onClose }) {
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="font-bold text-gray-900 dark:text-white">Choose a plan</h2>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-indigo-600 flex items-center justify-center">
+              <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <h2 className="font-bold text-gray-900 dark:text-white">Syntharix AI</h2>
+          </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl">×</button>
         </div>
         <div className="p-5 space-y-3">
+          {/* Subscription plan */}
+          <button onClick={()=>setPkg(SUBSCRIPTION_PLAN)}
+            className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors text-left">
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="font-bold text-gray-900 dark:text-white text-sm">{SUBSCRIPTION_PLAN.label}</p>
+                <span className="text-[10px] px-1.5 py-0.5 bg-indigo-600 text-white rounded font-semibold">BEST</span>
+              </div>
+              <p className="text-xs text-indigo-500 mt-0.5">Unlimited messages · Cancel anytime</p>
+            </div>
+            <div className="text-right shrink-0 ml-2">
+              <p className="text-lg font-bold text-gray-900 dark:text-white">${SUBSCRIPTION_PLAN.price.toFixed(2)}</p>
+              <p className="text-[10px] text-gray-400">/month</p>
+            </div>
+          </button>
+
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"/>
+            <span className="text-xs text-gray-400">or buy tokens</span>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"/>
+          </div>
+
           {TOKEN_PACKAGES.map(p=>(
             <button key={p.id} onClick={()=>setPkg(p)}
               className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-indigo-500 transition-colors text-left">
               <div>
                 <p className="font-semibold text-gray-900 dark:text-white text-sm">{p.label}</p>
-                <p className="text-xs text-indigo-500 mt-0.5">{p.tokens.toLocaleString()} tokens</p>
+                <p className="text-xs text-indigo-500 mt-0.5">{p.tokens.toLocaleString()} tokens · one-time</p>
               </div>
               <span className="text-lg font-bold text-gray-900 dark:text-white">${p.price.toFixed(2)}</span>
             </button>

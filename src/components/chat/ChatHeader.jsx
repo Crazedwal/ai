@@ -18,7 +18,7 @@ function ChatHeader({ title, stockMode, setStockMode }) {
               : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
           }`}
         >
-          📈 Stock Advisor {stockMode ? "ON" : "OFF"}
+          📈 Syntharix Stock {stockMode ? "ON" : "OFF"}
         </button>
         <button
           onClick={toggleTheme}
