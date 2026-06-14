@@ -317,12 +317,14 @@ td:nth-child(2){text-align:left}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
 /* NAV SIDEBAR */
-.nav-sidebar{width:160px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:8px 0;overflow-y:auto}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:.12s;border-left:2px solid transparent}
+.nav-sidebar{width:168px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:6px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:.1s;border-left:2px solid transparent;letter-spacing:.1px}
 .nav-item:hover{color:var(--text);background:var(--s2)}
-.nav-item.act{color:var(--blue);background:var(--s2);border-left-color:var(--blue)}
-.nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
-.nav-section{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:10px 14px 4px}
+.nav-item.act{color:var(--text);background:var(--s2);border-left-color:var(--blue);font-weight:600}
+.nav-icon{width:14px;height:14px;flex-shrink:0;opacity:.7}
+.nav-item.act .nav-icon{opacity:1;color:var(--blue)}
+.nav-item:hover .nav-icon{opacity:1}
+.nav-section{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--t3);padding:12px 14px 3px}
 
 /* PORTFOLIO VIEW */
 .portfolio-view{flex:1;overflow-y:auto;display:none;flex-direction:column}
@@ -356,9 +358,9 @@ td:nth-child(2){text-align:left}
 /* LEARN VIEW */
 .learn-view{flex:1;overflow-y:auto;display:none;flex-direction:column;padding:16px}
 .learn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.learn-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:.15s}
-.learn-card:hover{border-color:var(--blue);background:var(--s3)}
-.learn-card-icon{font-size:22px;margin-bottom:8px}
+.learn-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:16px;cursor:pointer;transition:.15s;border-left:3px solid var(--border)}
+.learn-card:hover{border-color:var(--blue);border-left-color:var(--blue);background:var(--s3)}
+.learn-card-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:7px}
 .learn-card-title{font-size:13px;font-weight:700;margin-bottom:4px}
 .learn-card-desc{font-size:11px;color:var(--t2);line-height:1.5}
 .learn-article{display:none;flex-direction:column;gap:12px}
@@ -405,7 +407,7 @@ td:nth-child(2){text-align:left}
     <button class="theme-opt"     id="opt-light" onclick="setTheme('light')">Light</button>
   </div>
   <button class="key-btn" onclick="resetKey()">Change Key</button>
-  <button id="premium-btn" onclick="openPremium()" style="margin-left:8px;padding:5px 12px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px">★ Go Premium</button>
+  <button id="premium-btn" onclick="openPremium()" style="margin-left:8px;padding:5px 14px;background:#d97706;border:none;border-radius:4px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;text-transform:uppercase">Premium</button>
 </header>
 
 <!-- PREMIUM PAYMENT MODAL -->
@@ -464,17 +466,34 @@ td:nth-child(2){text-align:left}
   <!-- SIDEBAR NAV -->
   <nav class="nav-sidebar">
     <div class="nav-section">Market</div>
-    <button class="nav-item act" id="nav-overview"  onclick="setNav('overview',this)"><span class="nav-icon">◉</span>Overview</button>
-    <button class="nav-item"     id="nav-all"       onclick="setNav('all',this)"><span class="nav-icon">▦</span>All Stocks</button>
-    <button class="nav-item"     id="nav-gainers"   onclick="setNav('gainers',this)"><span class="nav-icon">▲</span>Gainers</button>
-    <button class="nav-item"     id="nav-losers"    onclick="setNav('losers',this)"><span class="nav-icon">▼</span>Losers</button>
+    <button class="nav-item act" id="nav-overview"  onclick="setNav('overview',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview
+    </button>
+    <button class="nav-item" id="nav-all" onclick="setNav('all',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1" fill="currentColor" stroke="none"/></svg>All Stocks
+    </button>
+    <button class="nav-item" id="nav-gainers" onclick="setNav('gainers',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Gainers
+    </button>
+    <button class="nav-item" id="nav-losers" onclick="setNav('losers',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>Losers
+    </button>
     <div class="nav-section">Tools</div>
-    <button class="nav-item"     id="nav-watchlist" onclick="setNav('watchlist',this)"><span class="nav-icon">★</span>Watchlist</button>
-    <button class="nav-item"     id="nav-alerts"    onclick="setNav('alerts',this)"><span class="nav-icon">🔔</span>Alerts</button>
-    <button class="nav-item"     id="nav-portfolio" onclick="setNav('portfolio',this)"><span class="nav-icon">💼</span>Portfolio</button>
-    <button class="nav-item"     id="nav-history"   onclick="setNav('history',this)"><span class="nav-icon">📋</span>History</button>
-    <div class="nav-section">Education</div>
-    <button class="nav-item"     id="nav-learn"     onclick="setNav('learn',this)"><span class="nav-icon">📖</span>Learn</button>
+    <button class="nav-item" id="nav-watchlist" onclick="setNav('watchlist',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Watchlist
+    </button>
+    <button class="nav-item" id="nav-alerts" onclick="setNav('alerts',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alerts
+    </button>
+    <button class="nav-item" id="nav-portfolio" onclick="setNav('portfolio',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Portfolio
+    </button>
+    <button class="nav-item" id="nav-history" onclick="setNav('history',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>History
+    </button>
+    <button class="nav-item" id="nav-learn" onclick="setNav('learn',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Learn
+    </button>
   </nav>
 
   <div class="left">
@@ -571,18 +590,8 @@ td:nth-child(2){text-align:left}
           <div class="port-stat-val" id="port-pnl">$0.00</div>
         </div>
       </div>
-      <div class="port-buy-form">
-        <div>
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:4px">Ticker</div>
-          <input id="pb-sym" type="text" placeholder="e.g. AAPL" style="width:90px;text-transform:uppercase" maxlength="6">
-        </div>
-        <div>
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:4px">Shares</div>
-          <input id="pb-shares" type="number" placeholder="10" min="0.01" step="0.01" style="width:80px">
-        </div>
-        <button class="port-buy-btn" onclick="executeTrade('buy')">Buy</button>
-        <button class="port-sell-btn" onclick="executeTrade('sell')">Sell</button>
-        <span id="pb-err" style="font-size:11px;color:var(--red);align-self:center"></span>
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border);background:var(--s2);font-size:11px;color:var(--t3)">
+        Click any stock in <strong style="color:var(--t2)">All Stocks</strong> to open the detail panel and trade.
       </div>
       <div class="tbl-wrap" style="flex:1">
         <table>
@@ -613,12 +622,12 @@ td:nth-child(2){text-align:left}
           <div style="font-size:12px;color:var(--t2)">Learn how investing works, from fundamentals to reading charts.</div>
         </div>
         <div class="learn-grid">
-          <div class="learn-card" onclick="openArticle('stocks')"><div class="learn-card-icon">📈</div><div class="learn-card-title">What is a Stock?</div><div class="learn-card-desc">Understand ownership, shares, and why companies go public.</div></div>
-          <div class="learn-card" onclick="openArticle('pe')"><div class="learn-card-icon">🔢</div><div class="learn-card-title">P/E Ratio</div><div class="learn-card-desc">The most-used valuation metric and how to read it correctly.</div></div>
-          <div class="learn-card" onclick="openArticle('mcap')"><div class="learn-card-icon">🏦</div><div class="learn-card-title">Market Cap</div><div class="learn-card-desc">How company size is measured and what it tells investors.</div></div>
-          <div class="learn-card" onclick="openArticle('charts')"><div class="learn-card-icon">📊</div><div class="learn-card-title">Reading Charts</div><div class="learn-card-desc">Candlesticks, support/resistance, and trend lines explained.</div></div>
-          <div class="learn-card" onclick="openArticle('diversify')"><div class="learn-card-icon">🎯</div><div class="learn-card-title">Diversification</div><div class="learn-card-desc">Why spreading risk across sectors protects your portfolio.</div></div>
-          <div class="learn-card" onclick="openArticle('terms')"><div class="learn-card-icon">📝</div><div class="learn-card-title">Key Terms</div><div class="learn-card-desc">Bull, bear, dividend, short-selling, ETF — all defined simply.</div></div>
+          <div class="learn-card" onclick="openArticle('stocks')"><div class="learn-card-tag">Fundamentals</div><div class="learn-card-title">What is a Stock?</div><div class="learn-card-desc">Understand ownership, shares, and why companies go public.</div></div>
+          <div class="learn-card" onclick="openArticle('pe')"><div class="learn-card-tag">Valuation</div><div class="learn-card-title">P/E Ratio</div><div class="learn-card-desc">The most-used valuation metric and how to read it correctly.</div></div>
+          <div class="learn-card" onclick="openArticle('mcap')"><div class="learn-card-tag">Valuation</div><div class="learn-card-title">Market Cap</div><div class="learn-card-desc">How company size is measured and what it tells investors.</div></div>
+          <div class="learn-card" onclick="openArticle('charts')"><div class="learn-card-tag">Technical</div><div class="learn-card-title">Reading Charts</div><div class="learn-card-desc">Candlesticks, support/resistance, and trend lines explained.</div></div>
+          <div class="learn-card" onclick="openArticle('diversify')"><div class="learn-card-tag">Strategy</div><div class="learn-card-title">Diversification</div><div class="learn-card-desc">Why spreading risk across sectors protects your portfolio.</div></div>
+          <div class="learn-card" onclick="openArticle('terms')"><div class="learn-card-tag">Reference</div><div class="learn-card-title">Key Terms</div><div class="learn-card-desc">Bull, bear, dividend, short-selling, ETF — all defined simply.</div></div>
         </div>
       </div>
       <div id="learn-article" class="learn-article">
@@ -696,6 +705,12 @@ td:nth-child(2){text-align:left}
       </div>
       <div class="sk-meta" id="d-meta"></div>
       <button class="watch-btn" id="d-watch" onclick="toggleStar(sel,event)">★ Add to Watchlist</button>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <input id="d-shares" type="number" min="0.01" step="0.01" placeholder="Shares" style="width:90px;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:12px;outline:none;font-family:var(--mono)" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+        <button onclick="detailTrade('buy')" style="padding:6px 14px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px">BUY</button>
+        <button onclick="detailTrade('sell')" style="padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px">SELL</button>
+        <span id="d-trade-err" style="font-size:11px;color:var(--red)"></span>
+      </div>
     </div>
     <div class="detail-scroll" id="d-scroll">
       <div class="chart-sec">
@@ -1095,7 +1110,10 @@ function renderTable() {
   visible.forEach(([s, n, sec]) => {
     if (!existing.has(s)) {
       const tr = document.createElement('tr'); tr.dataset.sym = s; tr.onclick = () => selectStock(s)
-      tr.innerHTML = `<td><button class="star" id="star-${s}" onclick="toggleStar('${s}',event)">★</button></td>
+      const removeCol = curTab === 'watchlist'
+        ? `<td style="text-align:center"><button onclick="removeFromWatchlist('${s}',event)" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:2px 6px" title="Remove">✕</button></td>`
+        : `<td><button class="star" id="star-${s}" onclick="toggleStar('${s}',event)">★</button></td>`
+      tr.innerHTML = `${removeCol}
         <td><div class="sym">${s}</div><div class="co">${n}</div></td>
         <td class="pr" id="p-${s}"><span class="loading">—</span></td>
         <td id="c-${s}"><span class="loading">—</span></td>
@@ -1654,6 +1672,12 @@ function toggleStar(s,e){
   toast(watchlist.has(s)?`${s} added to watchlist`:`${s} removed`,'ok')
   renderTable(); if(sel===s) buildDetail()
 }
+function removeFromWatchlist(s,e){
+  e.stopPropagation()
+  watchlist.delete(s)
+  toast(`${s} removed from watchlist`,'ok')
+  renderTable()
+}
 function setTab(t,el){
   curTab=t; srtKey=''; srtDir=-1
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('act')); el.classList.add('act')
@@ -1694,45 +1718,41 @@ function savePort() {
   localStorage.setItem(CASH_KEY, portCash.toString())
 }
 
-function executeTrade(type) {
-  const sym    = document.getElementById('pb-sym').value.trim().toUpperCase()
-  const shares = parseFloat(document.getElementById('pb-shares').value)
-  const err    = document.getElementById('pb-err')
+function detailTrade(type) {
+  const shares = parseFloat(document.getElementById('d-shares').value)
+  const err    = document.getElementById('d-trade-err')
   err.textContent = ''
 
-  if (!sym) { err.textContent = 'Enter a ticker.'; return }
-  if (!UNIVERSE.find(([s]) => s === sym)) { err.textContent = `${sym} not in universe.`; return }
-  if (isNaN(shares) || shares <= 0) { err.textContent = 'Enter valid share count.'; return }
+  if (!sel) { err.textContent = 'No stock selected.'; return }
+  if (isNaN(shares) || shares <= 0) { err.textContent = 'Enter share count.'; return }
 
-  const price = prices[sym]
-  if (!price) { err.textContent = 'Price not loaded yet — wait a moment.'; return }
+  const price = prices[sel]
+  if (!price) { err.textContent = 'Price not loaded yet.'; return }
 
   const total = price * shares
 
   if (type === 'buy') {
-    if (total > portCash) { err.textContent = `Not enough cash. Need $${f2(total)}, have $${f2(portCash)}.`; return }
+    if (total > portCash) { err.textContent = `Insufficient cash ($${f2(portCash)} available).`; return }
     portCash -= total
-    if (!positions[sym]) positions[sym] = { shares: 0, avgCost: 0 }
-    const pos = positions[sym]
-    const prevValue = pos.shares * pos.avgCost
+    if (!positions[sel]) positions[sel] = { shares: 0, avgCost: 0 }
+    const pos = positions[sel]
+    pos.avgCost = (pos.shares * pos.avgCost + total) / (pos.shares + shares)
     pos.shares += shares
-    pos.avgCost = (prevValue + total) / pos.shares
-    tradeHistory.unshift({ time: Date.now(), type: 'buy', sym, shares, price, total })
-    toast(`Bought ${shares} ${sym} @ $${f2(price)}`, 'ok')
+    tradeHistory.unshift({ time: Date.now(), type: 'buy', sym: sel, shares, price, total })
+    toast(`Bought ${shares} ${sel} @ $${f2(price)}`, 'ok')
   } else {
-    const pos = positions[sym]
-    if (!pos || pos.shares < shares) { err.textContent = `You only own ${pos?.shares?.toFixed(2) || 0} shares of ${sym}.`; return }
+    const pos = positions[sel]
+    if (!pos || pos.shares < shares) { err.textContent = `You own ${pos?.shares?.toFixed(2) || 0} shares.`; return }
     portCash += total
     pos.shares -= shares
-    if (pos.shares < 0.0001) delete positions[sym]
-    tradeHistory.unshift({ time: Date.now(), type: 'sell', sym, shares, price, total })
-    toast(`Sold ${shares} ${sym} @ $${f2(price)}`, 'ok')
+    if (pos.shares < 0.0001) delete positions[sel]
+    tradeHistory.unshift({ time: Date.now(), type: 'sell', sym: sel, shares, price, total })
+    toast(`Sold ${shares} ${sel} @ $${f2(price)}`, 'ok')
   }
 
   savePort()
-  renderPortfolio()
-  document.getElementById('pb-sym').value = ''
-  document.getElementById('pb-shares').value = ''
+  document.getElementById('d-shares').value = ''
+  if (curNav === 'portfolio') renderPortfolio()
 }
 
 function renderPortfolio() {
@@ -1935,13 +1955,13 @@ function submitPremium() {
   localStorage.setItem('syntharix_stock_premium', 'true')
   document.getElementById('pm-form').style.display = 'none'
   document.getElementById('pm-success').style.display = 'block'
-  document.getElementById('premium-btn').textContent = '★ Premium'
+  document.getElementById('premium-btn').textContent = 'Active'
   document.getElementById('premium-btn').style.background = 'var(--green)'
 }
 
 window.addEventListener('load', () => {
   if (isPremium) {
-    document.getElementById('premium-btn').textContent = '★ Premium'
+    document.getElementById('premium-btn').textContent = 'Active'
     document.getElementById('premium-btn').style.background = 'var(--green)'
   }
 })
