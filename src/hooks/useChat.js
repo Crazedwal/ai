@@ -4,22 +4,31 @@ import { sendMessage as sendToAPI } from "@/lib/api"
 import { useModel } from "@/hooks/useModel"
 import { useTokens } from "@/hooks/useTokens"
 import { fetchStockData, extractTickers } from "@/lib/stockApi"
+import { useStockSubscription } from "@/hooks/useStockSubscription"
 
 function readLS(key) {
   try { return JSON.parse(localStorage.getItem(key) || 'null') } catch { return null }
 }
 
-const STOCK_SYSTEM = `You are a professional stock market analyst and financial advisor with 20 years of experience on Wall Street. When given live stock data, analyze it deeply and give clear, direct advice like a pro would. Cover:
-- Whether the stock looks bullish or bearish right now
-- Key price levels to watch (support/resistance)
-- Short-term outlook (days/weeks)
-- Risk level for this position
-- A clear recommendation: Buy, Hold, or Avoid — and why
-Be direct and confident. Use real financial terminology but explain it simply. Always remind the user that this is not official financial advice and they should do their own research.`
+const STOCK_SYSTEM_FREE = `You are a helpful stock market assistant. When given stock data, give a brief, friendly overview:
+- Current price and whether it's up or down today
+- A simple one-line opinion on the stock
+- One thing to watch out for
+Keep it short. Mention that premium subscribers get full professional analysis.`
+
+const STOCK_SYSTEM_PREMIUM = `You are a professional stock market analyst with 20 years of Wall Street experience. Give a full, detailed breakdown:
+- Bullish or bearish outlook with reasoning
+- Key support and resistance price levels
+- Short-term momentum and trend direction
+- Risk level (Low / Medium / High) and why
+- Technical signals worth noting (volume, volatility, recent movement)
+- Clear recommendation: Buy, Hold, or Avoid — with a price target if possible
+Be direct and confident. Use real financial terminology but keep it accessible. Always note this is not official financial advice.`
 
 export function useChat() {
   const { selectedModel } = useModel()
   const { canAfford, spendTokens } = useTokens()
+  const { subscribed } = useStockSubscription()
   const [stockMode, setStockMode] = useState(false)
   // ═══════════════════════════════════════════════════════════════
   // STATE: All the data our chat needs to track
@@ -56,7 +65,7 @@ export function useChat() {
   const systemMessage = {
     role: "system",
     content: [
-      stockMode ? STOCK_SYSTEM : "You are a helpful AI assistant. Be friendly, concise, and informative.",
+      stockMode ? (subscribed ? STOCK_SYSTEM_PREMIUM : STOCK_SYSTEM_FREE) : "You are a helpful AI assistant. Be friendly, concise, and informative.",
       persona ? `User personality: ${persona.title} — ${persona.subtitle}. Keep this in mind subtly; don't overdo it.` : "",
       constraints?.who          ? `The user is: ${constraints.who}.` : "",
       constraints?.frustrations ? `Avoid: ${constraints.frustrations}.` : "",
@@ -111,7 +120,8 @@ export function useChat() {
     // If stock mode is on, detect tickers and fetch live data
     let enrichedContent = content
     if (stockMode) {
-      const tickers = extractTickers(content)
+      const allTickers = extractTickers(content)
+      const tickers = subscribed ? allTickers : allTickers.slice(0, 1)
       if (tickers.length > 0) {
         const results = await Promise.all(tickers.map(fetchStockData))
         const validData = results.filter(Boolean)

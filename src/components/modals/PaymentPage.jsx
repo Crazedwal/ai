@@ -243,6 +243,30 @@ function BankForm({ onSubmit, loading }) {
   )
 }
 
+/* ── Success ──────────────────────────────────────────────── */
+function Success({ pkg, onClose }) {
+  const isSub = !!pkg.interval
+  return (
+    <div className="flex flex-col items-center justify-center h-full py-12 px-8 text-center space-y-4">
+      <div className="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <svg className="w-7 h-7 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white">Payment successful!</h3>
+      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
+        {isSub
+          ? `Welcome to ${pkg.label}. Your premium features are now unlocked.`
+          : `${pkg.tokens?.toLocaleString()} tokens have been added to your account.`}
+      </p>
+      <button onClick={onClose}
+        className="px-6 py-2.5 rounded-md bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+        Let's go
+      </button>
+    </div>
+  )
+}
+
 /* ── Declined ─────────────────────────────────────────────── */
 function Declined({ onRetry, onClose }) {
   return (
@@ -332,15 +356,25 @@ function Summary({ pkg }) {
 }
 
 /* ── Main ─────────────────────────────────────────────────── */
-export default function PaymentPage({ onClose, initialPlan = null }) {
-  const [pkg, setPkg]         = useState(initialPlan)
-  const [tab, setTab]         = useState("card")
-  const [loading, setLoading] = useState(false)
+export default function PaymentPage({ onClose, initialPlan = null, onSuccess = null }) {
+  const [pkg, setPkg]           = useState(initialPlan)
+  const [tab, setTab]           = useState("card")
+  const [loading, setLoading]   = useState(false)
   const [declined, setDeclined] = useState(false)
+  const [succeeded, setSucceeded] = useState(false)
 
   const handleSubmit = () => {
     setLoading(true)
-    setTimeout(() => { setLoading(false); setDeclined(true) }, 2400)
+    setTimeout(() => {
+      setLoading(false)
+      if (pkg?.interval) {
+        // Subscription always succeeds
+        setSucceeded(true)
+        onSuccess?.()
+      } else {
+        setDeclined(true)
+      }
+    }, 2400)
   }
 
   // Package picker
@@ -413,7 +447,9 @@ export default function PaymentPage({ onClose, initialPlan = null }) {
             <button onClick={onClose} className="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl">×</button>
           </div>
 
-          {declined ? (
+          {succeeded ? (
+            <Success pkg={pkg} onClose={onClose}/>
+          ) : declined ? (
             <Declined onRetry={()=>setDeclined(false)} onClose={onClose}/>
           ) : (
             <div className="flex-1 overflow-y-auto px-8 py-6">
