@@ -1152,18 +1152,18 @@ async function fetchIndices() {
 
 async function fetchProfile(sym) {
   if (profiles[sym]) return
-  enqueue(async () => {
+  try {
     const d = await apiFetch(`/stock/profile2?symbol=${sym}`)
     if (d && d.name) { profiles[sym] = d; if (sel === sym) buildDetail() }
-  })
+  } catch(e) {}
 }
 
 async function fetchMetrics(sym) {
   if (metrics[sym]) return
-  enqueue(async () => {
+  try {
     const d = await apiFetch(`/stock/metric?symbol=${sym}&metric=all`)
     if (d && d.metric) { metrics[sym] = d.metric; if (sel === sym) buildDetail() }
-  })
+  } catch(e) {}
 }
 
 async function fetchCandles(sym, res, from, to) {
@@ -1426,7 +1426,7 @@ function buildDetail() {
   loadChartData(sel, period)
 }
 
-function loadChartData(sym, res) {
+async function loadChartData(sym, res) {
   const now = Math.floor(Date.now()/1000)
   const periods = {
     '1D': {r:'5',  from: now - 86400},
@@ -1440,7 +1440,7 @@ function loadChartData(sym, res) {
   if (!cfg) return
   const key = `${sym}_${cfg.r}_${res}`
   if (histData[key]) { renderChart(histData[key]); return }
-  enqueue(async () => {
+  try {
     const d = await apiFetch(`/stock/candle?symbol=${sym}&resolution=${cfg.r}&from=${cfg.from}&to=${now}`)
     if (d && d.c && d.s === 'ok') {
       histData[key] = d.c
@@ -1449,7 +1449,10 @@ function loadChartData(sym, res) {
       const cc = document.getElementById('chart-container')
       if(cc && sel===sym) cc.innerHTML='<div class="chart-loading">No chart data available</div>'
     }
-  })
+  } catch(e) {
+    const cc = document.getElementById('chart-container')
+    if(cc && sel===sym) cc.innerHTML='<div class="chart-loading">No chart data available</div>'
+  }
 }
 
 function renderChart(data) {
