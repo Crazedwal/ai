@@ -22,7 +22,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;letter-spacing:.01em}
 
 /* PROFILE MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -87,8 +87,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .api-err{color:var(--red);font-size:12px;margin-top:6px}
 
 /* HEADER */
-.hdr{height:50px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:0;z-index:20}
-.logo{font-size:15px;font-weight:800;letter-spacing:-.8px;margin-right:16px}
+.hdr{height:44px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:0;z-index:20}
+.logo{font-size:13px;font-weight:800;letter-spacing:.5px;margin-right:16px;text-transform:uppercase}
 .logo b{color:var(--blue)}
 .indices{display:flex;gap:0;margin-right:auto}
 .idx{padding:0 12px;border-right:1px solid var(--border);line-height:1.2}
@@ -108,10 +108,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .key-btn:hover{color:var(--t2)}
 
 /* MAIN */
-.main{display:flex;height:calc(100vh - 50px)}
+.main{display:flex;height:calc(100vh - 44px)}
 .left{display:flex;flex-direction:column;flex:1;min-width:0;border-right:1px solid var(--border)}
 .filter-bar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0;padding:0 4px}
-.tab{padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--t2);border-bottom:2px solid transparent;border-top:none;border-left:none;border-right:none;background:none;transition:.15s;white-space:nowrap}
+.tab{padding:8px 14px;font-size:11px;font-weight:600;cursor:pointer;color:var(--t2);border-bottom:2px solid transparent;border-top:none;border-left:none;border-right:none;background:none;transition:.15s;white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
 .tab:hover{color:var(--text)}
 .tab.act{color:var(--blue);border-bottom-color:var(--blue)}
 .sec-sel{margin-left:auto;margin-right:8px;background:var(--s2);border:1px solid var(--border);color:var(--t2);padding:4px 8px;border-radius:5px;font-size:11px;outline:none;cursor:pointer}
@@ -121,20 +121,20 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .tbl-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 table{width:100%;border-collapse:collapse}
 thead{position:sticky;top:0;z-index:5;background:var(--s1)}
-thead th{padding:7px 10px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+thead th{padding:6px 10px;text-align:right;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
 thead th:hover{color:var(--t2)}
 thead th:first-child{text-align:left;padding-left:12px;width:30px}
 thead th:nth-child(2){text-align:left}
 tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s}
 tbody tr:hover{background:var(--s2)}
 tbody tr.sel{background:var(--s2)}
-td{padding:8px 10px;text-align:right;white-space:nowrap;vertical-align:middle}
+td{padding:6px 10px;text-align:right;white-space:nowrap;vertical-align:middle}
 td:first-child{padding-left:12px;width:30px}
 td:nth-child(2){text-align:left}
 .sym{font-weight:700;font-size:12px;font-family:var(--mono)}
 .co{font-size:10px;color:var(--t2);margin-top:1px;max-width:180px;overflow:hidden;text-overflow:ellipsis}
 .pr{font-family:var(--mono);font-weight:600;font-size:12px}
-.chg{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:3px;display:inline-block}
+.chg{font-family:var(--mono);font-size:11px;padding:1px 5px;border-radius:2px;display:inline-block}
 .up{color:var(--green);background:var(--gdim)}
 .dn{color:var(--red);background:var(--rdim)}
 .neu{color:var(--t2)}
@@ -199,7 +199,7 @@ td:nth-child(2){text-align:left}
 .right{width:300px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1)}
 .right-half{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .right-half+.right-half{border-top:2px solid var(--border)}
-.panel-hdr{padding:9px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:6px}
+.panel-hdr{padding:7px 14px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:6px}
 .panel-scroll{flex:1;overflow-y:auto;padding:0 0 8px}
 .panel-scroll::-webkit-scrollbar{width:3px}
 .panel-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
@@ -262,7 +262,7 @@ td:nth-child(2){text-align:left}
 
 /* STOCK DETAIL MODAL */
 .detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;justify-content:flex-end}
-.detail-panel{width:480px;height:100%;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;animation:slideIn .15s ease}
+.detail-panel{width:460px;height:100%;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;animation:slideIn .12s ease}
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
 .detail-close{background:none;border:none;color:var(--t2);cursor:pointer;font-size:18px;padding:4px 8px;line-height:1;transition:.1s}
 .detail-close:hover{color:var(--text)}
@@ -317,14 +317,14 @@ td:nth-child(2){text-align:left}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
 /* NAV SIDEBAR */
-.nav-sidebar{width:168px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:6px 0;overflow-y:auto}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:.1s;border-left:2px solid transparent;letter-spacing:.1px}
+.nav-sidebar{width:160px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:4px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:.1s;border-left:2px solid transparent;letter-spacing:.2px}
 .nav-item:hover{color:var(--text);background:var(--s2)}
-.nav-item.act{color:var(--text);background:var(--s2);border-left-color:var(--blue);font-weight:600}
-.nav-icon{width:14px;height:14px;flex-shrink:0;opacity:.7}
+.nav-item.act{color:var(--text);background:var(--s2);border-left-color:var(--blue);font-weight:700}
+.nav-icon{width:13px;height:13px;flex-shrink:0;opacity:.6}
 .nav-item.act .nav-icon{opacity:1;color:var(--blue)}
-.nav-item:hover .nav-icon{opacity:1}
-.nav-section{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--t3);padding:12px 14px 3px}
+.nav-item:hover .nav-icon{opacity:.9}
+.nav-section{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);padding:10px 12px 2px}
 
 /* PORTFOLIO VIEW */
 .portfolio-view{flex:1;overflow-y:auto;display:none;flex-direction:column}
@@ -439,7 +439,7 @@ td:nth-child(2){text-align:left}
 </div>
 
 <header class="hdr" id="app-hdr" style="display:none">
-  <div class="logo">Syntharix<b>Stock</b></div>
+  <div class="logo">SYNTHARIX <b>STOCK</b></div>
   <div class="indices">
     <div class="idx"><div class="in"><span class="live-dot"></span>Live</div><div class="iv" id="i-spx">—</div><div class="ic" id="ic-spx" style="color:var(--t2)">S&amp;P 500</div></div>
     <div class="idx"><div class="in">NASDAQ</div><div class="iv" id="i-comp">—</div><div class="ic" id="ic-comp">—</div></div>
@@ -2059,23 +2059,28 @@ async function fetchHistoricalPrice(sym, dateStr) {
   const key = sym + '_' + dateStr
   if (tmFetched.has(key)) return
   tmFetched.add(key)
-  // Look back up to 7 days to find the nearest trading day
   const from = dateToUnix(dateStr) - 86400 * 7
-  const to   = dateToUnix(dateStr) + 86400
-  enqueue(async () => {
-    try {
-      const d = await apiFetch(`/stock/candle?symbol=${sym}&resolution=D&from=${from}&to=${to}`)
-      if (d && d.s === 'ok' && d.c && d.c.length > 0) {
-        tmPrices[sym] = d.c[d.c.length - 1]
-        tmOpens[sym]  = d.o[d.o.length - 1]
-        renderTmRow(sym)
-      } else {
-        // No data for this period — show unavailable
-        const el = document.getElementById('tmr-' + sym)
-        if (el) el.querySelector('.tm-price-cell').innerHTML = '<span style="color:var(--t3)">No data</span>'
-      }
-    } catch(e) {}
-  })
+  const to   = dateToUnix(dateStr) + 86400 * 2
+  const row  = () => document.getElementById('tmr-' + sym)
+  try {
+    const d = await apiFetch(`/stock/candle?symbol=${sym}&resolution=D&from=${from}&to=${to}`)
+    if (d && d.s === 'ok' && d.c && d.c.length > 0) {
+      tmPrices[sym] = d.c[d.c.length - 1]
+      tmOpens[sym]  = d.o[d.o.length - 1]
+      renderTmRow(sym)
+    } else {
+      const el = row(); if (el) el.cells[1].colSpan = 4, el.cells[1].innerHTML = '<span style="color:var(--t3);font-size:11px">No data for this date</span>'
+    }
+  } catch(e) {
+    const el = row(); if (el) el.cells[1].colSpan = 4, el.cells[1].innerHTML = '<span style="color:var(--red);font-size:11px">Failed to load</span>'
+  }
+}
+
+async function loadTmPrices() {
+  for (const { sym } of tmStocks) {
+    await fetchHistoricalPrice(sym, tmCurrentDate)
+    await sleep(300)
+  }
 }
 
 function renderTmRow(sym) {
@@ -2174,7 +2179,7 @@ function startTmPlayback() {
     }
     updateTmStatus()
     tmFetched.clear()
-    tmStocks.forEach(({ sym }) => fetchHistoricalPrice(sym, tmCurrentDate))
+    loadTmPrices()
   }, 1000)
 }
 
