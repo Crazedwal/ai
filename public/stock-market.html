@@ -223,7 +223,7 @@ td:nth-child(2){text-align:left}
 .ov-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:10px}
 
 /* Index cards */
-.idx-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.idx-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
 .idx-card{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
 .idx-card .ic-name{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:4px}
 .idx-card .ic-val{font-size:16px;font-weight:700;font-family:var(--mono);letter-spacing:-.5px;line-height:1}
@@ -617,12 +617,27 @@ td:nth-child(2){text-align:left}
           <div class="idx-card"><div class="ic-name">DOW</div><div class="ic-val" id="ovc-dji">—</div><div class="ic-chg" id="ovcc-dji">—</div></div>
           <div class="idx-card"><div class="ic-name">VIX</div><div class="ic-val" id="ovc-vix">—</div><div class="ic-chg" id="ovcc-vix" style="color:var(--t3)">Volatility</div></div>
         </div>
+        <div class="idx-cards" style="margin-bottom:0">
+          <div class="idx-card"><div class="ic-name">Russell 2000</div><div class="ic-val" id="ovc-rut">—</div><div class="ic-chg" id="ovcc-rut">—</div></div>
+          <div class="idx-card"><div class="ic-name">Gold</div><div class="ic-val" id="ovc-gold">—</div><div class="ic-chg" id="ovcc-gold">—</div></div>
+          <div class="idx-card"><div class="ic-name">Crude Oil</div><div class="ic-val" id="ovc-oil">—</div><div class="ic-chg" id="ovcc-oil">—</div></div>
+          <div class="idx-card"><div class="ic-name">10Y Treasury</div><div class="ic-val" id="ovc-tny">—</div><div class="ic-chg" id="ovcc-tny" style="color:var(--t3)">Yield</div></div>
+        </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)">
+      <div style="border-top:1px solid var(--border)" class="ov-section">
+        <div class="ov-title">Sector Performance</div>
+        <div class="sector-list" id="ov-sectors"><div class="panel-empty">Loading...</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border)">
         <div class="ov-section" style="border-right:1px solid var(--border)">
-          <div class="ov-title">Sector Performance</div>
-          <div class="sector-list" id="ov-sectors"><div class="panel-empty">Loading...</div></div>
+          <div class="ov-title">Top Gainers</div>
+          <table class="active-table" id="ov-gainers"><tbody><tr><td colspan="3" style="color:var(--t3);font-size:11px;padding:12px 8px">Loading...</td></tr></tbody></table>
+        </div>
+        <div class="ov-section" style="border-right:1px solid var(--border)">
+          <div class="ov-title">Top Losers</div>
+          <table class="active-table" id="ov-losers"><tbody><tr><td colspan="3" style="color:var(--t3);font-size:11px;padding:12px 8px">Loading...</td></tr></tbody></table>
         </div>
         <div class="ov-section">
           <div class="ov-title">Most Active</div>
@@ -1324,19 +1339,42 @@ async function fetchIndices() {
     enqueue(async () => {
       const d = await apiFetch(`/quote?symbol=${encodeURIComponent(sym)}`)
       if (d && d.c) {
-        const chg = d.c - d.pc, pct = chg / d.pc * 100
+        const chg = d.c - d.pc, pcv = chg / d.pc * 100
         const el = document.getElementById('i-'+id)
         const ce = document.getElementById('ic-'+id)
         if (el) el.textContent = d.c.toLocaleString('en-US', {maximumFractionDigits: 2})
         if (ce && id !== 'vix') {
-          ce.textContent = (chg >= 0 ? '+' : '') + pct.toFixed(2) + '%'
+          ce.textContent = (chg >= 0 ? '+' : '') + pcv.toFixed(2) + '%'
           ce.className = 'ic ' + (chg >= 0 ? 'up' : 'dn')
         }
-        // mirror to overview cards
         const ovVal = document.getElementById('ovc-' + id)
         const ovChg = document.getElementById('ovcc-' + id)
         if (ovVal && el) ovVal.textContent = el.textContent
         if (ovChg && ce && id !== 'vix') { ovChg.textContent = ce.textContent; ovChg.className = 'ic-chg ' + (chg >= 0 ? 'up' : 'dn') }
+      }
+    })
+  }
+  // Extra indices via ETFs/symbols
+  const extraMap = {
+    '^RUT': 'rut', 'GC=F': 'gold', 'CL=F': 'oil', '^TNX': 'tny'
+  }
+  const extraLabels = { tny: 'Yield' }
+  for (const [sym, id] of Object.entries(extraMap)) {
+    enqueue(async () => {
+      const d = await apiFetch(`/quote?symbol=${encodeURIComponent(sym)}`)
+      if (d && d.c) {
+        const chg = d.c - d.pc, pcv = d.pc ? chg / d.pc * 100 : 0
+        const ovVal = document.getElementById('ovc-' + id)
+        const ovChg = document.getElementById('ovcc-' + id)
+        const isYield = id === 'tny'
+        const fmt = isYield ? d.c.toFixed(3) + '%' : (id === 'gold' || id === 'oil')
+          ? '$' + d.c.toLocaleString('en-US', {maximumFractionDigits: 2})
+          : d.c.toLocaleString('en-US', {maximumFractionDigits: 2})
+        if (ovVal) ovVal.textContent = fmt
+        if (ovChg && !isYield) {
+          ovChg.textContent = (chg >= 0 ? '+' : '') + pcv.toFixed(2) + '%'
+          ovChg.className = 'ic-chg ' + (chg >= 0 ? 'up' : 'dn')
+        }
       }
     })
   }
@@ -1816,12 +1854,13 @@ function calcSectorPerf() {
   for (const [sym,, sec] of UNIVERSE) {
     if (!loaded.has(sym)) continue
     const pc = pct(sym)
-    if (!map[sec]) map[sec] = { total: 0, count: 0 }
+    if (!map[sec]) map[sec] = { total: 0, count: 0, topSym: sym, topPct: pc }
     map[sec].total += pc
     map[sec].count++
+    if (pc > map[sec].topPct) { map[sec].topSym = sym; map[sec].topPct = pc }
   }
   return Object.entries(map)
-    .map(([sec, { total, count }]) => ({ sec, avg: total / count }))
+    .map(([sec, { total, count, topSym, topPct }]) => ({ sec, avg: total / count, count, topSym, topPct }))
     .sort((a, b) => b.avg - a.avg)
 }
 
@@ -1856,12 +1895,14 @@ async function renderOverview() {
       secEl.innerHTML = '<div class="panel-empty">Loading prices...</div>'
     } else {
       const maxAbs = Math.max(...secs.map(s => Math.abs(s.avg)), 0.01)
-      secEl.innerHTML = secs.map(({ sec, avg }) => {
+      secEl.innerHTML = secs.map(({ sec, avg, count, topSym, topPct }) => {
         const up = avg >= 0, si = up ? '+' : ''
         const barW = Math.min(Math.abs(avg) / maxAbs * 100, 100)
         const barColor = up ? 'var(--green)' : 'var(--red)'
-        return `<div class="sector-row">
-          <span class="sector-name">${sec}</span>
+        const topUp = topPct >= 0
+        return `<div class="sector-row" style="cursor:pointer" onclick="document.getElementById('sec-sel').value='${sec}';onSec();setNav('all',document.getElementById('nav-all'))">
+          <span class="sector-name">${sec}<span style="font-size:9px;color:var(--t3);margin-left:6px">${count} stocks</span></span>
+          <span style="font-size:10px;color:var(--t3);min-width:80px;text-align:right">Top: <span style="font-family:var(--mono);color:${topUp?'var(--green)':'var(--red)'}">${topSym} ${topUp?'+':''}${topPct.toFixed(1)}%</span></span>
           <div class="sector-bar-wrap"><div class="sector-bar" style="width:${barW}%;background:${barColor}"></div></div>
           <span class="sector-pct ${up ? 'up' : 'dn'}">${si}${avg.toFixed(2)}%</span>
         </div>`
@@ -1869,11 +1910,36 @@ async function renderOverview() {
     }
   }
 
+  // Helper to render a stock table
+  const renderStockTable = (el, stocks) => {
+    if (!el) return
+    if (stocks.length === 0) {
+      el.innerHTML = '<tbody><tr><td colspan="3" style="color:var(--t3);font-size:11px;padding:12px 8px">Loading...</td></tr></tbody>'
+    } else {
+      el.innerHTML = '<tbody>' + stocks.map(([s, n]) => {
+        const pc = pct(s), up = pc >= 0, si = up ? '+' : ''
+        return `<tr onclick="selectStock('${s}')">
+          <td><div class="at-sym">${s}</div><div class="at-co">${n}</div></td>
+          <td class="at-vol">$${f2(prices[s] || 0)}</td>
+          <td class="at-pct ${up ? 'up' : 'dn'}">${si}${pc.toFixed(2)}%</td>
+        </tr>`
+      }).join('') + '</tbody>'
+    }
+  }
+
+  // Top gainers
+  const allLoaded = UNIVERSE.filter(([s]) => loaded.has(s))
+  const gainers = [...allLoaded].sort((a, b) => pct(b[0]) - pct(a[0])).slice(0, 8)
+  renderStockTable(document.getElementById('ov-gainers'), gainers)
+
+  // Top losers
+  const losers = [...allLoaded].sort((a, b) => pct(a[0]) - pct(b[0])).slice(0, 8)
+  renderStockTable(document.getElementById('ov-losers'), losers)
+
   // Most active
+  const active = [...allLoaded].sort((a, b) => (vols[b[0]] || 0) - (vols[a[0]] || 0)).slice(0, 8)
   const activeEl = document.getElementById('ov-active')
   if (activeEl) {
-    const active = UNIVERSE.filter(([s]) => loaded.has(s))
-      .sort((a, b) => (vols[b[0]] || 0) - (vols[a[0]] || 0)).slice(0, 10)
     if (active.length === 0) {
       activeEl.innerHTML = '<tbody><tr><td colspan="3" style="color:var(--t3);font-size:11px;padding:12px 8px">Loading...</td></tr></tbody>'
     } else {
