@@ -1077,7 +1077,11 @@ window.addEventListener('load', () => {
 const queue = []
 let processing = false
 
-function enqueue(fn) { queue.push(fn); processQueue() }
+function enqueue(fn, priority) {
+  if (priority) queue.unshift(fn)
+  else queue.push(fn)
+  processQueue()
+}
 
 async function processQueue() {
   if (processing || queue.length === 0) return
@@ -1085,7 +1089,7 @@ async function processQueue() {
   while (queue.length > 0) {
     const fn = queue.shift()
     try { await fn() } catch(e) { console.warn(e) }
-    await sleep(220) // ~4-5 calls/sec, safe under 60/min
+    await sleep(220)
   }
   processing = false
 }
@@ -1152,18 +1156,18 @@ async function fetchIndices() {
 
 async function fetchProfile(sym) {
   if (profiles[sym]) return
-  try {
+  enqueue(async () => {
     const d = await apiFetch(`/stock/profile2?symbol=${sym}`)
     if (d && d.name) { profiles[sym] = d; if (sel === sym) buildDetail() }
-  } catch(e) {}
+  }, true)
 }
 
 async function fetchMetrics(sym) {
   if (metrics[sym]) return
-  try {
+  enqueue(async () => {
     const d = await apiFetch(`/stock/metric?symbol=${sym}&metric=all`)
     if (d && d.metric) { metrics[sym] = d.metric; if (sel === sym) buildDetail() }
-  } catch(e) {}
+  }, true)
 }
 
 async function fetchCandles(sym, res, from, to) {
@@ -1426,49 +1430,30 @@ function buildDetail() {
   loadChartData(sel, period)
 }
 
-async function yahooChart(sym, interval, from, to) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=${interval}&period1=${from}&period2=${to}&includePrePost=false`
-  const attempts = [
-    () => fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`)
-            .then(r => r.json()).then(j => JSON.parse(j.contents)),
-    () => fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`).then(r => r.json()),
-    () => fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`).then(r => r.json()),
-    () => fetch(url).then(r => r.json()),
-  ]
-  for (const attempt of attempts) {
-    try {
-      const data = await withTimeout(attempt(), 8000)
-      const closes = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close
-      if (closes && closes.length > 1) return closes.filter(v => v != null)
-    } catch(e) {}
-  }
-  return null
-}
-
-async function loadChartData(sym, res) {
+function loadChartData(sym, res) {
   const now = Math.floor(Date.now()/1000)
-  const key = `${sym}_${res}`
-  if (histData[key]) { renderChart(histData[key]); return }
-
-  const yahooIntervals = {
-    '1D': { interval:'5m',  from: now - 86400 },
-    '1W': { interval:'30m', from: now - 604800 },
-    '1M': { interval:'1d',  from: now - 2592000 },
-    '3M': { interval:'1d',  from: now - 7776000 },
-    '6M': { interval:'1d',  from: now - 15552000 },
-    '1Y': { interval:'1wk', from: now - 31536000 },
+  const periods = {
+    '1D': {r:'5',  from: now - 86400},
+    '1W': {r:'60', from: now - 604800},
+    '1M': {r:'D',  from: now - 2592000},
+    '3M': {r:'D',  from: now - 7776000},
+    '6M': {r:'D',  from: now - 15552000},
+    '1Y': {r:'W',  from: now - 31536000},
   }
-  const cfg = yahooIntervals[res]
+  const cfg = periods[res]
   if (!cfg) return
-
-  const closes = await yahooChart(sym, cfg.interval, cfg.from, now)
-  if (closes && closes.length > 1) {
-    histData[key] = closes
-    if (sel === sym && period === res) renderChart(closes)
-  } else {
-    const cc = document.getElementById('chart-container')
-    if(cc && sel===sym) cc.innerHTML='<div class="chart-loading">No chart data available</div>'
-  }
+  const key = `${sym}_${cfg.r}_${res}`
+  if (histData[key]) { renderChart(histData[key]); return }
+  enqueue(async () => {
+    const d = await apiFetch(`/stock/candle?symbol=${sym}&resolution=${cfg.r}&from=${cfg.from}&to=${now}`)
+    if (d && d.c && d.s === 'ok') {
+      histData[key] = d.c
+      if (sel === sym && period === res) renderChart(d.c)
+    } else {
+      const cc = document.getElementById('chart-container')
+      if(cc && sel===sym) cc.innerHTML='<div class="chart-loading">No chart data available</div>'
+    }
+  }, true)
 }
 
 function renderChart(data) {
