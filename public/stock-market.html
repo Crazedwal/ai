@@ -733,7 +733,7 @@ td:nth-child(2){text-align:left}
     <div class="timemachine-view" id="timemachine-view">
       <div class="tm-controls">
         <div class="tm-field">
-          <label>Date</label>
+          <label>Start Date</label>
           <input type="date" id="tm-date" min="2000-01-02">
         </div>
         <div class="tm-field">
@@ -746,24 +746,35 @@ td:nth-child(2){text-align:left}
             <option value="365">1 year / sec</option>
           </select>
         </div>
+        <div class="tm-field" style="position:relative">
+          <label>Add Stock</label>
+          <div style="display:flex;gap:6px">
+            <input id="tm-add-input" type="text" placeholder="e.g. AAPL" maxlength="6" autocomplete="off"
+              oninput="tmSuggest()" onkeydown="if(event.key==='Enter')tmAddFromInput()"
+              style="width:110px;background:var(--s1);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;outline:none;text-transform:uppercase;font-family:var(--mono)"
+              onfocus="this.style.borderColor='var(--blue)'" onblur="setTimeout(()=>document.getElementById('tm-suggest-box').style.display='none',150)">
+            <button class="tm-btn" onclick="tmAddFromInput()" style="background:var(--s3);color:var(--text);border:1px solid var(--border)">Add</button>
+          </div>
+          <div id="tm-suggest-box" style="display:none;position:absolute;top:100%;left:0;width:220px;background:var(--s1);border:1px solid var(--border);border-radius:7px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:50;max-height:180px;overflow-y:auto;margin-top:3px"></div>
+        </div>
         <button class="tm-btn" id="tm-start-btn" onclick="startTimeMachine()" style="background:var(--blue);color:#fff">Start</button>
         <button class="tm-btn" onclick="stopTimeMachine()" style="background:var(--s3);color:var(--t2);border:1px solid var(--border)">Return to Live</button>
       </div>
       <div class="tm-status" id="tm-status">
-        <span style="color:var(--t3)">Select a date and press Start to simulate the market at any point in history.</span>
+        <span style="color:var(--t3)">Add stocks above, pick a date, then press Start.</span>
       </div>
       <div class="tbl-wrap" style="flex:1">
         <table>
           <thead><tr>
-            <th></th>
-            <th onclick="srt('sym')">Symbol</th>
-            <th onclick="srt('p')">Price (Historical)</th>
-            <th onclick="srt('chg')">Change</th>
-            <th onclick="srt('pct')">% Chg</th>
-            <th onclick="srt('cap')">Sector</th>
+            <th style="text-align:left;padding-left:14px">Symbol</th>
+            <th>Historical Price</th>
+            <th>Change (Day)</th>
+            <th>% Chg</th>
+            <th>Sector</th>
+            <th>Buy</th>
             <th></th>
           </tr></thead>
-          <tbody id="tm-tbl"></tbody>
+          <tbody id="tm-tbl"><tr><td colspan="7" style="padding:32px;text-align:center;color:var(--t3);font-size:12px">Add stocks using the search above, then pick a date and press Start.</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1984,10 +1995,10 @@ function renderHistory() {
 let tmActive = false
 let tmCurrentDate = null
 let tmTimer = null
-const tmPrices   = {}
-const tmOpens    = {}
-const tmChanges  = {}
-const tmFetched  = new Set()
+let tmStocks = []          // [{sym, name, sector}] user-selected stocks
+const tmPrices  = {}
+const tmOpens   = {}
+const tmFetched = new Set()
 
 function dateToUnix(d) { return Math.floor(new Date(d + 'T16:00:00Z').getTime() / 1000) }
 
@@ -2001,27 +2012,69 @@ function advanceDate(dateStr, days) {
   return d.toISOString().split('T')[0]
 }
 
+// Autocomplete suggestions
+function tmSuggest() {
+  const q = document.getElementById('tm-add-input').value.trim().toUpperCase()
+  const box = document.getElementById('tm-suggest-box')
+  if (!q) { box.style.display = 'none'; return }
+  const matches = UNIVERSE.filter(([s, n]) =>
+    (s.startsWith(q) || n.toUpperCase().includes(q)) && !tmStocks.find(x => x.sym === s)
+  ).slice(0, 8)
+  if (!matches.length) { box.style.display = 'none'; return }
+  box.style.display = 'block'
+  box.innerHTML = matches.map(([s, n, sec]) =>
+    `<div onclick="tmAddStock('${s}')" style="padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:.1s"
+      onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+      <span style="font-family:var(--mono);font-weight:700;font-size:12px">${s}</span>
+      <span style="font-size:11px;color:var(--t2);margin-left:8px">${n}</span>
+    </div>`
+  ).join('')
+}
+
+function tmAddFromInput() {
+  const sym = document.getElementById('tm-add-input').value.trim().toUpperCase()
+  if (!sym) return
+  tmAddStock(sym)
+}
+
+function tmAddStock(sym) {
+  document.getElementById('tm-suggest-box').style.display = 'none'
+  document.getElementById('tm-add-input').value = ''
+  const info = UNIVERSE.find(([s]) => s === sym)
+  if (!info) { toast(`${sym} not found in universe`, 'err'); return }
+  if (tmStocks.find(x => x.sym === sym)) { toast(`${sym} already added`, 'err'); return }
+  tmStocks.push({ sym, name: info[1], sector: info[2] })
+  renderTmTable()
+  if (tmActive) fetchHistoricalPrice(sym, tmCurrentDate)
+}
+
+function tmRemoveStock(sym) {
+  tmStocks = tmStocks.filter(x => x.sym !== sym)
+  delete tmPrices[sym]
+  delete tmOpens[sym]
+  renderTmTable()
+}
+
 async function fetchHistoricalPrice(sym, dateStr) {
   const key = sym + '_' + dateStr
   if (tmFetched.has(key)) return
   tmFetched.add(key)
-  const from = dateToUnix(dateStr) - 86400 * 5
+  // Look back up to 7 days to find the nearest trading day
+  const from = dateToUnix(dateStr) - 86400 * 7
   const to   = dateToUnix(dateStr) + 86400
-  return new Promise(resolve => {
-    enqueue(async () => {
-      try {
-        const d = await apiFetch(`/stock/candle?symbol=${sym}&resolution=D&from=${from}&to=${to}`)
-        if (d && d.s === 'ok' && d.c && d.c.length > 0) {
-          const close = d.c[d.c.length - 1]
-          const open  = d.o[d.o.length - 1]
-          tmPrices[sym]  = close
-          tmOpens[sym]   = open
-          tmChanges[sym] = close - open
-          renderTmRow(sym)
-        }
-      } catch(e) {}
-      resolve()
-    })
+  enqueue(async () => {
+    try {
+      const d = await apiFetch(`/stock/candle?symbol=${sym}&resolution=D&from=${from}&to=${to}`)
+      if (d && d.s === 'ok' && d.c && d.c.length > 0) {
+        tmPrices[sym] = d.c[d.c.length - 1]
+        tmOpens[sym]  = d.o[d.o.length - 1]
+        renderTmRow(sym)
+      } else {
+        // No data for this period — show unavailable
+        const el = document.getElementById('tmr-' + sym)
+        if (el) el.querySelector('.tm-price-cell').innerHTML = '<span style="color:var(--t3)">No data</span>'
+      }
+    } catch(e) {}
   })
 }
 
@@ -2031,41 +2084,43 @@ function renderTmRow(sym) {
   const p = tmPrices[sym], o = tmOpens[sym]
   if (!p) return
   const chg = p - o, pct = o ? chg / o * 100 : 0, up = chg >= 0, si = up ? '+' : '', cls = up ? 'up' : 'dn'
+  const info = tmStocks.find(x => x.sym === sym) || {}
   el.innerHTML = `
-    <td style="text-align:center"><button onclick="tmBuy('${sym}',event)" style="background:var(--green);color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;padding:3px 8px;cursor:pointer">BUY</button></td>
-    <td><div class="sym">${sym}</div><div class="co">${(UNIVERSE.find(([s])=>s===sym)||[])[1]||''}</div></td>
-    <td class="pr">$${f2(p)}</td>
+    <td style="text-align:left;padding-left:14px"><div class="sym">${sym}</div><div class="co">${info.name || ''}</div></td>
+    <td class="pr tm-price-cell">$${f2(p)}</td>
     <td><span class="chg ${cls}">${si}$${f2(Math.abs(chg))}</span></td>
     <td><span class="chg ${cls}">${si}${pct.toFixed(2)}%</span></td>
-    <td class="vol">${(UNIVERSE.find(([s])=>s===sym)||[])[2]||''}</td>
-    <td></td>`
+    <td class="vol">${info.sector || ''}</td>
+    <td><button onclick="tmBuy('${sym}',event)" style="background:var(--green);color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;padding:4px 10px;cursor:pointer;letter-spacing:.3px">BUY</button></td>
+    <td><button onclick="tmRemoveStock('${sym}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 6px" title="Remove">✕</button></td>`
 }
 
 function tmBuy(sym, e) {
   e.stopPropagation()
   const price = tmPrices[sym]
-  if (!price) { toast('Price not loaded', 'err'); return }
-  const sharesStr = prompt(`Buy ${sym} at $${f2(price)}\nCurrent cash: $${f2(portCash)}\n\nHow many shares?`)
+  if (!price) { toast('Price not loaded yet — wait a moment', 'err'); return }
+  const sharesStr = prompt(`Buy ${sym} at $${f2(price)}\nSimulated date: ${fmtDateDisplay(tmCurrentDate)}\nCash available: $${f2(portCash)}\n\nHow many shares?`)
   if (!sharesStr) return
   const shares = parseFloat(sharesStr)
   if (isNaN(shares) || shares <= 0) { toast('Invalid share count', 'err'); return }
   const total = price * shares
-  if (total > portCash) { toast(`Not enough cash. Need $${f2(total)}`, 'err'); return }
+  if (total > portCash) { toast(`Insufficient cash — need $${f2(total)}, have $${f2(portCash)}`, 'err'); return }
   portCash -= total
   if (!positions[sym]) positions[sym] = { shares: 0, avgCost: 0 }
   const pos = positions[sym]
   pos.avgCost = (pos.shares * pos.avgCost + total) / (pos.shares + shares)
   pos.shares += shares
-  tradeHistory.unshift({ time: Date.now(), type: 'buy', sym, shares, price, total, note: `Time Machine: ${tmCurrentDate}` })
+  tradeHistory.unshift({ time: Date.now(), type: 'buy', sym, shares, price, total, note: `Time Machine — ${fmtDateDisplay(tmCurrentDate)}` })
   savePort()
   toast(`Bought ${shares} ${sym} @ $${f2(price)} (${tmCurrentDate})`, 'ok')
 }
 
 function startTimeMachine() {
   const dateVal = document.getElementById('tm-date').value
-  if (!dateVal) { toast('Pick a date first', 'err'); return }
+  if (!dateVal) { toast('Pick a start date', 'err'); return }
   const today = new Date().toISOString().split('T')[0]
   if (dateVal >= today) { toast('Pick a date in the past', 'err'); return }
+  if (tmStocks.length === 0) { toast('Add at least one stock first', 'err'); return }
 
   tmActive = true
   tmCurrentDate = dateVal
@@ -2075,55 +2130,51 @@ function startTimeMachine() {
 
   document.getElementById('tm-start-btn').textContent = 'Restart'
   renderTmTable()
-  loadTmPrices()
+  tmStocks.forEach(({ sym }) => fetchHistoricalPrice(sym, tmCurrentDate))
   startTmPlayback()
 }
 
 function renderTmTable() {
   const tbody = document.getElementById('tm-tbl')
   if (!tbody) return
-  const top50 = UNIVERSE.slice(0, 50)
-  tbody.innerHTML = top50.map(([s]) =>
-    `<tr id="tmr-${s}" onclick="tmSelectStock('${s}')">
-      <td colspan="7" style="color:var(--t3);font-size:11px;padding:8px 14px">Loading ${s}...</td>
+  if (tmStocks.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="padding:32px;text-align:center;color:var(--t3);font-size:12px">Add stocks using the search above, then pick a date and press Start.</td></tr>'
+    return
+  }
+  tbody.innerHTML = tmStocks.map(({ sym, name }) =>
+    `<tr id="tmr-${sym}">
+      <td style="text-align:left;padding-left:14px"><div class="sym">${sym}</div><div class="co">${name}</div></td>
+      <td class="tm-price-cell" colspan="4" style="color:var(--t3);font-size:11px">${tmActive ? 'Loading...' : 'Press Start to load prices'}</td>
+      <td></td>
+      <td><button onclick="tmRemoveStock('${sym}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 6px" title="Remove">✕</button></td>
     </tr>`
   ).join('')
-  updateTmStatus()
-}
-
-function loadTmPrices() {
-  const top50 = UNIVERSE.slice(0, 50)
-  top50.forEach(([s]) => fetchHistoricalPrice(s, tmCurrentDate))
-}
-
-function tmSelectStock(s) {
-  if (!tmPrices[s]) return
-  const savedPrice = prices[s]
-  prices[s] = tmPrices[s]
-  opens[s]  = tmOpens[s]
-  selectStock(s)
-  setTimeout(() => { prices[s] = savedPrice }, 100)
+  if (tmActive) updateTmStatus()
 }
 
 function updateTmStatus() {
   const el = document.getElementById('tm-status')
   if (!el) return
   const speed = parseInt(document.getElementById('tm-speed').value)
-  const speedLabel = speed === 0 ? 'Paused' : speed === 1 ? '1 day/sec' : speed === 7 ? '1 week/sec' : speed === 30 ? '1 month/sec' : '1 year/sec'
-  el.innerHTML = `<div class="tm-live-dot"></div><strong>Simulating:</strong>&nbsp;${fmtDateDisplay(tmCurrentDate)}&nbsp;<span style="color:var(--t3)">— ${speedLabel}</span>`
+  const label = { 0: 'Paused', 1: '1 day / sec', 7: '1 week / sec', 30: '1 month / sec', 365: '1 year / sec' }[speed] || ''
+  el.innerHTML = `<div class="tm-live-dot"></div><strong>Simulating:</strong>&nbsp;${fmtDateDisplay(tmCurrentDate)}&nbsp;<span style="color:var(--t3)">— ${label}</span>`
 }
 
 function startTmPlayback() {
   clearInterval(tmTimer)
   const speed = parseInt(document.getElementById('tm-speed').value)
-  if (speed === 0) return
+  if (speed === 0) { updateTmStatus(); return }
   const today = new Date().toISOString().split('T')[0]
   tmTimer = setInterval(() => {
     tmCurrentDate = advanceDate(tmCurrentDate, speed)
-    if (tmCurrentDate >= today) { tmCurrentDate = today; clearInterval(tmTimer); toast('Reached present day', 'ok'); return }
+    if (tmCurrentDate >= today) {
+      tmCurrentDate = today
+      clearInterval(tmTimer)
+      toast('Reached present day', 'ok')
+    }
     updateTmStatus()
     tmFetched.clear()
-    loadTmPrices()
+    tmStocks.forEach(({ sym }) => fetchHistoricalPrice(sym, tmCurrentDate))
   }, 1000)
 }
 
@@ -2136,9 +2187,9 @@ function stopTimeMachine() {
   clearInterval(tmTimer)
   tmTimer = null
   const el = document.getElementById('tm-status')
-  if (el) el.innerHTML = '<span style="color:var(--t3)">Select a date and press Start to simulate the market at any point in history.</span>'
+  if (el) el.innerHTML = '<span style="color:var(--t3)">Add stocks above, pick a date, then press Start.</span>'
   document.getElementById('tm-start-btn').textContent = 'Start'
-  document.getElementById('tm-tbl').innerHTML = ''
+  renderTmTable()
   toast('Returned to live market', 'ok')
 }
 
