@@ -680,8 +680,9 @@ td:nth-child(2){text-align:left}
           <div class="port-stat-val" id="port-pnl">$0.00</div>
         </div>
       </div>
-      <div style="padding:8px 14px;border-bottom:1px solid var(--border);background:var(--s2);font-size:11px;color:var(--t3)">
-        Click any stock in <strong style="color:var(--t2)">All Stocks</strong> to open the detail panel and trade.
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border);background:var(--s2);font-size:11px;color:var(--t3);display:flex;align-items:center;justify-content:space-between">
+        <span>Click any stock in <strong style="color:var(--t2)">All Stocks</strong> to open the detail panel and trade.</span>
+        <button onclick="confirmResetPortfolio()" style="background:none;border:1px solid var(--red);color:var(--red);font-size:10px;padding:3px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;font-weight:600">Reset Portfolio</button>
       </div>
       <div class="tbl-wrap" style="flex:1">
         <table>
@@ -1927,6 +1928,25 @@ function savePort() {
   localStorage.setItem(PORT_KEY, JSON.stringify(positions))
   localStorage.setItem(HIST_KEY, JSON.stringify(tradeHistory))
   localStorage.setItem(CASH_KEY, portCash.toString())
+}
+
+function confirmResetPortfolio() {
+  const holdingCount = Object.keys(positions).length
+  const totalVal = Object.entries(positions).reduce((s,[sym,p]) => s + p.shares * (prices[sym] || p.avgCost), 0)
+  let msg = 'Are you sure you want to reset your portfolio?\n\n'
+  msg += 'This will:\n'
+  msg += '- Set your cash back to $100,000.00\n'
+  msg += '- Remove all stock positions' + (holdingCount ? ` (${holdingCount} holding${holdingCount > 1 ? 's' : ''} worth ~$${f2(totalVal)})` : '') + '\n'
+  msg += '- Clear your entire trade history\n\n'
+  msg += 'This action cannot be undone.'
+  if (confirm(msg)) {
+    portCash = STARTING_CASH
+    positions = {}
+    tradeHistory = []
+    savePort()
+    renderPortfolio()
+    toast('Portfolio reset to $100,000.00')
+  }
 }
 
 function detailTrade(type) {
