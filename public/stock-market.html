@@ -367,6 +367,17 @@ td:nth-child(2){text-align:left}
 .tm-status{padding:10px 16px;font-size:12px;color:var(--t2);border-bottom:1px solid var(--border);background:var(--s1);display:flex;align-items:center;gap:10px}
 .tm-live-dot{width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:blink 1s infinite;flex-shrink:0}
 .tm-progress{padding:0 16px 8px;font-size:10px;color:var(--t3)}
+.tm-detail{display:none;border-bottom:1px solid var(--border);background:var(--s1);padding:16px;flex-direction:column;gap:12px}
+.tm-detail.open{display:flex}
+.tm-detail-hdr{display:flex;justify-content:space-between;align-items:center}
+.tm-detail-hdr h3{font-size:16px;font-weight:700;margin:0}
+.tm-detail-hdr .tm-d-price{font-size:20px;font-weight:700}
+.tm-detail-chart{height:160px;background:var(--s2);border-radius:8px;border:1px solid var(--border);position:relative;overflow:hidden}
+.tm-detail-chart canvas{display:block;width:100%;height:100%}
+.tm-detail-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tm-detail-stats .tds{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.tm-detail-stats .tds-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:3px}
+.tm-detail-stats .tds-val{font-size:13px;font-weight:600}
 
 /* PROFILE (bottom of sidebar) */
 .nav-profile{margin-top:auto;border-top:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:.12s}
@@ -763,6 +774,26 @@ td:nth-child(2){text-align:left}
       </div>
       <div class="tm-status" id="tm-status">
         <span style="color:var(--t3)">Add stocks above, pick a date, then press Start.</span>
+      </div>
+      <!-- TM Detail Panel -->
+      <div class="tm-detail" id="tm-detail">
+        <div class="tm-detail-hdr">
+          <div>
+            <h3 id="tmd-sym">AAPL</h3>
+            <div style="font-size:11px;color:var(--t2)" id="tmd-name">Apple Inc</div>
+          </div>
+          <div style="text-align:right">
+            <div class="tm-d-price" id="tmd-price">$0.00</div>
+            <div style="font-size:12px" id="tmd-chg"></div>
+          </div>
+          <button onclick="closeTmDetail()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;padding:4px 8px;margin-left:8px">&#10005;</button>
+        </div>
+        <div style="font-size:10px;color:var(--t3)" id="tmd-date-label"></div>
+        <div class="tm-detail-chart">
+          <div id="tmd-chart-msg" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:12px">Loading chart...</div>
+          <canvas id="tmd-canvas" width="600" height="160" style="display:none"></canvas>
+        </div>
+        <div class="tm-detail-stats" id="tmd-stats"></div>
       </div>
       <div class="tbl-wrap" style="flex:1">
         <table>
@@ -2213,6 +2244,8 @@ function renderTmRow(sym) {
   if (!p) return
   const chg = p - o, pct = o ? chg / o * 100 : 0, up = chg >= 0, si = up ? '+' : '', cls = up ? 'up' : 'dn'
   const info = tmStocks.find(x => x.sym === sym) || {}
+  el.style.cursor = 'pointer'
+  el.onclick = () => openTmDetail(sym)
   el.innerHTML = `
     <td style="text-align:left;padding-left:14px"><div class="sym">${sym}</div><div class="co">${info.name || ''}</div></td>
     <td class="pr tm-price-cell">$${f2(p)}</td>
@@ -2220,7 +2253,7 @@ function renderTmRow(sym) {
     <td><span class="chg ${cls}">${si}${pct.toFixed(2)}%</span></td>
     <td class="vol">${info.sector || ''}</td>
     <td><button onclick="tmBuy('${sym}',event)" style="background:var(--green);color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;padding:4px 10px;cursor:pointer;letter-spacing:.3px">BUY</button></td>
-    <td><button onclick="tmRemoveStock('${sym}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 6px" title="Remove">✕</button></td>`
+    <td><button onclick="event.stopPropagation();tmRemoveStock('${sym}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 6px" title="Remove">✕</button></td>`
 }
 
 function tmBuy(sym, e) {
@@ -2241,6 +2274,130 @@ function tmBuy(sym, e) {
   tradeHistory.unshift({ time: Date.now(), type: 'buy', sym, shares, price, total, note: `Time Machine — ${fmtDateDisplay(tmCurrentDate)}` })
   savePort()
   toast(`Bought ${shares} ${sym} @ $${f2(price)} (${tmCurrentDate})`, 'ok')
+}
+
+// ─── TM DETAIL PANEL ──────────────────────────────────────────────────────────
+let tmDetailSym = null
+
+function closeTmDetail() {
+  document.getElementById('tm-detail').classList.remove('open')
+  tmDetailSym = null
+}
+
+async function openTmDetail(sym) {
+  if (!tmActive || !tmCurrentDate) return
+  tmDetailSym = sym
+  const info = tmStocks.find(x => x.sym === sym) || {}
+  const p = tmPrices[sym], o = tmOpens[sym]
+  const panel = document.getElementById('tm-detail')
+  panel.classList.add('open')
+
+  document.getElementById('tmd-sym').textContent = sym
+  document.getElementById('tmd-name').textContent = info.name || ''
+  document.getElementById('tmd-date-label').textContent = 'Historical data as of ' + fmtDateDisplay(tmCurrentDate)
+
+  if (p) {
+    document.getElementById('tmd-price').textContent = '$' + f2(p)
+    const chg = p - (o || p), pct = o ? chg / o * 100 : 0, up = chg >= 0, si = up ? '+' : ''
+    const chgEl = document.getElementById('tmd-chg')
+    chgEl.className = up ? 'up' : 'dn'
+    chgEl.textContent = si + '$' + f2(Math.abs(chg)) + ' (' + si + pct.toFixed(2) + '%)'
+  } else {
+    document.getElementById('tmd-price').textContent = '—'
+    document.getElementById('tmd-chg').textContent = ''
+  }
+
+  const canvas = document.getElementById('tmd-canvas')
+  const msg = document.getElementById('tmd-chart-msg')
+  canvas.style.display = 'none'
+  msg.style.display = 'flex'
+  msg.textContent = 'Loading chart...'
+
+  const targetUnix = dateToUnix(tmCurrentDate)
+  const from = targetUnix - 86400 * 90
+  const to = targetUnix + 86400
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&period1=${from}&period2=${to}&includePrePost=false`
+
+  const attempts = [
+    () => fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`)
+            .then(r => r.json()).then(j => JSON.parse(j.contents)),
+    () => fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`).then(r => r.json()),
+    () => fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`).then(r => r.json()),
+    () => fetch(url).then(r => r.json()),
+  ]
+
+  let chartResult = null
+  for (const attempt of attempts) {
+    try {
+      const data = await withTimeout(attempt(), 9000)
+      chartResult = data?.chart?.result?.[0]
+      if (chartResult?.timestamp?.length > 1) break
+      chartResult = null
+    } catch(e) {}
+  }
+
+  if (tmDetailSym !== sym) return
+
+  if (chartResult) {
+    const closes = chartResult.indicators.quote[0].close.filter(v => v != null)
+    const highs = chartResult.indicators.quote[0].high?.filter(v => v != null) || []
+    const lows = chartResult.indicators.quote[0].low?.filter(v => v != null) || []
+    const volumes = chartResult.indicators.quote[0].volume?.filter(v => v != null) || []
+    const opens = chartResult.indicators.quote[0].open?.filter(v => v != null) || []
+
+    if (closes.length > 1) {
+      msg.style.display = 'none'
+      canvas.style.display = 'block'
+      drawTmChart(canvas, closes)
+    } else {
+      msg.textContent = 'Not enough chart data'
+    }
+
+    const high90 = highs.length ? Math.max(...highs) : null
+    const low90 = lows.length ? Math.min(...lows) : null
+    const avgVol = volumes.length ? volumes.reduce((a,b) => a+b, 0) / volumes.length : null
+    const firstClose = closes[0] || null
+    const lastClose = closes[closes.length - 1] || null
+    const pct90 = firstClose && lastClose ? ((lastClose - firstClose) / firstClose * 100) : null
+    const avgClose = closes.length ? closes.reduce((a,b) => a+b, 0) / closes.length : null
+
+    const statsEl = document.getElementById('tmd-stats')
+    statsEl.innerHTML = `
+      <div class="tds"><div class="tds-lbl">90-Day High</div><div class="tds-val ${high90 ? 'up' : ''}">${high90 ? '$'+f2(high90) : '—'}</div></div>
+      <div class="tds"><div class="tds-lbl">90-Day Low</div><div class="tds-val ${low90 ? 'dn' : ''}">${low90 ? '$'+f2(low90) : '—'}</div></div>
+      <div class="tds"><div class="tds-lbl">90-Day Change</div><div class="tds-val ${pct90 !== null ? (pct90 >= 0 ? 'up' : 'dn') : ''}">${pct90 !== null ? (pct90 >= 0 ? '+' : '') + pct90.toFixed(2) + '%' : '—'}</div></div>
+      <div class="tds"><div class="tds-lbl">Avg Close</div><div class="tds-val">${avgClose ? '$'+f2(avgClose) : '—'}</div></div>
+      <div class="tds"><div class="tds-lbl">Avg Volume</div><div class="tds-val">${avgVol ? fvol(avgVol) : '—'}</div></div>
+      <div class="tds"><div class="tds-lbl">Open (Day)</div><div class="tds-val">${o ? '$'+f2(o) : '—'}</div></div>
+      <div class="tds"><div class="tds-lbl">Close (Day)</div><div class="tds-val">${p ? '$'+f2(p) : '—'}</div></div>
+      <div class="tds"><div class="tds-lbl">Data Points</div><div class="tds-val">${closes.length} days</div></div>
+    `
+  } else {
+    msg.textContent = 'Chart data unavailable'
+    document.getElementById('tmd-stats').innerHTML = ''
+  }
+}
+
+function drawTmChart(canvas, data) {
+  const W = canvas.width, H = canvas.height
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0,0,W,H)
+  const mn = Math.min(...data), mx = Math.max(...data), pad = (mx-mn)*.1 || 1
+  const lo = mn-pad, hi = mx+pad, rng = hi-lo
+  const px = i => i/(data.length-1)*W, py = v => H-((v-lo)/rng)*H
+  const isUp = data[data.length-1] >= data[0], color = css(isUp ? '--green' : '--red')
+
+  ctx.lineWidth = .5; ctx.strokeStyle = css('--border'); ctx.fillStyle = css('--t3'); ctx.font = '9px SF Mono,Consolas,monospace'
+  for (let i=1;i<5;i++) { const y=H*i/5; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); ctx.fillText('$'+f2(hi-rng*y/H),3,y-3) }
+
+  const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,color+'25'); g.addColorStop(1,color+'00')
+  ctx.beginPath(); ctx.moveTo(px(0),py(data[0])); data.forEach((p,i) => ctx.lineTo(px(i),py(p)))
+  ctx.lineTo(px(data.length-1),H); ctx.lineTo(0,H); ctx.closePath(); ctx.fillStyle=g; ctx.fill()
+
+  ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=1.8; ctx.lineJoin='round'
+  data.forEach((p,i) => i===0 ? ctx.moveTo(px(i),py(p)) : ctx.lineTo(px(i),py(p))); ctx.stroke()
+
+  ctx.beginPath(); ctx.arc(px(data.length-1),py(data[data.length-1]),3.5,0,Math.PI*2); ctx.fillStyle=color; ctx.fill()
 }
 
 function startTimeMachine() {
@@ -2314,6 +2471,7 @@ function stopTimeMachine() {
   tmActive = false
   clearInterval(tmTimer)
   tmTimer = null
+  closeTmDetail()
   const el = document.getElementById('tm-status')
   if (el) el.innerHTML = '<span style="color:var(--t3)">Add stocks above, pick a date, then press Start.</span>'
   document.getElementById('tm-start-btn').textContent = 'Start'
