@@ -355,22 +355,70 @@ td:nth-child(2){text-align:left}
 .hist-buy{background:var(--gdim);color:var(--green)}
 .hist-sell{background:var(--rdim);color:var(--red)}
 
+/* TIME MACHINE */
+.timemachine-view{flex:1;overflow-y:auto;display:none;flex-direction:column}
+.tm-controls{padding:16px;border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.tm-field{display:flex;flex-direction:column;gap:5px}
+.tm-field label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3)}
+.tm-field input,.tm-field select{background:var(--s1);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;outline:none;font-family:inherit;transition:.15s}
+.tm-field input:focus,.tm-field select:focus{border-color:var(--blue)}
+.tm-btn{padding:7px 16px;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.tm-btn:hover{opacity:.85}
+.tm-status{padding:10px 16px;font-size:12px;color:var(--t2);border-bottom:1px solid var(--border);background:var(--s1);display:flex;align-items:center;gap:10px}
+.tm-live-dot{width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:blink 1s infinite;flex-shrink:0}
+.tm-progress{padding:0 16px 8px;font-size:10px;color:var(--t3)}
+
+/* PROFILE (bottom of sidebar) */
+.nav-profile{margin-top:auto;border-top:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:.12s}
+.nav-profile:hover{background:var(--s2)}
+.nav-avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:var(--blue)}
+.nav-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.nav-profile-info{flex:1;min-width:0}
+.nav-profile-name{font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-profile-sub{font-size:10px;color:var(--t3)}
+
+/* PROFILE MODAL (account) */
+.acct-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:400;display:none;align-items:center;justify-content:center}
+.acct-modal{background:var(--s1);border:1px solid var(--border);border-radius:14px;width:360px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.acct-hdr{padding:20px 20px 0;display:flex;justify-content:space-between;align-items:center}
+.acct-hdr h2{font-size:15px;font-weight:800}
+.acct-body{padding:20px;display:flex;flex-direction:column;gap:14px}
+.acct-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.acct-avatar-lg{width:72px;height:72px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;cursor:pointer;border:2px solid var(--border);overflow:hidden;position:relative;transition:.15s}
+.acct-avatar-lg:hover{border-color:var(--blue)}
+.acct-avatar-lg img{width:100%;height:100%;object-fit:cover}
+.acct-avatar-hint{font-size:10px;color:var(--t3)}
+.acct-field label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);display:block;margin-bottom:5px}
+.acct-field input{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:7px;font-size:13px;outline:none;transition:.15s;font-family:inherit}
+.acct-field input:focus{border-color:var(--blue)}
+.acct-footer{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px}
+.acct-save{width:100%;padding:9px;background:var(--blue);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.acct-save:hover{opacity:.85}
+.acct-signout{width:100%;padding:9px;background:none;color:var(--red);border:1px solid var(--border);border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.acct-signout:hover{background:var(--rdim)}
+
 /* LEARN VIEW */
-.learn-view{flex:1;overflow-y:auto;display:none;flex-direction:column;padding:16px}
-.learn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.learn-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:16px;cursor:pointer;transition:.15s;border-left:3px solid var(--border)}
+.learn-view{flex:1;overflow-y:auto;display:none;flex-direction:column}
+.learn-inner{padding:20px;max-width:860px;width:100%}
+.learn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:0}
+.learn-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:18px;cursor:pointer;transition:.15s;border-left:3px solid var(--border)}
 .learn-card:hover{border-color:var(--blue);border-left-color:var(--blue);background:var(--s3)}
-.learn-card-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:7px}
-.learn-card-title{font-size:13px;font-weight:700;margin-bottom:4px}
-.learn-card-desc{font-size:11px;color:var(--t2);line-height:1.5}
-.learn-article{display:none;flex-direction:column;gap:12px}
+.learn-card-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:8px}
+.learn-card-title{font-size:13px;font-weight:700;margin-bottom:5px}
+.learn-card-desc{font-size:11px;color:var(--t2);line-height:1.6}
+.learn-article{display:none;flex-direction:column;gap:0;padding:20px}
 .learn-article.open{display:flex}
-.learn-back{background:none;border:1px solid var(--border);color:var(--t2);padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;margin-bottom:4px;width:fit-content;transition:.15s}
+.learn-back{background:none;border:1px solid var(--border);color:var(--t2);padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;margin-bottom:16px;width:fit-content;transition:.15s}
 .learn-back:hover{color:var(--text)}
-.learn-art-title{font-size:17px;font-weight:800}
-.learn-art-body{font-size:12px;color:var(--t2);line-height:1.7}
-.learn-art-body h3{font-size:13px;font-weight:700;color:var(--text);margin:12px 0 4px}
+.learn-art-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:8px}
+.learn-art-title{font-size:22px;font-weight:800;margin-bottom:6px}
+.learn-art-subtitle{font-size:13px;color:var(--t2);margin-bottom:24px;line-height:1.5;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.learn-art-body{font-size:13px;color:var(--t2);line-height:1.8;display:flex;flex-direction:column;gap:0}
+.learn-art-body h3{font-size:13px;font-weight:700;color:var(--text);margin:20px 0 6px;padding-left:10px;border-left:2px solid var(--blue)}
+.learn-art-body p{margin-bottom:10px}
 .learn-art-body strong{color:var(--text)}
+.learn-callout{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin:10px 0;font-size:12px;color:var(--t2);line-height:1.6}
+.learn-callout strong{color:var(--text);display:block;margin-bottom:3px}
 </style>
 </head>
 <body>
@@ -491,10 +539,52 @@ td:nth-child(2){text-align:left}
     <button class="nav-item" id="nav-history" onclick="setNav('history',this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>History
     </button>
+    <button class="nav-item" id="nav-timemachine" onclick="setNav('timemachine',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><path d="M3.05 11a9 9 0 0 1 .5-2.5"/></svg>Time Machine
+    </button>
     <button class="nav-item" id="nav-learn" onclick="setNav('learn',this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Learn
     </button>
+    <div class="nav-profile" id="nav-profile-btn" onclick="openAccount()">
+      <div class="nav-avatar" id="sidebar-avatar"></div>
+      <div class="nav-profile-info">
+        <div class="nav-profile-name" id="sidebar-name">Guest</div>
+        <div class="nav-profile-sub" id="sidebar-sub">Sign in</div>
+      </div>
+    </div>
   </nav>
+
+  <!-- ACCOUNT MODAL -->
+  <div class="acct-overlay" id="acct-overlay" onclick="if(event.target===this)closeAccount()">
+    <div class="acct-modal">
+      <div class="acct-hdr">
+        <h2>Account</h2>
+        <button onclick="closeAccount()" style="background:none;border:none;color:var(--t2);font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <div class="acct-body">
+        <div class="acct-avatar-wrap">
+          <div class="acct-avatar-lg" id="acct-avatar-lg" onclick="document.getElementById('pfp-input').click()" title="Click to change">
+            <span id="acct-avatar-initials"></span>
+            <img id="acct-avatar-img" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">
+          </div>
+          <div class="acct-avatar-hint">Click to change photo</div>
+          <input type="file" id="pfp-input" accept="image/*" style="display:none" onchange="handlePfp(event)">
+        </div>
+        <div class="acct-field">
+          <label>Display Name</label>
+          <input id="acct-name" type="text" placeholder="Enter your name">
+        </div>
+        <div class="acct-field">
+          <label>Email</label>
+          <input id="acct-email" type="email" placeholder="Enter your email">
+        </div>
+      </div>
+      <div class="acct-footer">
+        <button class="acct-save" onclick="saveAccount()">Save Changes</button>
+        <button class="acct-signout" id="acct-signout-btn" onclick="signOut()">Sign Out</button>
+      </div>
+    </div>
+  </div>
 
   <div class="left">
     <div class="filter-bar">
@@ -616,24 +706,65 @@ td:nth-child(2){text-align:left}
 
     <!-- Learn view -->
     <div class="learn-view" id="learn-view">
-      <div id="learn-home">
-        <div style="margin-bottom:14px">
-          <div style="font-size:16px;font-weight:800;margin-bottom:4px">Stock Market Basics</div>
-          <div style="font-size:12px;color:var(--t2)">Learn how investing works, from fundamentals to reading charts.</div>
+      <div id="learn-home" class="learn-inner">
+        <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="font-size:18px;font-weight:800;margin-bottom:5px">Investor Education</div>
+          <div style="font-size:12px;color:var(--t2)">Learn how markets work — from the basics of stock ownership to technical analysis and portfolio strategy.</div>
         </div>
         <div class="learn-grid">
-          <div class="learn-card" onclick="openArticle('stocks')"><div class="learn-card-tag">Fundamentals</div><div class="learn-card-title">What is a Stock?</div><div class="learn-card-desc">Understand ownership, shares, and why companies go public.</div></div>
-          <div class="learn-card" onclick="openArticle('pe')"><div class="learn-card-tag">Valuation</div><div class="learn-card-title">P/E Ratio</div><div class="learn-card-desc">The most-used valuation metric and how to read it correctly.</div></div>
-          <div class="learn-card" onclick="openArticle('mcap')"><div class="learn-card-tag">Valuation</div><div class="learn-card-title">Market Cap</div><div class="learn-card-desc">How company size is measured and what it tells investors.</div></div>
-          <div class="learn-card" onclick="openArticle('charts')"><div class="learn-card-tag">Technical</div><div class="learn-card-title">Reading Charts</div><div class="learn-card-desc">Candlesticks, support/resistance, and trend lines explained.</div></div>
-          <div class="learn-card" onclick="openArticle('diversify')"><div class="learn-card-tag">Strategy</div><div class="learn-card-title">Diversification</div><div class="learn-card-desc">Why spreading risk across sectors protects your portfolio.</div></div>
-          <div class="learn-card" onclick="openArticle('terms')"><div class="learn-card-tag">Reference</div><div class="learn-card-title">Key Terms</div><div class="learn-card-desc">Bull, bear, dividend, short-selling, ETF — all defined simply.</div></div>
+          <div class="learn-card" onclick="openArticle('stocks')"><div class="learn-card-tag">Fundamentals</div><div class="learn-card-title">What is a Stock?</div><div class="learn-card-desc">Understand ownership, shares, and why companies list on exchanges.</div></div>
+          <div class="learn-card" onclick="openArticle('pe')"><div class="learn-card-tag">Valuation</div><div class="learn-card-title">P/E Ratio</div><div class="learn-card-desc">The most-used valuation metric — how to read it and where it fails.</div></div>
+          <div class="learn-card" onclick="openArticle('mcap')"><div class="learn-card-tag">Valuation</div><div class="learn-card-title">Market Capitalization</div><div class="learn-card-desc">How company size is measured and what it means for risk and growth.</div></div>
+          <div class="learn-card" onclick="openArticle('charts')"><div class="learn-card-tag">Technical Analysis</div><div class="learn-card-title">Reading Charts</div><div class="learn-card-desc">Candlesticks, support and resistance, trend lines, and volume signals.</div></div>
+          <div class="learn-card" onclick="openArticle('diversify')"><div class="learn-card-tag">Strategy</div><div class="learn-card-title">Diversification</div><div class="learn-card-desc">Why spreading risk across sectors and asset classes protects your portfolio.</div></div>
+          <div class="learn-card" onclick="openArticle('terms')"><div class="learn-card-tag">Reference</div><div class="learn-card-title">Key Terms Glossary</div><div class="learn-card-desc">Bull, bear, dividend, short-selling, ETF, EPS — all defined clearly.</div></div>
         </div>
       </div>
       <div id="learn-article" class="learn-article">
-        <button class="learn-back" onclick="closeArticle()">← Back</button>
+        <button class="learn-back" onclick="closeArticle()">← Back to articles</button>
+        <div class="learn-art-tag" id="art-tag"></div>
         <div class="learn-art-title" id="art-title"></div>
+        <div class="learn-art-subtitle" id="art-subtitle"></div>
         <div class="learn-art-body" id="art-body"></div>
+      </div>
+    </div>
+
+    <!-- Time Machine view -->
+    <div class="timemachine-view" id="timemachine-view">
+      <div class="tm-controls">
+        <div class="tm-field">
+          <label>Date</label>
+          <input type="date" id="tm-date" min="2000-01-02">
+        </div>
+        <div class="tm-field">
+          <label>Playback Speed</label>
+          <select id="tm-speed">
+            <option value="0">Paused</option>
+            <option value="1">1 day / sec</option>
+            <option value="7">1 week / sec</option>
+            <option value="30" selected>1 month / sec</option>
+            <option value="365">1 year / sec</option>
+          </select>
+        </div>
+        <button class="tm-btn" id="tm-start-btn" onclick="startTimeMachine()" style="background:var(--blue);color:#fff">Start</button>
+        <button class="tm-btn" onclick="stopTimeMachine()" style="background:var(--s3);color:var(--t2);border:1px solid var(--border)">Return to Live</button>
+      </div>
+      <div class="tm-status" id="tm-status">
+        <span style="color:var(--t3)">Select a date and press Start to simulate the market at any point in history.</span>
+      </div>
+      <div class="tbl-wrap" style="flex:1">
+        <table>
+          <thead><tr>
+            <th></th>
+            <th onclick="srt('sym')">Symbol</th>
+            <th onclick="srt('p')">Price (Historical)</th>
+            <th onclick="srt('chg')">Change</th>
+            <th onclick="srt('pct')">% Chg</th>
+            <th onclick="srt('cap')">Sector</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="tm-tbl"></tbody>
+        </table>
       </div>
     </div>
 
@@ -715,7 +846,12 @@ td:nth-child(2){text-align:left}
     <div class="detail-scroll" id="d-scroll">
       <div class="chart-sec">
         <div class="ct-tabs">
-          ${['1D','1W','1M','3M','6M','1Y'].map(t=>`<button class="ct${t==='1D'?' act':''}" onclick="setPeriod('${t}')">${t}</button>`).join('')}
+          <button class="ct act" onclick="setPeriod('1D')">1D</button>
+          <button class="ct" onclick="setPeriod('1W')">1W</button>
+          <button class="ct" onclick="setPeriod('1M')">1M</button>
+          <button class="ct" onclick="setPeriod('3M')">3M</button>
+          <button class="ct" onclick="setPeriod('6M')">6M</button>
+          <button class="ct" onclick="setPeriod('1Y')">1Y</button>
         </div>
         <div id="chart-container"><div class="chart-loading">Loading chart data...</div></div>
       </div>
@@ -1352,6 +1488,7 @@ function setNav(t, el) {
   const portView    = document.getElementById('portfolio-view')
   const histView    = document.getElementById('history-view')
   const learnView   = document.getElementById('learn-view')
+  const tmView      = document.getElementById('timemachine-view')
   const filterRow   = document.getElementById('filter-row')
   const secSel      = document.getElementById('sec-sel')
   const cnt         = document.getElementById('cnt')
@@ -1363,6 +1500,7 @@ function setNav(t, el) {
   portView.style.display   = 'none'
   histView.style.display   = 'none'
   learnView.style.display  = 'none'
+  tmView.style.display     = 'none'
   filterRow.style.display  = 'none'
   secSel.style.display     = 'none'
   cnt.textContent          = ''
@@ -1381,12 +1519,26 @@ function setNav(t, el) {
     renderHistory()
   } else if (t === 'learn') {
     learnView.style.display = 'flex'
+  } else if (t === 'timemachine') {
+    tmView.style.display = 'flex'
+    const today = new Date(); today.setDate(today.getDate() - 1)
+    const maxDate = today.toISOString().split('T')[0]
+    document.getElementById('tm-date').setAttribute('max', maxDate)
+    if (!document.getElementById('tm-date').value) {
+      const defaultDate = new Date('2010-01-04')
+      document.getElementById('tm-date').value = defaultDate.toISOString().split('T')[0]
+    }
   } else {
     tblView.style.display       = 'flex'
     tblView.style.flexDirection = 'column'
     filterRow.style.display     = 'flex'
     secSel.style.display        = ''
     curTab = t
+    if (t === 'watchlist') {
+      filterRow.style.display = 'none'
+      secSel.style.display    = 'none'
+    }
+    document.getElementById('tbl').innerHTML = '' // force row rebuild for correct first column
     renderTable()
   }
 }
@@ -1828,78 +1980,336 @@ function renderHistory() {
   </table>`
 }
 
+// ─── TIME MACHINE ─────────────────────────────────────────────────────────────
+let tmActive = false
+let tmCurrentDate = null
+let tmTimer = null
+const tmPrices   = {}
+const tmOpens    = {}
+const tmChanges  = {}
+const tmFetched  = new Set()
+
+function dateToUnix(d) { return Math.floor(new Date(d + 'T16:00:00Z').getTime() / 1000) }
+
+function fmtDateDisplay(d) {
+  return new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+}
+
+function advanceDate(dateStr, days) {
+  const d = new Date(dateStr + 'T12:00:00Z')
+  d.setDate(d.getDate() + days)
+  return d.toISOString().split('T')[0]
+}
+
+async function fetchHistoricalPrice(sym, dateStr) {
+  const key = sym + '_' + dateStr
+  if (tmFetched.has(key)) return
+  tmFetched.add(key)
+  const from = dateToUnix(dateStr) - 86400 * 5
+  const to   = dateToUnix(dateStr) + 86400
+  return new Promise(resolve => {
+    enqueue(async () => {
+      try {
+        const d = await apiFetch(`/stock/candle?symbol=${sym}&resolution=D&from=${from}&to=${to}`)
+        if (d && d.s === 'ok' && d.c && d.c.length > 0) {
+          const close = d.c[d.c.length - 1]
+          const open  = d.o[d.o.length - 1]
+          tmPrices[sym]  = close
+          tmOpens[sym]   = open
+          tmChanges[sym] = close - open
+          renderTmRow(sym)
+        }
+      } catch(e) {}
+      resolve()
+    })
+  })
+}
+
+function renderTmRow(sym) {
+  const el = document.getElementById('tmr-' + sym)
+  if (!el) return
+  const p = tmPrices[sym], o = tmOpens[sym]
+  if (!p) return
+  const chg = p - o, pct = o ? chg / o * 100 : 0, up = chg >= 0, si = up ? '+' : '', cls = up ? 'up' : 'dn'
+  el.innerHTML = `
+    <td style="text-align:center"><button onclick="tmBuy('${sym}',event)" style="background:var(--green);color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;padding:3px 8px;cursor:pointer">BUY</button></td>
+    <td><div class="sym">${sym}</div><div class="co">${(UNIVERSE.find(([s])=>s===sym)||[])[1]||''}</div></td>
+    <td class="pr">$${f2(p)}</td>
+    <td><span class="chg ${cls}">${si}$${f2(Math.abs(chg))}</span></td>
+    <td><span class="chg ${cls}">${si}${pct.toFixed(2)}%</span></td>
+    <td class="vol">${(UNIVERSE.find(([s])=>s===sym)||[])[2]||''}</td>
+    <td></td>`
+}
+
+function tmBuy(sym, e) {
+  e.stopPropagation()
+  const price = tmPrices[sym]
+  if (!price) { toast('Price not loaded', 'err'); return }
+  const sharesStr = prompt(`Buy ${sym} at $${f2(price)}\nCurrent cash: $${f2(portCash)}\n\nHow many shares?`)
+  if (!sharesStr) return
+  const shares = parseFloat(sharesStr)
+  if (isNaN(shares) || shares <= 0) { toast('Invalid share count', 'err'); return }
+  const total = price * shares
+  if (total > portCash) { toast(`Not enough cash. Need $${f2(total)}`, 'err'); return }
+  portCash -= total
+  if (!positions[sym]) positions[sym] = { shares: 0, avgCost: 0 }
+  const pos = positions[sym]
+  pos.avgCost = (pos.shares * pos.avgCost + total) / (pos.shares + shares)
+  pos.shares += shares
+  tradeHistory.unshift({ time: Date.now(), type: 'buy', sym, shares, price, total, note: `Time Machine: ${tmCurrentDate}` })
+  savePort()
+  toast(`Bought ${shares} ${sym} @ $${f2(price)} (${tmCurrentDate})`, 'ok')
+}
+
+function startTimeMachine() {
+  const dateVal = document.getElementById('tm-date').value
+  if (!dateVal) { toast('Pick a date first', 'err'); return }
+  const today = new Date().toISOString().split('T')[0]
+  if (dateVal >= today) { toast('Pick a date in the past', 'err'); return }
+
+  tmActive = true
+  tmCurrentDate = dateVal
+  tmFetched.clear()
+  Object.keys(tmPrices).forEach(k => delete tmPrices[k])
+  Object.keys(tmOpens).forEach(k => delete tmOpens[k])
+
+  document.getElementById('tm-start-btn').textContent = 'Restart'
+  renderTmTable()
+  loadTmPrices()
+  startTmPlayback()
+}
+
+function renderTmTable() {
+  const tbody = document.getElementById('tm-tbl')
+  if (!tbody) return
+  const top50 = UNIVERSE.slice(0, 50)
+  tbody.innerHTML = top50.map(([s]) =>
+    `<tr id="tmr-${s}" onclick="tmSelectStock('${s}')">
+      <td colspan="7" style="color:var(--t3);font-size:11px;padding:8px 14px">Loading ${s}...</td>
+    </tr>`
+  ).join('')
+  updateTmStatus()
+}
+
+function loadTmPrices() {
+  const top50 = UNIVERSE.slice(0, 50)
+  top50.forEach(([s]) => fetchHistoricalPrice(s, tmCurrentDate))
+}
+
+function tmSelectStock(s) {
+  if (!tmPrices[s]) return
+  const savedPrice = prices[s]
+  prices[s] = tmPrices[s]
+  opens[s]  = tmOpens[s]
+  selectStock(s)
+  setTimeout(() => { prices[s] = savedPrice }, 100)
+}
+
+function updateTmStatus() {
+  const el = document.getElementById('tm-status')
+  if (!el) return
+  const speed = parseInt(document.getElementById('tm-speed').value)
+  const speedLabel = speed === 0 ? 'Paused' : speed === 1 ? '1 day/sec' : speed === 7 ? '1 week/sec' : speed === 30 ? '1 month/sec' : '1 year/sec'
+  el.innerHTML = `<div class="tm-live-dot"></div><strong>Simulating:</strong>&nbsp;${fmtDateDisplay(tmCurrentDate)}&nbsp;<span style="color:var(--t3)">— ${speedLabel}</span>`
+}
+
+function startTmPlayback() {
+  clearInterval(tmTimer)
+  const speed = parseInt(document.getElementById('tm-speed').value)
+  if (speed === 0) return
+  const today = new Date().toISOString().split('T')[0]
+  tmTimer = setInterval(() => {
+    tmCurrentDate = advanceDate(tmCurrentDate, speed)
+    if (tmCurrentDate >= today) { tmCurrentDate = today; clearInterval(tmTimer); toast('Reached present day', 'ok'); return }
+    updateTmStatus()
+    tmFetched.clear()
+    loadTmPrices()
+  }, 1000)
+}
+
+document.addEventListener('change', e => {
+  if (e.target.id === 'tm-speed' && tmActive) startTmPlayback()
+})
+
+function stopTimeMachine() {
+  tmActive = false
+  clearInterval(tmTimer)
+  tmTimer = null
+  const el = document.getElementById('tm-status')
+  if (el) el.innerHTML = '<span style="color:var(--t3)">Select a date and press Start to simulate the market at any point in history.</span>'
+  document.getElementById('tm-start-btn').textContent = 'Start'
+  document.getElementById('tm-tbl').innerHTML = ''
+  toast('Returned to live market', 'ok')
+}
+
+// ─── ACCOUNT / PROFILE ────────────────────────────────────────────────────────
+const ACCT_KEY = 'syntharix_account'
+
+function loadAccount() {
+  const raw = localStorage.getItem(ACCT_KEY)
+  return raw ? JSON.parse(raw) : { name: '', email: '', pfp: null, signedIn: false }
+}
+
+function saveAccountData(data) {
+  localStorage.setItem(ACCT_KEY, JSON.stringify(data))
+}
+
+function renderSidebarProfile() {
+  const acct = loadAccount()
+  const avatarEl = document.getElementById('sidebar-avatar')
+  const nameEl   = document.getElementById('sidebar-name')
+  const subEl    = document.getElementById('sidebar-sub')
+
+  const display = acct.name || 'Guest'
+  nameEl.textContent = display
+  subEl.textContent  = acct.signedIn ? (acct.email || 'Signed in') : 'Click to sign in'
+
+  if (acct.pfp) {
+    avatarEl.innerHTML = `<img src="${acct.pfp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`
+  } else {
+    avatarEl.textContent = display.charAt(0).toUpperCase() || '?'
+    avatarEl.innerHTML = `<span>${display.charAt(0).toUpperCase() || '?'}</span>`
+  }
+}
+
+function openAccount() {
+  const acct = loadAccount()
+  document.getElementById('acct-name').value  = acct.name  || ''
+  document.getElementById('acct-email').value = acct.email || ''
+  const initials = document.getElementById('acct-avatar-initials')
+  const img      = document.getElementById('acct-avatar-img')
+  if (acct.pfp) {
+    img.src = acct.pfp; img.style.display = 'block'
+    initials.style.display = 'none'
+  } else {
+    img.style.display = 'none'
+    initials.style.display = ''
+    initials.textContent = (acct.name || '?').charAt(0).toUpperCase()
+  }
+  document.getElementById('acct-signout-btn').textContent = acct.signedIn ? 'Sign Out' : 'Sign In'
+  document.getElementById('acct-overlay').style.display = 'flex'
+}
+
+function closeAccount() {
+  document.getElementById('acct-overlay').style.display = 'none'
+}
+
+function saveAccount() {
+  const acct = loadAccount()
+  acct.name   = document.getElementById('acct-name').value.trim()
+  acct.email  = document.getElementById('acct-email').value.trim()
+  acct.signedIn = true
+  saveAccountData(acct)
+  renderSidebarProfile()
+  closeAccount()
+  toast('Profile saved', 'ok')
+}
+
+function signOut() {
+  const acct = loadAccount()
+  if (acct.signedIn) {
+    acct.signedIn = false
+    saveAccountData(acct)
+    renderSidebarProfile()
+    closeAccount()
+    toast('Signed out', 'ok')
+  } else {
+    // treat as sign in — just save whatever is in fields
+    acct.signedIn = true
+    acct.name  = document.getElementById('acct-name').value.trim() || 'User'
+    acct.email = document.getElementById('acct-email').value.trim()
+    saveAccountData(acct)
+    renderSidebarProfile()
+    closeAccount()
+    toast('Signed in', 'ok')
+  }
+}
+
+function handlePfp(e) {
+  const file = e.target.files[0]; if (!file) return
+  const reader = new FileReader()
+  reader.onload = ev => {
+    const acct = loadAccount()
+    acct.pfp = ev.target.result
+    saveAccountData(acct)
+    const img      = document.getElementById('acct-avatar-img')
+    const initials = document.getElementById('acct-avatar-initials')
+    img.src = ev.target.result; img.style.display = 'block'
+    initials.style.display = 'none'
+    renderSidebarProfile()
+  }
+  reader.readAsDataURL(file)
+}
+
+window.addEventListener('load', () => { renderSidebarProfile() })
+
 // ─── LEARN ────────────────────────────────────────────────────────────────────
 const ARTICLES = {
   stocks: {
-    title: 'What is a Stock?',
-    body: `<p>A <strong>stock</strong> (or share) represents a tiny slice of ownership in a company. When a company wants to raise money, it can sell pieces of itself to the public through a process called an <strong>IPO (Initial Public Offering)</strong>.</p>
-<h3>Why Buy Stocks?</h3>
-<p>As a shareholder you benefit in two ways: <strong>price appreciation</strong> (the stock goes up in value) and <strong>dividends</strong> (a portion of profits paid to you periodically). Historically, the stock market has returned ~10% per year on average — beating savings accounts and bonds over long periods.</p>
-<h3>Risk</h3>
-<p>Stock prices move constantly based on earnings, news, and market sentiment. You can lose money too — there's no guarantee. The key is holding quality companies over a long time horizon and not panic-selling during downturns.</p>
-<h3>Where Are They Traded?</h3>
-<p>Stocks are listed on exchanges like the <strong>NYSE</strong> and <strong>NASDAQ</strong>. Trades happen in milliseconds through brokers (Robinhood, Fidelity, etc.). You're matched with someone willing to sell at your price.</p>`
+    tag: 'Fundamentals', title: 'What is a Stock?',
+    subtitle: 'A stock represents fractional ownership of a company. Understanding what you actually own when you buy shares is the foundation of every investing decision you will ever make.',
+    body: `<h3>Ownership, not a bet</h3><p>When you buy a share of Apple, you own a small percentage of the entire business — its offices, products, patents, cash, and future earnings. You are not lending money; you are a part-owner. That distinction matters. As the company grows and generates more profit, your slice becomes more valuable.</p>
+<h3>How companies issue stock</h3><p>A private company that wants to raise capital can sell shares to the public through an <strong>Initial Public Offering (IPO)</strong>. The company sets an initial price, investment banks sell the shares to institutional investors, and then those shares trade freely on an exchange like the NYSE or NASDAQ. After the IPO, the company receives no money from secondary market trading — only from the original sale.</p>
+<h3>Two ways to make money</h3><p><strong>Price appreciation</strong> — if the company performs well, more investors want to own it and the price rises. You sell higher than you bought and keep the difference. <strong>Dividends</strong> — some companies distribute a portion of profits to shareholders quarterly. Mature, stable businesses (utilities, consumer staples) tend to pay dividends. High-growth companies (most tech) reinvest profits instead.</p>
+<div class="learn-callout"><strong>Historical context</strong>The S&P 500 — a basket of the 500 largest US companies — has returned approximately 10% per year on average since 1926, before inflation. No savings account, bond, or cash equivalent has consistently matched that over long time horizons.</div>
+<h3>What moves the price?</h3><p>Stock prices reflect the collective opinion of every buyer and seller about a company's future. Earnings reports, interest rate changes, competitor moves, management decisions, and broader economic conditions all shift that opinion — sometimes rationally, sometimes not. In the short term markets are driven by emotion. Over years and decades, prices track fundamentals.</p>
+<h3>Risk you cannot avoid</h3><p>Every stock can go to zero. Companies fail, get disrupted, or face fraud. The risk of holding any single company is enormous compared to holding a diversified basket. This is why most professional investors hold dozens of positions and why broad index ETFs exist. You are compensated with higher expected returns for accepting that risk.</p>`
   },
   pe: {
-    title: 'P/E Ratio Explained',
-    body: `<p>The <strong>Price-to-Earnings ratio</strong> is the #1 valuation metric on Wall Street. It tells you how much investors are paying for each dollar of company earnings.</p>
-<h3>Formula</h3>
-<p><strong>P/E = Stock Price ÷ Earnings Per Share (EPS)</strong><br>Example: Stock at $100, EPS of $5 → P/E of 20. You're paying $20 for every $1 the company earns.</p>
-<h3>What's a "Good" P/E?</h3>
-<p>The S&P 500 historically averages around 15–25x. Growth stocks (like tech) often trade at 40–100x because investors expect big future earnings. Value stocks trade at 8–15x. There's no universal "good" — compare within the same sector.</p>
-<h3>Limitations</h3>
-<p>P/E is backward-looking and can be distorted by one-time events. A company losing money has no P/E. Always combine it with other metrics like revenue growth, margins, and debt levels.</p>`
+    tag: 'Valuation', title: 'The P/E Ratio',
+    subtitle: 'Price-to-Earnings is the most widely cited valuation metric in finance. Knowing how to use it — and where it breaks down — separates informed investors from noise-followers.',
+    body: `<h3>What it measures</h3><p>P/E tells you how much the market is willing to pay for each dollar of a company's earnings. <strong>P/E = Stock Price ÷ Earnings Per Share (EPS)</strong>. If a stock trades at $150 and the company earned $10 per share over the past year, the P/E is 15. You are paying $15 for every $1 of annual profit.</p>
+<h3>Trailing vs Forward P/E</h3><p><strong>Trailing P/E</strong> uses the past 12 months of actual earnings — concrete, audited numbers. <strong>Forward P/E</strong> uses analyst estimates for the next 12 months — speculative but more useful for growing companies. When people say a stock is "expensive at 35x," they usually mean trailing P/E.</p>
+<div class="learn-callout"><strong>Reference ranges</strong>S&P 500 historical average: 15–18x. Value stocks: 8–14x. Quality growth companies: 25–50x. Early-stage hypergrowth: 60–200x or no P/E (negative earnings).</div>
+<h3>Why a high P/E isn't always bad</h3><p>Investors pay a premium for growth. If a company is expected to double its earnings every two years, a 60x P/E today might look cheap in retrospect. NVIDIA traded at 30x in 2020 and the stock tripled by 2023 as earnings exploded. The P/E contracted even as the price rose — because earnings grew faster than the price.</p>
+<h3>Why a low P/E isn't always cheap</h3><p>A company trading at 6x earnings might be cheap. Or it might be a value trap — a business in permanent decline where the earnings will fall every year. Banks, energy companies, and retailers often appear cheap by P/E but face structural headwinds. Always ask: why is this trading at a discount?</p>
+<h3>Compare within sectors</h3><p>A P/E only means something relative to peers. A software company at 40x is not the same as an auto manufacturer at 40x. Software has higher margins, recurring revenue, and lower capital requirements. Always compare a stock's P/E to its sector median and its own historical range.</p>
+<h3>When P/E is useless</h3><p>If a company has negative earnings — it is losing money — P/E is undefined. For early-stage growth companies, analysts instead use <strong>Price-to-Sales (P/S)</strong>, <strong>EV/EBITDA</strong>, or <strong>Price-to-Free-Cash-Flow</strong>. These limitations are why professional investors never rely on a single metric.</p>`
   },
   mcap: {
-    title: 'Market Capitalization',
-    body: `<p><strong>Market Cap = Share Price × Total Shares Outstanding</strong>. It's the total market value of a company — the price to buy the whole thing.</p>
-<h3>Size Categories</h3>
-<p><strong>Mega Cap:</strong> $200B+ (Apple, Microsoft, NVIDIA) — most stable, liquid<br>
-<strong>Large Cap:</strong> $10B–$200B — established companies, lower risk<br>
-<strong>Mid Cap:</strong> $2B–$10B — growth potential, moderate risk<br>
-<strong>Small Cap:</strong> $300M–$2B — higher growth ceiling, higher volatility</p>
-<h3>Why It Matters</h3>
-<p>Market cap shows company size, not stock price. A $5 stock can be a bigger company than a $500 stock if it has more shares outstanding. Larger companies are generally safer but grow slower. Smaller companies are riskier but can multiply faster.</p>`
+    tag: 'Valuation', title: 'Market Capitalization',
+    subtitle: 'Market cap is how the financial world measures company size. It determines index inclusion, institutional eligibility, volatility profile, and how much growth is realistically possible.',
+    body: `<h3>The formula</h3><p><strong>Market Cap = Current Share Price × Total Shares Outstanding</strong>. Apple at $190/share with 15.4 billion shares outstanding has a market cap of roughly $2.9 trillion. That is the total price to theoretically buy the entire company at today's price — though in practice a takeover would require a premium above market price.</p>
+<h3>Size tiers and what they mean</h3>
+<div class="learn-callout"><strong>Mega Cap ($200B+)</strong> Apple, Microsoft, NVIDIA, Alphabet. The most liquid stocks in the world. Institutional money flows freely. Prices are harder to move — which means less volatility but also less explosive upside.</div>
+<div class="learn-callout"><strong>Large Cap ($10B–$200B)</strong> Established, profitable businesses with proven models. Lower failure risk than smaller companies. The sweet spot for most long-term investors.</div>
+<div class="learn-callout"><strong>Mid Cap ($2B–$10B)</strong> Companies past their startup phase but still growing meaningfully. Higher risk than large caps but often better growth trajectories.</div>
+<div class="learn-callout"><strong>Small Cap ($300M–$2B)</strong> Fastest potential growth, highest failure rate. Institutional investors often cannot own them due to liquidity constraints — creating opportunities for individual investors who do their research.</div>
+<h3>Price per share tells you nothing about size</h3><p>Amazon at $200/share is a larger company than many stocks priced at $2,000 — because Amazon has far more shares outstanding. Berkshire Hathaway Class A trades at over $600,000 per share and is a large company; a $2 penny stock with 100 million shares is a $200M company. Always look at market cap, not share price, when evaluating size.</p>
+<h3>Market cap vs enterprise value</h3><p>Market cap ignores debt and cash. <strong>Enterprise Value (EV)</strong> adds debt and subtracts cash — representing the true acquisition cost. A company with $1B market cap and $500M debt is worth $1.5B to acquire. EV is more accurate for comparing companies with different capital structures.</p>`
   },
   charts: {
-    title: 'Reading Stock Charts',
-    body: `<p>Charts visualize price movement over time. Understanding them helps you spot trends and time entries and exits better.</p>
-<h3>Line vs Candlestick</h3>
-<p>A <strong>line chart</strong> connects closing prices — simple, good for spotting trends. A <strong>candlestick</strong> shows open, high, low, and close for each period. Green candles = price went up. Red = went down.</p>
-<h3>Support &amp; Resistance</h3>
-<p><strong>Support</strong> is a price floor — the level buyers step in. <strong>Resistance</strong> is a ceiling where sellers appear. When price breaks through resistance, it often becomes new support.</p>
-<h3>Trends</h3>
-<p><strong>Uptrend:</strong> higher highs and higher lows. <strong>Downtrend:</strong> lower highs and lower lows. Trading with the trend is generally safer than against it.</p>
-<h3>Volume</h3>
-<p>High volume on a price move confirms it. Low volume moves are often fake-outs. Always check volume when a stock breaks a key level.</p>`
+    tag: 'Technical Analysis', title: 'Reading Stock Charts',
+    subtitle: 'Charts are a visual record of every trade ever made in a stock. Learning to read them helps you identify trends, time entries, and manage risk — skills that separate systematic traders from guesswork.',
+    body: `<h3>Line charts vs Candlesticks</h3><p>A <strong>line chart</strong> connects each day's closing price — clean, good for identifying long-term trends. A <strong>candlestick chart</strong> shows four data points per period: open, high, low, and close. The body of the candle spans open to close. Green (or white) bodies mean price closed higher than open. Red (or black) bodies mean it closed lower. The thin wicks above and below show the intraday high and low.</p>
+<h3>Support and resistance</h3><p><strong>Support</strong> is a price level where buying consistently appears — the floor where sellers run out of ammunition. <strong>Resistance</strong> is the ceiling where selling pressure overwhelms buyers. These levels form because of human psychology: people who bought at $50 and watched it fall to $40 will sell when it recovers to $50, creating resistance. When a resistance level breaks on high volume, it often flips to become new support.</p>
+<h3>Trend identification</h3><p>An <strong>uptrend</strong> is a series of higher highs and higher lows. A <strong>downtrend</strong> is a series of lower highs and lower lows. A <strong>sideways trend</strong> (consolidation) is when price chops between defined support and resistance. Trading in the direction of the trend is the simplest edge in technical analysis. Fighting a trend is the fastest way to lose money.</p>
+<h3>Moving averages</h3><p>A <strong>moving average</strong> smooths price data to remove noise. The <strong>50-day MA</strong> and <strong>200-day MA</strong> are watched by institutional investors worldwide. When the 50-day crosses above the 200-day, it is called a <strong>golden cross</strong> — a bullish signal. The reverse is a <strong>death cross</strong> — bearish. Price consistently above the 200-day MA means the stock is in a long-term uptrend.</p>
+<h3>Volume confirms moves</h3><p>A price breakout on high volume is far more significant than one on thin volume. Volume measures conviction. If a stock breaks to a new high on 3x average daily volume, large institutions are buying. If it breaks out on 20% of average volume, it may be a false breakout that reverses quickly. Always confirm price moves with volume analysis.</p>
+<div class="learn-callout"><strong>The most important lesson in technical analysis</strong>No setup works 100% of the time. Technical analysis is about probabilities, not certainties. The best traders are right 55–60% of the time and manage losses aggressively when they are wrong. Risk management — position sizing and stop losses — matters more than entry precision.</div>`
   },
   diversify: {
-    title: 'Diversification',
-    body: `<p>Diversification means spreading your money across many investments so one bad pick doesn't wipe you out. It's the only free lunch in investing.</p>
-<h3>Across Sectors</h3>
-<p>If you hold only tech stocks and tech crashes, your whole portfolio crashes. Owning Finance, Healthcare, Energy, and Consumer stocks means a bad quarter in one sector is cushioned by others.</p>
-<h3>Across Asset Classes</h3>
-<p>Stocks, bonds, real estate, and commodities (gold, oil) often move differently. Adding bonds gives stability during stock market crashes.</p>
-<h3>The Rule of Thumb</h3>
-<p>Most financial advisors suggest holding 20–30 individual stocks across at least 5 sectors, or simply buying broad ETFs like <strong>SPY</strong> (tracks S&P 500) or <strong>QQQ</strong> (tracks NASDAQ-100) for instant diversification.</p>
-<h3>Over-Diversification</h3>
-<p>Holding 100+ stocks reduces your ability to beat the market. The top positions in your portfolio drive most of your returns. Don't diversify away performance.</p>`
+    tag: 'Strategy', title: 'Diversification',
+    subtitle: 'Diversification is the process of spreading capital across uncorrelated assets to reduce the risk that any single failure destroys your portfolio. Nobel laureate Harry Markowitz called it "the only free lunch in investing."',
+    body: `<h3>The core problem: correlation</h3><p>If every position in your portfolio moves up and down together, you are taking concentrated risk — not diversified risk. True diversification requires assets that do not correlate with each other. When one falls, another holds steady or rises, smoothing your overall returns.</p>
+<h3>Diversifying across sectors</h3><p>Technology stocks tend to rise and fall together. If you hold only AAPL, MSFT, NVDA, and GOOGL, a tech selloff wipes out your entire portfolio simultaneously. Holding positions across Technology, Healthcare, Finance, Energy, Consumer Staples, and Industrials means sector-specific downturns are cushioned by holdings unaffected by that theme.</p>
+<h3>Diversifying across asset classes</h3><p>Stocks and bonds have historically moved inversely — when equities fall sharply, investors flee to government bonds, pushing bond prices up. A portfolio of 70% stocks and 30% bonds captures most of the equity upside while dramatically reducing drawdowns during market crashes. Gold and real estate add further uncorrelated exposure.</p>
+<div class="learn-callout"><strong>The 2022 example</strong>A pure equity portfolio fell 18–20% in 2022. A 60/40 stock-bond portfolio fell roughly 16%. A portfolio also including REITs and commodities (energy stocks, gold) fell only 8–10% — demonstrating how sector and asset class diversification limits damage.</div>
+<h3>How many stocks?</h3><p>Research shows that 20–30 stocks across uncorrelated sectors captures roughly 90% of the diversification benefit of holding 500 stocks. Beyond 40–50 holdings, you are essentially running an expensive index fund. Concentrated positions in your highest-conviction ideas — while still maintaining sector breadth — is the approach used by most successful active managers.</p>
+<h3>The cost of over-diversification</h3><p>If you own 150 stocks, your best performers have negligible impact on your total portfolio. A 200% return on a 0.5% position moves your portfolio by 1%. Diversification reduces risk — but it also dilutes reward. The goal is the minimum number of positions needed to reduce catastrophic risk, not the maximum number of positions possible.</p>
+<h3>Index ETFs as instant diversification</h3><p><strong>SPY</strong> holds all 500 S&P 500 companies for an expense ratio of 0.09%/year. <strong>VTI</strong> holds the entire US market — over 3,700 stocks. Decades of research show that most active fund managers underperform these simple index funds after fees. For most investors, a portfolio of 2–3 low-cost ETFs is the most rational approach.</p>`
   },
   terms: {
-    title: 'Key Stock Market Terms',
-    body: `<p>A quick glossary of the terms you'll hear most often:</p>
-<h3>Bull vs Bear</h3>
-<p><strong>Bull market:</strong> prices rising 20%+ from a recent low — optimism, growth. <strong>Bear market:</strong> prices falling 20%+ from a recent high — pessimism, contraction.</p>
-<h3>Dividend</h3>
-<p>A cash payment companies make to shareholders, usually quarterly. Expressed as a yield (annual dividend ÷ stock price). Mature companies like Coca-Cola pay reliable dividends.</p>
-<h3>Short Selling</h3>
-<p>Borrowing shares to sell now, hoping to buy them back cheaper later and pocket the difference. High risk — losses are theoretically unlimited if the price rises.</p>
-<h3>ETF</h3>
-<p>Exchange-Traded Fund — a basket of stocks that trades like a single stock. SPY holds all 500 S&P 500 companies. Great for passive investors.</p>
-<h3>EPS</h3>
-<p>Earnings Per Share — company profit divided by shares outstanding. Growing EPS over time is a sign of a healthy business.</p>
-<h3>52-Week High/Low</h3>
-<p>The highest and lowest price a stock hit in the past year. Breaking above the 52W high is a bullish signal; falling to a new low is bearish.</p>`
+    tag: 'Reference', title: 'Key Terms Glossary',
+    subtitle: 'The financial industry has a vocabulary designed, sometimes unintentionally, to confuse outsiders. These are the terms that appear in every earnings call, analyst report, and trading desk conversation.',
+    body: `<h3>Bull and Bear Markets</h3><p>A <strong>bull market</strong> is a sustained rise of 20% or more from a recent low — characterized by optimism, economic expansion, and rising corporate earnings. A <strong>bear market</strong> is a decline of 20% or more from a recent peak — characterized by fear, economic contraction, or recession. The average bull market lasts about 4 years. The average bear market lasts about 10 months.</p>
+<h3>Earnings Per Share (EPS)</h3><p>Net income divided by shares outstanding. If a company earned $10 billion and has 10 billion shares outstanding, EPS is $1.00. Growing EPS — sustainably, not through accounting tricks — is the most reliable indicator of a healthy, compounding business. Analysts forecast EPS every quarter; beating or missing those forecasts drives violent short-term price swings.</p>
+<h3>Dividends and Dividend Yield</h3><p>A <strong>dividend</strong> is a cash payment distributed to shareholders, typically quarterly. <strong>Yield = Annual Dividend ÷ Stock Price</strong>. A $50 stock paying $2/year has a 4% yield. Companies with long histories of raising dividends — the "Dividend Aristocrats" — are generally seen as financial quality markers. Note: a very high yield (8%+) often signals the market expects a dividend cut.</p>
+<h3>Short Selling</h3><p>Borrowing shares from a broker and immediately selling them, then buying them back later at (hopefully) a lower price. Profit = sale price minus repurchase price. Risk is theoretically unlimited because a stock can rise infinitely. Short selling is how investors profit from overvalued companies — and how fraud is exposed. It is also extremely dangerous and not appropriate for most investors.</p>
+<h3>ETF vs Mutual Fund</h3><p>Both are baskets of securities. An <strong>ETF (Exchange-Traded Fund)</strong> trades on an exchange throughout the day like a stock, has lower fees, and is more tax-efficient. A <strong>mutual fund</strong> is priced once daily at market close and often carries higher fees. For most retail investors, ETFs are the superior vehicle.</p>
+<h3>Volume and Liquidity</h3><p><strong>Volume</strong> is the number of shares traded in a given period. <strong>Liquidity</strong> is how easily you can buy or sell without moving the price. Apple trades hundreds of millions of shares daily — you can execute any reasonable order instantly. A small-cap stock trading 50,000 shares/day has low liquidity: a large order will move the price against you.</p>
+<h3>52-Week High / Low</h3><p>The highest and lowest price a stock reached in the past 52 weeks. Stocks breaking to new 52-week highs often continue rising — there is no overhead resistance from investors waiting to "get out even." Conversely, stocks making new 52-week lows often continue falling as holders capitulate.</p>
+<h3>Beta</h3><p>A measure of a stock's volatility relative to the market. <strong>Beta of 1.0</strong> moves with the market. <strong>Beta &gt; 1.0</strong> is more volatile (a 1.5 beta stock tends to move 50% more than the market in either direction). <strong>Beta &lt; 1.0</strong> is less volatile — useful for defensive positioning in uncertain markets. Utilities and consumer staples tend to have low beta.</p>`
   }
 }
 
@@ -1907,7 +2317,9 @@ function openArticle(id) {
   const art = ARTICLES[id]; if (!art) return
   document.getElementById('learn-home').style.display = 'none'
   document.getElementById('learn-article').style.display = 'flex'
+  document.getElementById('art-tag').textContent = art.tag
   document.getElementById('art-title').textContent = art.title
+  document.getElementById('art-subtitle').textContent = art.subtitle
   document.getElementById('art-body').innerHTML = art.body
 }
 
