@@ -497,7 +497,7 @@ td:nth-child(2){text-align:left}
       </div>
       <div id="pm-err" style="color:var(--red);font-size:12px;min-height:16px"></div>
       <button onclick="submitPremium()" style="width:100%;padding:11px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Subscribe — $5.99/mo</button>
-      <div style="font-size:10px;color:var(--t3);text-align:center">Simulated payment · No real charge</div>
+      <div style="font-size:10px;color:var(--t3);text-align:center">Payments are currently unavailable.</div>
     </div>
 
     <!-- Success state -->
@@ -2362,13 +2362,8 @@ function submitPremium() {
   if (card.length < 16) { err.textContent = 'Enter a valid 16-digit card number.'; return }
   if (!/^\d{2}\/\d{2}$/.test(exp)) { err.textContent = 'Enter expiry as MM/YY.'; return }
   if (cvv.length < 3) { err.textContent = 'Enter a valid CVV.'; return }
-  err.textContent = ''
-  isPremium = true
-  localStorage.setItem('syntharix_stock_premium', 'true')
-  document.getElementById('pm-form').style.display = 'none'
-  document.getElementById('pm-success').style.display = 'block'
-  document.getElementById('premium-btn').textContent = 'Active'
-  document.getElementById('premium-btn').style.background = 'var(--green)'
+  err.style.color = 'var(--t2)'
+  err.textContent = 'Not set up to accept payments at this time.'
 }
 
 window.addEventListener('load', () => {
