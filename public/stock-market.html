@@ -2269,6 +2269,10 @@ function fmtDateDisplay(d) {
 function advanceDate(dateStr, days) {
   const d = new Date(dateStr + 'T12:00:00Z')
   d.setDate(d.getDate() + days)
+  // Skip weekends — advance Sat→Mon, Sun→Mon
+  const dow = d.getUTCDay()
+  if (dow === 0) d.setDate(d.getDate() + 1)
+  else if (dow === 6) d.setDate(d.getDate() + 2)
   return d.toISOString().split('T')[0]
 }
 
@@ -2320,9 +2324,8 @@ function withTimeout(promise, ms) {
 }
 
 async function yahooHistorical(sym, targetUnix) {
-  // Fetch a 14-day window ending at targetDate so we always capture the nearest trading day
-  const from = targetUnix - 86400 * 14
-  const to   = targetUnix + 86400      // +1 day buffer for timezone edge cases
+  const from = targetUnix - 86400 * 30
+  const to   = targetUnix + 86400
   const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&period1=${from}&period2=${to}&includePrePost=false`
 
   const attempts = [
@@ -2366,25 +2369,17 @@ async function fetchHistoricalPrice(sym, dateStr) {
   if (tmFetched.has(key)) return
   tmFetched.add(key)
 
-  const setRowMsg = (html) => {
-    const el = document.getElementById('tmr-' + sym)
-    if (!el) return
-    el.innerHTML = `
-      <td style="text-align:left;padding-left:14px"><div class="sym">${sym}</div></td>
-      <td colspan="5">${html}</td>
-      <td><button onclick="tmRemoveStock('${sym}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 6px">✕</button></td>`
-  }
-
   const targetUnix = dateToUnix(dateStr)
   const result = await yahooHistorical(sym, targetUnix)
 
   if (result) {
     tmPrices[sym] = result.close
     tmOpens[sym]  = result.open
-    renderTmRow(sym)
-  } else {
-    setRowMsg('<span style="color:var(--t3);font-size:11px">No data for this date</span>')
+  } else if (tmPrices[sym]) {
+    // Carry forward last known price (holiday, proxy failure, etc.)
+    tmOpens[sym] = tmPrices[sym]
   }
+  renderTmRow(sym)
 }
 
 async function loadTmPrices() {
@@ -2567,7 +2562,12 @@ function startTimeMachine() {
   if (tmStocks.length === 0) { toast('Add at least one stock first', 'err'); return }
 
   tmActive = true
-  tmCurrentDate = dateVal
+  // Snap to nearest trading day if user picked a weekend
+  const startD = new Date(dateVal + 'T12:00:00Z')
+  const dow = startD.getUTCDay()
+  if (dow === 0) startD.setDate(startD.getDate() + 1)
+  else if (dow === 6) startD.setDate(startD.getDate() + 2)
+  tmCurrentDate = startD.toISOString().split('T')[0]
   tmFetched.clear()
   Object.keys(tmPrices).forEach(k => delete tmPrices[k])
   Object.keys(tmOpens).forEach(k => delete tmOpens[k])
