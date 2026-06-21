@@ -1428,17 +1428,17 @@ function buildDetail() {
 
 async function yahooChart(sym, interval, from, to) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=${interval}&period1=${from}&period2=${to}&includePrePost=false`
-  const proxies = [
-    u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
-    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-    u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-    u => u,
+  const attempts = [
+    () => fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`)
+            .then(r => r.json()).then(j => JSON.parse(j.contents)),
+    () => fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`).then(r => r.json()),
+    () => fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`).then(r => r.json()),
+    () => fetch(url).then(r => r.json()),
   ]
-  for (const proxy of proxies) {
+  for (const attempt of attempts) {
     try {
-      const r = await withTimeout(fetch(proxy(url)).then(r => r.json()), 8000)
-      const raw = proxy === proxies[0] ? JSON.parse(r.contents) : r
-      const closes = raw?.chart?.result?.[0]?.indicators?.quote?.[0]?.close
+      const data = await withTimeout(attempt(), 8000)
+      const closes = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close
       if (closes && closes.length > 1) return closes.filter(v => v != null)
     } catch(e) {}
   }
