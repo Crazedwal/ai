@@ -2055,6 +2055,37 @@ function tmRemoveStock(sym) {
   renderTmTable()
 }
 
+function withTimeout(promise, ms) {
+  return Promise.race([promise, new Promise((_, r) => setTimeout(() => r(new Error('timeout')), ms))])
+}
+
+async function yahooHistorical(sym, from, to) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&period1=${from}&period2=${to}&includePrePost=false`
+
+  const attempts = [
+    () => fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`)
+            .then(r => r.json()).then(j => JSON.parse(j.contents)),
+    () => fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`).then(r => r.json()),
+    () => fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`).then(r => r.json()),
+    () => fetch(url).then(r => r.json()),
+  ]
+
+  for (const attempt of attempts) {
+    try {
+      const data = await withTimeout(attempt(), 9000)
+      const result = data?.chart?.result?.[0]
+      const closes = result?.indicators?.quote?.[0]?.close
+      const opens  = result?.indicators?.quote?.[0]?.open
+      if (closes?.length) {
+        const close = [...closes].reverse().find(v => v != null)
+        const open  = [...(opens || [])].reverse().find(v => v != null)
+        if (close) return { close, open: open || close }
+      }
+    } catch(e) { /* try next */ }
+  }
+  return null
+}
+
 async function fetchHistoricalPrice(sym, dateStr) {
   const key = sym + '_' + dateStr
   if (tmFetched.has(key)) return
@@ -2063,7 +2094,6 @@ async function fetchHistoricalPrice(sym, dateStr) {
   const setRowMsg = (html) => {
     const el = document.getElementById('tmr-' + sym)
     if (!el) return
-    // rebuild row with placeholder cells so we can set message in cell[1]
     el.innerHTML = `
       <td style="text-align:left;padding-left:14px"><div class="sym">${sym}</div></td>
       <td colspan="5">${html}</td>
@@ -2073,46 +2103,14 @@ async function fetchHistoricalPrice(sym, dateStr) {
   const from = dateToUnix(dateStr) - 86400 * 7
   const to   = dateToUnix(dateStr) + 86400 * 2
 
-  // Try Finnhub first
-  try {
-    const res = await fetch(`${BASE}/stock/candle?symbol=${sym}&resolution=D&from=${from}&to=${to}&token=${API_KEY}`)
-    if (res.ok) {
-      const d = await res.json()
-      if (d && d.s === 'ok' && d.c && d.c.length > 0) {
-        tmPrices[sym] = d.c[d.c.length - 1]
-        tmOpens[sym]  = d.o[d.o.length - 1]
-        renderTmRow(sym)
-        return
-      }
-    }
-  } catch(e) {}
-
-  // Finnhub failed — fall back to Yahoo Finance via CORS proxy
-  try {
-    const PROXY = 'https://api.allorigins.win/get?url='
-    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&period1=${from}&period2=${to}`
-    const res = await fetch(PROXY + encodeURIComponent(yahooUrl))
-    if (res.ok) {
-      const wrapper = await res.json()
-      const data = JSON.parse(wrapper.contents)
-      const result = data?.chart?.result?.[0]
-      const closes = result?.indicators?.quote?.[0]?.close
-      const opens  = result?.indicators?.quote?.[0]?.open
-      if (closes && closes.length > 0) {
-        // get last non-null values
-        const close = [...closes].reverse().find(v => v != null)
-        const open  = [...opens].reverse().find(v => v != null)
-        if (close) {
-          tmPrices[sym] = close
-          tmOpens[sym]  = open || close
-          renderTmRow(sym)
-          return
-        }
-      }
-    }
-  } catch(e) {}
-
-  setRowMsg('<span style="color:var(--t3);font-size:11px">No historical data available for this date</span>')
+  const result = await yahooHistorical(sym, from, to)
+  if (result) {
+    tmPrices[sym] = result.close
+    tmOpens[sym]  = result.open
+    renderTmRow(sym)
+  } else {
+    setRowMsg('<span style="color:var(--t3);font-size:11px">No data available for this date</span>')
+  }
 }
 
 async function loadTmPrices() {
